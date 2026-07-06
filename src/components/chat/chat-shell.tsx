@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import type { Dictionary, Locale } from "@/i18n/types";
+import type { Locale } from "@/i18n/types";
 import { ConversationSidebar, type ConversationItem } from "./conversation-sidebar";
 import { ChatRoom } from "./chat-room";
 
@@ -36,11 +36,9 @@ const defaultConversations: ConversationItem[] = [
 
 export function ChatShell({
   locale,
-  dictionary,
   groupId,
 }: {
   locale: Locale;
-  dictionary: Dictionary;
   groupId: number;
 }) {
   const conversations = useMemo(() => defaultConversations, []);
@@ -49,12 +47,11 @@ export function ChatShell({
     <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[340px_1fr] lg:px-6">
       <ConversationSidebar
         locale={locale}
-        dictionary={dictionary}
+        appName="Tiny Chat"
         conversations={conversations}
         activeGroupId={groupId}
       />
-      <ChatRoom locale={locale} dictionary={dictionary} groupId={groupId} />
+      <ChatRoom locale={locale} groupId={groupId} />
     </div>
   );
 }
-

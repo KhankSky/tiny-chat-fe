@@ -31,6 +31,33 @@ export async function apiPost<TResponse, TBody>(
   return payload.data;
 }
 
+export async function apiPut<TResponse, TBody>(
+  path: string,
+  body: TBody,
+): Promise<TResponse> {
+  const token = getAccessToken();
+  const response = await fetch(`${API_BASE_URL}${path}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+
+  const payload = (await response.json()) as ApiResponse<TResponse>;
+
+  if (!response.ok) {
+    throw new Error(payload.message || "Something went wrong");
+  }
+
+  if (!payload.data) {
+    throw new Error(payload.message || "Missing response data");
+  }
+
+  return payload.data;
+}
+
 export async function apiGet<TResponse>(path: string): Promise<TResponse> {
   const token = getAccessToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {

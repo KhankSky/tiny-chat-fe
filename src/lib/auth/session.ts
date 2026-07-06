@@ -25,3 +25,9 @@ export function getStoredAuthUser() {
     return null;
   }
 }
+
+export function clearAuthSession() {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(AUTH_USER_KEY);
+}

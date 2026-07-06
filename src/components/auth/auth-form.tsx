@@ -42,7 +42,9 @@ export function AuthForm({
       );
 
       persistAuthSession(user);
-      router.push(user.profileCompleted ? `/${locale}/app` : `/${locale}/auth/complete-profile`);
+      router.push(
+        user.profileCompleted ? `/${locale}/conversations` : `/${locale}/auth/complete-profile`,
+      );
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);

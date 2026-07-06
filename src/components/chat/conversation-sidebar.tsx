@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Dictionary, Locale } from "@/i18n/types";
+import type { Locale } from "@/i18n/types";
 
 export type ConversationItem = {
   groupId: number;
@@ -13,12 +13,12 @@ export type ConversationItem = {
 
 export function ConversationSidebar({
   locale,
-  dictionary,
+  appName,
   conversations,
   activeGroupId,
 }: {
   locale: Locale;
-  dictionary: Dictionary;
+  appName: string;
   conversations: ConversationItem[];
   activeGroupId: number;
 }) {
@@ -26,7 +26,7 @@ export function ConversationSidebar({
     <aside className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-slate-950/85">
       <div className="border-b border-white/10 p-5">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
-          {dictionary.appName}
+          {appName}
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-white">
           {locale === "vi" ? "Cuộc hội thoại" : "Conversations"}
@@ -45,7 +45,7 @@ export function ConversationSidebar({
             return (
               <Link
                 key={conversation.groupId}
-                href={`/${locale}/groups/${conversation.groupId}`}
+                href={`/${locale}/conversations/${conversation.groupId}`}
                 className={`block rounded-3xl border p-4 transition ${
                   active
                     ? "border-cyan-400/40 bg-cyan-400/10"
@@ -79,4 +79,3 @@ export function ConversationSidebar({
     </aside>
   );
 }
-
