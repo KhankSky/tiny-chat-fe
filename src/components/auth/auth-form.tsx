@@ -6,10 +6,19 @@ import { useRouter } from "next/navigation";
 import { apiPost } from "@/lib/api/client";
 import type { AuthUserResponse } from "@/lib/api/types";
 import { persistAuthSession } from "@/lib/auth/session";
+import type { Dictionary, Locale } from "@/i18n/types";
 
 type Mode = "login" | "register";
 
-export function AuthForm({ mode }: { mode: Mode }) {
+export function AuthForm({
+  mode,
+  dictionary,
+  locale,
+}: {
+  mode: Mode;
+  dictionary: Dictionary;
+  locale: Locale;
+}) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,10 +42,10 @@ export function AuthForm({ mode }: { mode: Mode }) {
       );
 
       persistAuthSession(user);
-      router.push(user.profileCompleted ? "/app" : "/auth/complete-profile");
+      router.push(user.profileCompleted ? `/${locale}/app` : `/${locale}/auth/complete-profile`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Request failed");
+      setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);
     } finally {
       setLoading(false);
     }
@@ -46,7 +55,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
     <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-200" htmlFor="email">
-          Email
+          {dictionary.auth.emailLabel}
         </label>
         <input
           id="email"
@@ -54,7 +63,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50"
-          placeholder="you@example.com"
+          placeholder={dictionary.auth.emailPlaceholder}
           autoComplete="email"
           required
         />
@@ -62,7 +71,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
 
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-200" htmlFor="password">
-          Password
+          {dictionary.auth.passwordLabel}
         </label>
         <input
           id="password"
@@ -70,7 +79,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50"
-          placeholder="••••••••"
+          placeholder={dictionary.auth.passwordPlaceholder}
           autoComplete={isLogin ? "current-password" : "new-password"}
           required
         />
@@ -87,7 +96,11 @@ export function AuthForm({ mode }: { mode: Mode }) {
         disabled={loading}
         className="inline-flex w-full items-center justify-center rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading ? "Please wait..." : isLogin ? "Login" : "Create account"}
+        {loading
+          ? dictionary.auth.loading
+          : isLogin
+            ? dictionary.auth.loginButton
+            : dictionary.auth.registerButton}
       </button>
     </form>
   );
