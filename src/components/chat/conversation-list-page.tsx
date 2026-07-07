@@ -1,23 +1,64 @@
 "use client";
 
 import Link from "next/link";
-import type { ConversationItem } from "./conversation-sidebar";
+import { useEffect, useState } from "react";
+import { apiGet } from "@/lib/api/client";
 import type { Locale } from "@/i18n/types";
+
+type ConversationResponse = {
+  conversationId: number;
+  groupId: number;
+  title: string;
+  description: string | null;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+  memberCount: number;
+};
 
 export function ConversationListPage({
   locale,
   title,
   description,
-  conversations,
 }: {
   locale: Locale;
   title: string;
   description: string;
-  conversations: ConversationItem[];
 }) {
+  const [conversations, setConversations] = useState<ConversationResponse[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadConversations() {
+      try {
+        setLoading(true);
+        const data = await apiGet<ConversationResponse[]>("/api/conversations");
+        if (active) {
+          setConversations(data);
+        }
+      } catch (err) {
+        if (active) {
+          setError(err instanceof Error ? err.message : "Could not load conversations");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadConversations();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
   return (
-    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[340px_1fr] lg:px-6">
-      <aside className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-slate-950/85">
+    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[360px_1fr] lg:px-6">
+      <aside className="flex h-full flex-col rounded-lg border border-white/10 bg-slate-950/85">
         <div className="border-b border-white/10 p-5">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
             Tiny Chat
@@ -27,12 +68,32 @@ export function ConversationListPage({
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">
+          {loading ? (
+            <p className="px-3 py-4 text-sm text-slate-400">
+              {locale === "vi" ? "Đang tải..." : "Loading..."}
+            </p>
+          ) : null}
+
+          {error ? (
+            <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              {error}
+            </p>
+          ) : null}
+
+          {!loading && !error && conversations.length === 0 ? (
+            <p className="px-3 py-4 text-sm leading-7 text-slate-400">
+              {locale === "vi"
+                ? "Bạn chưa có cuộc trò chuyện nào."
+                : "You do not have any conversations yet."}
+            </p>
+          ) : null}
+
           <div className="space-y-2">
             {conversations.map((conversation) => (
               <Link
-                key={conversation.groupId}
-                href={`/${locale}/conversations/${conversation.groupId}`}
-                className="block rounded-3xl border border-transparent bg-white/0 p-4 transition hover:border-white/10 hover:bg-white/5"
+                key={conversation.conversationId}
+                href={`/${locale}/conversations/${conversation.conversationId}`}
+                className="block rounded-lg border border-transparent p-4 transition hover:border-white/10 hover:bg-white/5"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -40,18 +101,22 @@ export function ConversationListPage({
                       {conversation.title}
                     </p>
                     <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-400">
-                      {conversation.preview}
+                      {conversation.lastMessage ||
+                        conversation.description ||
+                        (locale === "vi" ? "Chưa có tin nhắn." : "No messages yet.")}
                     </p>
                   </div>
-                  {conversation.unreadCount ? (
-                    <span className="rounded-full bg-cyan-400 px-2.5 py-1 text-xs font-semibold text-slate-950">
-                      {conversation.unreadCount}
-                    </span>
-                  ) : null}
+                  <span className="shrink-0 rounded-full border border-white/10 px-2 py-1 text-xs text-slate-400">
+                    {conversation.memberCount}
+                  </span>
                 </div>
                 <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                  <span>#{conversation.groupId}</span>
-                  <span>{conversation.updatedAt}</span>
+                  <span>#{conversation.conversationId}</span>
+                  <span>
+                    {conversation.lastMessageAt
+                      ? new Date(conversation.lastMessageAt).toLocaleString()
+                      : ""}
+                  </span>
                 </div>
               </Link>
             ))}
@@ -59,25 +124,19 @@ export function ConversationListPage({
         </div>
       </aside>
 
-      <main className="flex min-h-[calc(100vh-2rem)] flex-col justify-center rounded-[2rem] border border-white/10 bg-slate-950/80 p-8 text-white">
+      <main className="flex min-h-[calc(100vh-2rem)] flex-col justify-center rounded-lg border border-white/10 bg-slate-950/80 p-8 text-white">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
           Tiny Chat
         </p>
-        <h2 className="mt-4 text-3xl font-semibold">Inbox ready</h2>
+        <h2 className="mt-4 text-3xl font-semibold">
+          {locale === "vi" ? "Chọn một cuộc trò chuyện" : "Select a conversation"}
+        </h2>
         <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
-          Pick a conversation on the left. This route is the Messenger-style entry
-          point before opening the actual thread.
+          {locale === "vi"
+            ? "Danh sách bên trái được lấy từ backend theo tài khoản đang đăng nhập."
+            : "The list on the left is loaded from the backend for the signed-in user."}
         </p>
-        <div className="mt-8">
-          <Link
-            href={`/${locale}/conversations/1`}
-            className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-          >
-            Open first conversation
-          </Link>
-        </div>
       </main>
     </div>
   );
 }
-

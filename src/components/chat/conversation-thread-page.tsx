@@ -1,7 +1,32 @@
 "use client";
 
-import { ChatRoom } from "./chat-room";
+import { useEffect, useState } from "react";
+import { apiGet } from "@/lib/api/client";
 import type { Locale } from "@/i18n/types";
+import { ChatRoom } from "./chat-room";
+import { ConversationSidebar, type ConversationItem } from "./conversation-sidebar";
+
+type ConversationResponse = {
+  conversationId: number;
+  groupId: number;
+  title: string;
+  description: string | null;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+  memberCount: number;
+};
+
+function toConversationItem(conversation: ConversationResponse): ConversationItem {
+  return {
+    conversationId: conversation.conversationId,
+    groupId: conversation.groupId,
+    title: conversation.title,
+    preview: conversation.lastMessage || conversation.description || "No messages yet.",
+    updatedAt: conversation.lastMessageAt
+      ? new Date(conversation.lastMessageAt).toLocaleString()
+      : "",
+  };
+}
 
 export function ConversationThreadPage({
   locale,
@@ -10,22 +35,39 @@ export function ConversationThreadPage({
   locale: Locale;
   conversationId: number;
 }) {
-  return (
-    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[340px_1fr] lg:px-6">
-      <aside className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-slate-950/85 p-5 text-white">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
-          Tiny Chat
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold">
-          {locale === "vi" ? "Cuộc hội thoại" : "Conversations"}
-        </h1>
-        <p className="mt-2 text-sm leading-7 text-slate-400">
-          {locale === "vi"
-            ? "Danh sách phòng sẽ nằm ở đây."
-            : "Your conversation list can live here."}
-        </p>
-      </aside>
+  const [conversations, setConversations] = useState<ConversationItem[]>([]);
 
+  useEffect(() => {
+    let active = true;
+
+    async function loadConversations() {
+      try {
+        const data = await apiGet<ConversationResponse[]>("/api/conversations");
+        if (active) {
+          setConversations(data.map(toConversationItem));
+        }
+      } catch {
+        if (active) {
+          setConversations([]);
+        }
+      }
+    }
+
+    loadConversations();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  return (
+    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[360px_1fr] lg:px-6">
+      <ConversationSidebar
+        locale={locale}
+        appName="Tiny Chat"
+        conversations={conversations}
+        activeGroupId={conversationId}
+      />
       <ChatRoom locale={locale} groupId={conversationId} />
     </div>
   );

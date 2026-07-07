@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Locale } from "@/i18n/types";
 
 export type ConversationItem = {
+  conversationId?: number;
   groupId: number;
   title: string;
   preview: string;
@@ -42,10 +43,11 @@ export function ConversationSidebar({
         <div className="space-y-2">
           {conversations.map((conversation) => {
             const active = conversation.groupId === activeGroupId;
+            const conversationId = conversation.conversationId ?? conversation.groupId;
             return (
               <Link
-                key={conversation.groupId}
-                href={`/${locale}/conversations/${conversation.groupId}`}
+                key={conversationId}
+                href={`/${locale}/conversations/${conversationId}`}
                 className={`block rounded-3xl border p-4 transition ${
                   active
                     ? "border-cyan-400/40 bg-cyan-400/10"
