@@ -52,9 +52,13 @@ function createOptimisticMessage(
 export function ChatRoom({
   locale,
   groupId,
+  sidebarOpen,
+  onToggleSidebar,
 }: {
   locale: Locale;
   groupId: number;
+  sidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }) {
   const [messages, setMessages] = useState<LocalChatMessage[]>([]);
   const [content, setContent] = useState("");
@@ -111,50 +115,49 @@ export function ChatRoom({
         if (!active) return;
 
         setSocketStatus("connected");
-        unsubscribeRef.current = client.subscribe(
-          `/topic/groups/${groupId}/messages`,
-          (body) => {
-            if (!active) return;
-            try {
-              const nextMessage = parseChatMessage(body);
-              setMessages((prev) => {
-                if (prev.some((message) => message.messageId === nextMessage.messageId)) {
-                  return prev;
-                }
-                if (
-                  prev.some(
-                    (message) =>
-                      message.senderId === nextMessage.senderId &&
-                      message.content === nextMessage.content &&
-                      message.messageId < 0 &&
-                      Math.abs(
-                        new Date(message.sentAt).getTime() - new Date(nextMessage.sentAt).getTime(),
-                      ) < 15_000,
-                  )
-                ) {
-                  return prev.map((message) =>
-                    message.messageId < 0 &&
+        unsubscribeRef.current = client.subscribe(`/topic/groups/${groupId}/messages`, (body) => {
+          if (!active) return;
+          try {
+            const nextMessage = parseChatMessage(body);
+            setMessages((prev) => {
+              if (prev.some((message) => message.messageId === nextMessage.messageId)) {
+                return prev;
+              }
+
+              if (
+                prev.some(
+                  (message) =>
                     message.senderId === nextMessage.senderId &&
-                    message.content === nextMessage.content
-                      ? nextMessage
-                      : message,
-                  );
-                }
-                return [...prev, nextMessage];
-              });
-            } catch (error) {
-              logClientError("Received invalid chat data", {
-                groupId,
-                error: error instanceof Error ? error.message : "Unknown error",
-              });
-              setSocketError(
-                locale === "vi"
-                  ? "Nhận dữ liệu chat không hợp lệ."
-                  : "Received invalid chat data.",
-              );
-            }
-          },
-        );
+                    message.content === nextMessage.content &&
+                    message.messageId < 0 &&
+                    Math.abs(
+                      new Date(message.sentAt).getTime() - new Date(nextMessage.sentAt).getTime(),
+                    ) < 15_000,
+                )
+              ) {
+                return prev.map((message) =>
+                  message.messageId < 0 &&
+                  message.senderId === nextMessage.senderId &&
+                  message.content === nextMessage.content
+                    ? nextMessage
+                    : message,
+                );
+              }
+
+              return [...prev, nextMessage];
+            });
+          } catch (messageError) {
+            logClientError("Received invalid chat data", {
+              groupId,
+              error: messageError instanceof Error ? messageError.message : "Unknown error",
+            });
+            setSocketError(
+              locale === "vi"
+                ? "Nhận dữ liệu chat không hợp lệ."
+                : "Received invalid chat data.",
+            );
+          }
+        });
       } catch (err) {
         if (active) {
           const message = err instanceof Error ? err.message : "Failed to load messages";
@@ -221,15 +224,25 @@ export function ChatRoom({
   }
 
   return (
-    <section className="flex min-h-[calc(100vh-3rem)] flex-col rounded-[2rem] border border-white/10 bg-slate-950/80">
-      <header className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-        <div>
-          <p className="text-sm text-slate-400">
-            {locale === "vi" ? "Phòng trò chuyện nhóm" : "Group conversation room"}
+    <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
+      <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
+            {locale === "vi" ? "Phòng trò chuyện" : "Conversation"}
           </p>
-          <h2 className="text-xl font-semibold text-white">Group #{groupId}</h2>
+          <h2 className="mt-2 truncate text-xl font-semibold text-white">Group #{groupId}</h2>
         </div>
         <div className="flex items-center gap-2">
+          {onToggleSidebar ? (
+            <button
+              type="button"
+              onClick={onToggleSidebar}
+              aria-label={sidebarOpen ? "Collapse info sidebar" : "Open info sidebar"}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+            >
+              {sidebarOpen ? ">" : "<"}
+            </button>
+          ) : null}
           <span
             className={`rounded-full border px-3 py-1 text-xs ${
               socketStatus === "connected"
@@ -263,7 +276,7 @@ export function ChatRoom({
         </div>
       </header>
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-4 py-5 sm:px-6">
         {loading ? (
           <p className="text-sm text-slate-400">
             {locale === "vi" ? "Đang tải..." : "Loading..."}
@@ -285,10 +298,7 @@ export function ChatRoom({
         {messages.map((message) => {
           const isMine = currentUser?.userId === message.senderId;
           return (
-            <div
-              key={message.messageId}
-              className={`flex ${isMine ? "justify-end" : "justify-start"}`}
-            >
+            <div key={message.messageId} className={`flex ${isMine ? "justify-end" : "justify-start"}`}>
               <div
                 className={`max-w-[75%] rounded-3xl px-4 py-3 text-sm leading-7 ${
                   isMine
@@ -309,7 +319,7 @@ export function ChatRoom({
         <div ref={bottomRef} />
       </div>
 
-      <div className="border-t border-white/10 p-4">
+      <div className="shrink-0 border-t border-white/10 bg-[#0b111c] p-4">
         <div className="flex gap-3">
           <input
             value={content}

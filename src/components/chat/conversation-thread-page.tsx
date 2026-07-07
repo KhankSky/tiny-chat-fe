@@ -37,6 +37,7 @@ export function ConversationThreadPage({
   conversationId: number;
 }) {
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [detailsOpen, setDetailsOpen] = useState(true);
 
   useEffect(() => {
     let active = true;
@@ -54,7 +55,7 @@ export function ConversationThreadPage({
       }
     }
 
-    loadConversations();
+    void loadConversations();
 
     return () => {
       active = false;
@@ -62,15 +63,33 @@ export function ConversationThreadPage({
   }, []);
 
   return (
-    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[340px_1fr_320px] lg:px-6">
-      <ConversationSidebar
-        locale={locale}
-        appName="Tiny Chat"
-        conversations={conversations}
-        activeGroupId={conversationId}
-      />
-      <ChatRoom locale={locale} groupId={conversationId} />
-      <GroupSidebar locale={locale} groupId={conversationId} />
+    <div className="h-screen w-full overflow-hidden bg-[#070d18] text-white">
+      <div
+        className={`grid h-full min-h-0 w-full ${
+          detailsOpen
+            ? "lg:grid-cols-[340px_minmax(0,1fr)_360px]"
+            : "lg:grid-cols-[340px_minmax(0,1fr)_72px]"
+        }`}
+      >
+        <ConversationSidebar
+          locale={locale}
+          appName="Tiny Chat"
+          conversations={conversations}
+          activeGroupId={conversationId}
+        />
+        <ChatRoom
+          locale={locale}
+          groupId={conversationId}
+          sidebarOpen={detailsOpen}
+          onToggleSidebar={() => setDetailsOpen((value) => !value)}
+        />
+        <GroupSidebar
+          locale={locale}
+          groupId={conversationId}
+          collapsed={!detailsOpen}
+          onToggle={() => setDetailsOpen((value) => !value)}
+        />
+      </div>
     </div>
   );
 }

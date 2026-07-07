@@ -12,15 +12,20 @@ function avatarFallback(name: string | null | undefined) {
 export function GroupSidebar({
   locale,
   groupId,
+  collapsed = false,
+  onToggle,
 }: {
   locale: Locale;
   groupId: number;
+  collapsed?: boolean;
+  onToggle?: () => void;
 }) {
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
+
     async function loadGroup() {
       try {
         const data = await apiGet<GroupDetailResponse>(`/api/groups/${groupId}/detail`);
@@ -38,24 +43,66 @@ export function GroupSidebar({
     };
   }, [groupId]);
 
-  return (
-    <aside className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-slate-950/85">
-      <div className="border-b border-white/10 p-5">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
-          {locale === "vi" ? "Thông tin nhóm" : "Group info"}
-        </p>
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/15 text-lg font-semibold text-cyan-200 ring-1 ring-inset ring-cyan-400/30">
+  if (collapsed) {
+    return (
+      <aside className="flex h-full min-h-0 w-[72px] flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
+        <div className="flex items-center justify-center border-b border-white/10 px-2 py-3">
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={locale === "vi" ? "Mở sidebar phải" : "Open right sidebar"}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+          >
+            &lt;
+          </button>
+        </div>
+
+        <div className="flex flex-1 flex-col items-center gap-4 px-2 py-4">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/15 text-lg font-semibold text-cyan-200 ring-1 ring-inset ring-cyan-400/30">
             {avatarFallback(group?.groupName)}
           </div>
+          <div
+            className="text-[10px] uppercase tracking-[0.45em] text-slate-500"
+            style={{ writingMode: "vertical-rl" }}
+          >
+            {locale === "vi" ? "Thông tin" : "Info"}
+          </div>
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={locale === "vi" ? "Mở sidebar phải" : "Open right sidebar"}
+            className="mt-auto inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+          >
+            &gt;
+          </button>
+        </div>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
+      <div className="border-b border-white/10 px-5 py-4">
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h2 className="truncate text-xl font-semibold text-white">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
+              {locale === "vi" ? "Thông tin nhóm" : "Group info"}
+            </p>
+            <h2 className="mt-2 truncate text-2xl font-semibold text-white">
               {group?.groupName || (locale === "vi" ? "Đang tải nhóm" : "Loading group")}
             </h2>
-            <p className="text-sm text-slate-400">
+            <p className="mt-1 text-sm text-slate-400">
               {locale === "vi" ? "Group ID" : "Group ID"}: {groupId}
             </p>
           </div>
+          <button
+            type="button"
+            onClick={onToggle}
+            aria-label={locale === "vi" ? "Thu gọn sidebar phải" : "Collapse right sidebar"}
+            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+          >
+            &gt;
+          </button>
         </div>
         {group?.groupDescription ? (
           <p className="mt-4 text-sm leading-7 text-slate-400">{group.groupDescription}</p>
@@ -66,12 +113,10 @@ export function GroupSidebar({
         <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
           {locale === "vi" ? "Số thành viên" : "Members"}
         </p>
-        <p className="mt-2 text-2xl font-semibold text-white">
-          {group?.memberCount ?? 0}
-        </p>
+        <p className="mt-2 text-2xl font-semibold text-white">{group?.memberCount ?? 0}</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="min-h-0 flex-1 overflow-y-auto p-3">
         {error ? (
           <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {error}

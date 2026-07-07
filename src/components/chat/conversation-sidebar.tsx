@@ -24,34 +24,36 @@ export function ConversationSidebar({
   activeGroupId: number;
 }) {
   return (
-    <aside className="flex h-full flex-col rounded-[2rem] border border-white/10 bg-slate-950/85">
-      <div className="border-b border-white/10 p-5">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
+    <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
+      <div className="border-b border-white/10 px-5 py-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
           {appName}
         </p>
         <h1 className="mt-2 text-2xl font-semibold text-white">
-          {locale === "vi" ? "Cuộc hội thoại" : "Conversations"}
+          {locale === "vi" ? "Đoạn chat" : "Chats"}
         </h1>
-        <p className="mt-2 text-sm leading-7 text-slate-400">
+        <p className="mt-2 text-sm leading-6 text-slate-400">
           {locale === "vi"
-            ? "Chọn một nhóm để mở khung chat."
-            : "Pick a group to open the chat pane."}
+            ? "Chọn một cuộc hội thoại để mở khung chat ở giữa màn hình."
+            : "Pick a conversation to open the center chat pane."}
         </p>
-        <Link
-          href={`/${locale}/groups/match`}
-          className="mt-4 inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-400/30 hover:bg-cyan-400/15"
-        >
-          {locale === "vi" ? "Tìm nhóm" : "Find a group"}
-        </Link>
-        <Link
-          href={`/${locale}/profile`}
-          className="mt-3 inline-flex rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5"
-        >
-          {locale === "vi" ? "Hồ sơ của tôi" : "My profile"}
-        </Link>
+        <div className="mt-4 flex gap-3">
+          <Link
+            href={`/${locale}/groups/match`}
+            className="inline-flex items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+          >
+            {locale === "vi" ? "Tìm nhóm" : "Find group"}
+          </Link>
+          <Link
+            href={`/${locale}/profile`}
+            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/10"
+          >
+            {locale === "vi" ? "Hồ sơ" : "Profile"}
+          </Link>
+        </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
         <div className="space-y-2">
           {conversations.map((conversation) => {
             const active = conversation.groupId === activeGroupId;
@@ -62,7 +64,7 @@ export function ConversationSidebar({
                 href={`/${locale}/conversations/${conversationId}`}
                 className={`block rounded-3xl border p-4 transition ${
                   active
-                    ? "border-cyan-400/40 bg-cyan-400/10"
+                    ? "border-cyan-400/40 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]"
                     : "border-transparent bg-white/0 hover:border-white/10 hover:bg-white/5"
                 }`}
               >
