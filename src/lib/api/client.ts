@@ -6,7 +6,7 @@ const API_BASE_URL =
 
 export async function apiPost<TResponse, TBody>(
   path: string,
-  body: TBody,
+  body?: TBody,
 ): Promise<TResponse> {
   const token = getAccessToken();
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -15,7 +15,7 @@ export async function apiPost<TResponse, TBody>(
       "Content-Type": "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
-    body: JSON.stringify(body),
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
 
   const payload = (await response.json()) as ApiResponse<TResponse>;

@@ -65,6 +65,23 @@ export function ConversationListPage({
           </p>
           <h1 className="mt-2 text-2xl font-semibold text-white">{title}</h1>
           <p className="mt-2 text-sm leading-7 text-slate-400">{description}</p>
+
+          <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
+            <p className="text-sm font-semibold text-white">
+              {locale === "vi" ? "Cần một nhóm mới?" : "Need a new group?"}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              {locale === "vi"
+                ? "Ghép nhóm theo level, mục tiêu và sở thích chỉ với một nút bấm."
+                : "Match by level, goal, and interests with a single tap."}
+            </p>
+            <Link
+              href={`/${locale}/groups/match`}
+              className="mt-4 inline-flex rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              {locale === "vi" ? "Tìm nhóm" : "Find a group"}
+            </Link>
+          </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-3">

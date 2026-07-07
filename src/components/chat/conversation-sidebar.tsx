@@ -37,6 +37,12 @@ export function ConversationSidebar({
             ? "Chọn một nhóm để mở khung chat."
             : "Pick a group to open the chat pane."}
         </p>
+        <Link
+          href={`/${locale}/groups/match`}
+          className="mt-4 inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-400/30 hover:bg-cyan-400/15"
+        >
+          {locale === "vi" ? "Tìm nhóm" : "Find a group"}
+        </Link>
       </div>
 
       <div className="flex-1 overflow-y-auto p-3">
