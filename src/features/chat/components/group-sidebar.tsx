@@ -177,15 +177,9 @@ export function GroupSidebar({
               alt={group?.groupName || t.loadingGroup}
             />
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-                {t.membersEyebrow}
-              </p>
-              <h2 className="mt-2 truncate text-xl font-semibold text-white">
+              <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
                 {group?.groupName || t.loadingGroup}
               </h2>
-              <p className="mt-1 text-sm text-slate-400">
-                {t.groupIdLabel}: {groupId}
-              </p>
             </div>
           </div>
           <Button
