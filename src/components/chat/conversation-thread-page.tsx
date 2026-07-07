@@ -5,6 +5,7 @@ import { apiGet } from "@/lib/api/client";
 import type { Locale } from "@/i18n/types";
 import { ChatRoom } from "./chat-room";
 import { ConversationSidebar, type ConversationItem } from "./conversation-sidebar";
+import { GroupSidebar } from "./group-sidebar";
 
 type ConversationResponse = {
   conversationId: number;
@@ -61,7 +62,7 @@ export function ConversationThreadPage({
   }, []);
 
   return (
-    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[360px_1fr] lg:px-6">
+    <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[340px_1fr_320px] lg:px-6">
       <ConversationSidebar
         locale={locale}
         appName="Tiny Chat"
@@ -69,6 +70,7 @@ export function ConversationThreadPage({
         activeGroupId={conversationId}
       />
       <ChatRoom locale={locale} groupId={conversationId} />
+      <GroupSidebar locale={locale} groupId={conversationId} />
     </div>
   );
 }

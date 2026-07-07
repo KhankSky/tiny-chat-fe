@@ -31,3 +31,32 @@ export type MatchGroupResponse = {
   matchedReason: string | null;
   joinedAt: string | null;
 };
+
+export type MeProfileResponse = {
+  id: number;
+  displayName: string | null;
+  avatarUrl: string | null;
+  email: string;
+  username: string;
+};
+
+export type UpdateMeProfileRequest = {
+  displayName: string | null;
+  avatarUrl: string | null;
+};
+
+export type GroupMemberResponse = {
+  userId: number;
+  displayName: string | null;
+  avatarUrl: string | null;
+  role: "OWNER" | "MEMBER";
+};
+
+export type GroupDetailResponse = {
+  groupId: number;
+  groupName: string | null;
+  groupDescription: string | null;
+  groupAvatarUrl: string | null;
+  memberCount: number;
+  members: GroupMemberResponse[];
+};
