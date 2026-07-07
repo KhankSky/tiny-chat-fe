@@ -8,6 +8,7 @@ import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Input } from "@/shared/ui/input";
+import { Modal } from "@/shared/ui/modal";
 
 function nameColor(index: number, offline: boolean) {
   const colors = [
@@ -74,13 +75,9 @@ function MemberRow({
 export function GroupSidebar({
   dictionary,
   groupId,
-  collapsed = false,
-  onToggle,
 }: {
   dictionary: Dictionary;
   groupId: number;
-  collapsed?: boolean;
-  onToggle?: () => void;
 }) {
   const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
@@ -88,7 +85,6 @@ export function GroupSidebar({
   const [isEditing, setIsEditing] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
-  const [groupAvatarUrl, setGroupAvatarUrl] = useState("");
   const [groupAvatarFile, setGroupAvatarFile] = useState<File | null>(null);
   const [groupAvatarPreviewUrl, setGroupAvatarPreviewUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -104,7 +100,6 @@ export function GroupSidebar({
           setGroup(data);
           setGroupName(data.groupName ?? "");
           setGroupDescription(data.groupDescription ?? "");
-          setGroupAvatarUrl(data.groupAvatarUrl ?? "");
         }
       } catch (err) {
         if (active) {
@@ -141,7 +136,6 @@ export function GroupSidebar({
     setSaveError(null);
     setGroupName(group?.groupName ?? "");
     setGroupDescription(group?.groupDescription ?? "");
-    setGroupAvatarUrl(group?.groupAvatarUrl ?? "");
     handleGroupAvatarChange(null);
   }
 
@@ -150,26 +144,19 @@ export function GroupSidebar({
     setSaveError(null);
 
     try {
-      let updated = group;
       if (groupAvatarFile) {
         const formData = new FormData();
         formData.append("file", groupAvatarFile);
-        updated = await uploadGroupAvatar(groupId, formData);
-      } else {
-        updated = await updateGroupDetail(groupId, {
-          groupAvatarUrl: groupAvatarUrl.trim() || null,
-        });
+        await uploadGroupAvatar(groupId, formData);
       }
 
       const nextGroup = await updateGroupDetail(groupId, {
         groupName: groupName.trim() || null,
         groupDescription: groupDescription.trim() || null,
-        groupAvatarUrl: updated?.groupAvatarUrl ?? (groupAvatarUrl.trim() || null),
       });
       setGroup(nextGroup);
       setGroupName(nextGroup.groupName ?? "");
       setGroupDescription(nextGroup.groupDescription ?? "");
-      setGroupAvatarUrl(nextGroup.groupAvatarUrl ?? "");
       handleGroupAvatarChange(null);
       setIsEditing(false);
     } catch (err) {
@@ -179,87 +166,88 @@ export function GroupSidebar({
     }
   }
 
-  if (collapsed) {
-    return (
-      <aside className="flex h-full min-h-0 w-[72px] flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
-        <div className="flex items-center justify-center border-b border-white/10 px-2 py-3">
-          <Button
-            type="button"
-            onClick={onToggle}
-            aria-label={t.openRightSidebar}
-            variant="icon"
-          >
-            &lt;
-          </Button>
-        </div>
-
-        <div className="flex flex-1 flex-col items-center gap-4 px-2 py-4">
-          <Avatar className="h-12 w-12 ring-1 ring-cyan-400/30" src={group?.groupAvatarUrl} alt={group?.groupName || t.loadingGroup} />
-          <div
-            className="text-[10px] uppercase tracking-[0.45em] text-slate-500"
-            style={{ writingMode: "vertical-rl" }}
-          >
-            {t.collapsedLabel}
-          </div>
-          <Button
-            type="button"
-            onClick={onToggle}
-            aria-label={t.openRightSidebar}
-            className="mt-auto"
-            variant="icon"
-          >
-            &gt;
-          </Button>
-        </div>
-      </aside>
-    );
-  }
-
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 gap-3">
-            <Avatar
-              className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30"
-              src={group?.groupAvatarUrl}
-              alt={group?.groupName || t.loadingGroup}
-            />
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="group/avatar relative h-13 w-13 shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
+              aria-label={t.editGroup}
+            >
+              <Avatar
+                className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30 transition-all duration-200 group-hover/avatar:opacity-60"
+                src={group?.groupAvatarUrl}
+                alt={group?.groupName || t.loadingGroup}
+              />
+              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity duration-200 group-hover/avatar:opacity-100 pointer-events-none">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="h-5 w-5 text-white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316A2.192 2.192 0 0 0 14.502 4h-5.004c-.53 0-1.027.27-1.316.732l-.822 1.317a2.3 2.3 0 0 1-1.64 1.055L6.827 6.175ZM12 9.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"
+                  />
+                </svg>
+              </div>
+            </button>
             <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-              {t.membersEyebrow}
-            </p>
+            {/*<p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">*/}
+            {/*  {t.membersEyebrow}*/}
+            {/*</p>*/}
             <h2 className="mt-2 truncate text-xl font-semibold text-white">
               {group?.groupName || t.loadingGroup}
             </h2>
-            <p className="mt-1 text-sm text-slate-400">
-              {t.groupIdLabel}: {groupId}
-            </p>
+            {/*<p className="mt-1 text-sm text-slate-400">*/}
+            {/*  {t.groupIdLabel}: {groupId}*/}
+            {/*</p>*/}
             </div>
           </div>
           <Button
             type="button"
-            onClick={() => setIsEditing((value) => !value)}
+            onClick={() => setIsEditing(true)}
             aria-label={t.editGroup}
-            className="shrink-0"
-            variant="secondary"
-          >
-            {t.editGroup}
-          </Button>
-          <Button
-            type="button"
-            onClick={onToggle}
-            aria-label={t.collapseRightSidebar}
             className="shrink-0"
             variant="icon"
           >
-            &gt;
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-5 w-5 text-slate-200"
+            >
+              <path d="M12 20h9" />
+              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+            </svg>
           </Button>
         </div>
-        {isEditing ? (
-          <div className="mt-4 space-y-3 rounded border border-white/10 bg-white/[0.03] p-3">
-            <label className="flex cursor-pointer items-center gap-3">
-              <Avatar className="h-14 w-14 shrink-0 ring-1 ring-cyan-400/30" src={groupAvatarPreviewUrl || group?.groupAvatarUrl} alt={group?.groupName || t.loadingGroup} />
+      </div>
+
+      {isEditing ? (
+        <Modal ariaLabel={t.editGroup} onClose={cancelEdit} className="max-w-md rounded-3xl p-5">
+          <div className="space-y-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
+                {t.membersEyebrow}
+              </p>
+              <h3 className="mt-2 text-xl font-semibold text-white">{t.editGroup}</h3>
+            </div>
+            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+              <Avatar className="h-16 w-16 shrink-0 ring-1 ring-cyan-400/30" src={groupAvatarPreviewUrl || group?.groupAvatarUrl} alt={group?.groupName || t.loadingGroup} />
               <span className="min-w-0 text-sm text-slate-300">
                 <span className="block font-medium text-white">{t.groupAvatarLabel}</span>
                 <span className="block truncate text-xs text-slate-400">
@@ -283,12 +271,6 @@ export function GroupSidebar({
               onChange={(event) => setGroupDescription(event.target.value)}
               placeholder={t.groupDescriptionPlaceholder}
             />
-            <Input
-              value={groupAvatarUrl}
-              onChange={(event) => setGroupAvatarUrl(event.target.value)}
-              placeholder={t.groupAvatarUrlPlaceholder}
-              disabled={Boolean(groupAvatarFile)}
-            />
             {saveError ? <ErrorMessage>{saveError}</ErrorMessage> : null}
             <div className="flex gap-2">
               <Button type="button" onClick={saveGroupDetail} disabled={isSaving}>
@@ -299,8 +281,8 @@ export function GroupSidebar({
               </Button>
             </div>
           </div>
-        ) : null}
-      </div>
+        </Modal>
+      ) : null}
 
       <div className="min-h-0 flex-1 overflow-y-auto py-4">
         {error ? (

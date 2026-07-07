@@ -71,7 +71,8 @@ export const vi = {
     emailLabel: "Email",
     passwordLabel: "Mật khẩu",
     displayNameLabel: "Tên hiển thị",
-    avatarUrlLabel: "Ảnh đại diện URL",
+    avatarUrlLabel: "Ảnh đại diện",
+    avatarUploadHint: "Bấm để tải ảnh lên",
     englishLevelLabel: "Trình độ tiếng Anh",
     practiceGoalLabel: "Mục tiêu luyện tập",
     interestsLabel: "Sở thích",
@@ -152,7 +153,6 @@ export const vi = {
       groupAvatarUploadHint: "Bấm để tải ảnh lên",
       groupNamePlaceholder: "Tên nhóm",
       groupDescriptionPlaceholder: "Mô tả nhóm",
-      groupAvatarUrlPlaceholder: "Avatar URL dự phòng",
       saveGroupError: "Không thể lưu nhóm",
     },
     profileModal: {
@@ -230,7 +230,9 @@ export const vi = {
     userIdLabel: "User ID",
     displayNameLabel: "Tên hiển thị",
     displayNamePlaceholder: "Khanh",
-    avatarUrlLabel: "Avatar URL",
+    avatarUrlLabel: "Ảnh đại diện",
+    avatarLabel: "Ảnh đại diện",
+    avatarUploadHint: "Bấm để tải ảnh lên",
     saveButton: "Lưu hồ sơ",
   },
   enums: {

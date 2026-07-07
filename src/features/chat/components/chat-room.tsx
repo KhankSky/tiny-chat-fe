@@ -15,15 +15,11 @@ export function ChatRoom({
   dictionary,
   groupId,
   currentUser = null,
-  sidebarOpen,
-  onToggleSidebar,
 }: {
   locale: Locale;
   dictionary: Dictionary;
   groupId: number;
   currentUser?: AuthUserResponse | null;
-  sidebarOpen?: boolean;
-  onToggleSidebar?: () => void;
 }) {
   const t = dictionary.chat;
   const {
@@ -48,18 +44,6 @@ export function ChatRoom({
           <h2 className="mt-2 truncate text-xl font-semibold text-white">Group #{groupId}</h2>
         </div>
         <div className="flex items-center gap-2">
-          {onToggleSidebar ? (
-            <Button
-              type="button"
-              onClick={onToggleSidebar}
-              aria-label={
-                sidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open
-              }
-              variant="icon"
-            >
-              {sidebarOpen ? ">" : "<"}
-            </Button>
-          ) : null}
           <StatusBadge
             tone={
               socketStatus === "connected"

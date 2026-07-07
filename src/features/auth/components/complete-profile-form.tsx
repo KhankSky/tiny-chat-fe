@@ -2,11 +2,13 @@
 
 import type { FormEvent } from "react";
 import type { ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { completeProfile } from "@/features/auth/api/auth-api";
+import { uploadMeAvatar } from "@/features/profile/api/profile-api";
 import type { CompleteProfileRequest } from "@/features/auth/types";
-import { persistAuthSession } from "@/shared/auth/session";
+import { Avatar } from "@/shared/ui/avatar";
+import { persistAuthSession, updateStoredAuthUser } from "@/shared/auth/session";
 import type { Dictionary, Locale } from "@/i18n/types";
 
 type ProfileRequest = CompleteProfileRequest;
@@ -49,7 +51,8 @@ export function CompleteProfileForm({
   const router = useRouter();
   const t = dictionary.auth;
   const [displayName, setDisplayName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
   const [bio, setBio] = useState("");
   const [englishLevel, setEnglishLevel] = useState<ProfileRequest["englishLevel"]>("LEVEL_A");
   const [practiceGoal, setPracticeGoal] =
@@ -66,6 +69,18 @@ export function CompleteProfileForm({
     );
   }
 
+  useEffect(() => {
+    return () => {
+      if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    };
+  }, [avatarPreviewUrl]);
+
+  function handleAvatarFileChange(file: File | null) {
+    if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    setAvatarFile(file);
+    setAvatarPreviewUrl(file ? URL.createObjectURL(file) : null);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
@@ -79,7 +94,7 @@ export function CompleteProfileForm({
     try {
       const user = await completeProfile({
         displayName,
-        avatarUrl: avatarUrl.trim() || null,
+        avatarUrl: null,
         englishLevel,
         practiceGoal,
         interests: selectedInterests,
@@ -87,6 +102,22 @@ export function CompleteProfileForm({
       });
 
       persistAuthSession(user);
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("file", avatarFile);
+        const uploaded = await uploadMeAvatar(formData);
+        persistAuthSession(
+          updateStoredAuthUser((stored) =>
+            stored
+              ? {
+                  ...stored,
+                  avatarUrl: uploaded.avatarUrl,
+                  displayName: uploaded.displayName,
+                }
+              : stored,
+          ) ?? user,
+        );
+      }
       router.replace(`/${locale}/conversations`);
       router.refresh();
     } catch (err) {
@@ -108,18 +139,25 @@ export function CompleteProfileForm({
             required
           />
         </Field>
-
-        <Field label={t.avatarUrlLabel}>
-          <input
-            value={avatarUrl}
-            onChange={(event) => setAvatarUrl(event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
-            placeholder="https://..."
+        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+          <Avatar
+            className="h-11 w-11 ring-1 ring-cyan-400/30"
+            src={avatarPreviewUrl}
+            alt={displayName || t.displayNameLabel}
           />
-        </Field>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
+          <span className="min-w-0 text-sm text-slate-300">
+            <span className="block font-medium text-white">{t.avatarUrlLabel}</span>
+            <span className="block truncate text-xs text-slate-400">
+              {avatarFile ? avatarFile.name : t.avatarUploadHint}
+            </span>
+          </span>
+          <input
+            className="sr-only"
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            onChange={(event) => handleAvatarFileChange(event.target.files?.[0] ?? null)}
+          />
+        </label>
         <Field label={t.englishLevelLabel}>
           <select
             value={englishLevel}

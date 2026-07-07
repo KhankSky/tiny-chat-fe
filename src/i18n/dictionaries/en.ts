@@ -71,7 +71,8 @@ export const en = {
     emailLabel: "Email",
     passwordLabel: "Password",
     displayNameLabel: "Display name",
-    avatarUrlLabel: "Avatar URL",
+    avatarUrlLabel: "Avatar image",
+    avatarUploadHint: "Click to upload an image",
     englishLevelLabel: "English level",
     practiceGoalLabel: "Practice goal",
     interestsLabel: "Interests",
@@ -152,7 +153,6 @@ export const en = {
       groupAvatarUploadHint: "Click to upload an image",
       groupNamePlaceholder: "Group name",
       groupDescriptionPlaceholder: "Group description",
-      groupAvatarUrlPlaceholder: "Avatar URL fallback",
       saveGroupError: "Could not save group",
     },
     profileModal: {
@@ -230,7 +230,9 @@ export const en = {
     userIdLabel: "User ID",
     displayNameLabel: "Display name",
     displayNamePlaceholder: "Khanh",
-    avatarUrlLabel: "Avatar URL",
+    avatarUrlLabel: "Avatar image",
+    avatarLabel: "Avatar image",
+    avatarUploadHint: "Click to upload an image",
     saveButton: "Save profile",
   },
   enums: {

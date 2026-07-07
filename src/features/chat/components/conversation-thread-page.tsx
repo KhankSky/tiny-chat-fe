@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useConversations } from "@/features/chat/hooks/use-conversations";
 import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
 import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
@@ -18,18 +17,13 @@ export function ConversationThreadPage({
   dictionary: Dictionary;
   conversationId: number;
 }) {
-  const [detailsOpen, setDetailsOpen] = useState(true);
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-[#070d18] text-white">
       <div
-        className={`grid h-full min-h-0 w-full ${
-          detailsOpen
-            ? "lg:grid-cols-[340px_minmax(0,1fr)_360px]"
-            : "lg:grid-cols-[340px_minmax(0,1fr)_72px]"
-        }`}
+        className="grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]"
       >
         <ConversationSidebar
           locale={locale}
@@ -44,14 +38,10 @@ export function ConversationThreadPage({
           dictionary={dictionary}
           groupId={conversationId}
           currentUser={profileEditor.currentUser}
-          sidebarOpen={detailsOpen}
-          onToggleSidebar={() => setDetailsOpen((value) => !value)}
         />
         <GroupSidebar
           dictionary={dictionary}
           groupId={conversationId}
-          collapsed={!detailsOpen}
-          onToggle={() => setDetailsOpen((value) => !value)}
         />
       </div>
 

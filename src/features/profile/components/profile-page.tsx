@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getMeProfile, updateMeProfile } from "@/features/profile/api/profile-api";
+import { getMeProfile, updateMeProfile, uploadMeAvatar } from "@/features/profile/api/profile-api";
 import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
 import type { Dictionary, Locale } from "@/i18n/types";
+import { Avatar } from "@/shared/ui/avatar";
 
 export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictionary }) {
   const router = useRouter();
   const t = dictionary.profile;
   const [profile, setProfile] = useState<MeProfileResponse | null>(null);
   const [displayName, setDisplayName] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +26,6 @@ export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictio
         if (!active) return;
         setProfile(data);
         setDisplayName(data.displayName ?? "");
-        setAvatarUrl(data.avatarUrl ?? "");
       } catch (err) {
         if (active) {
           setError(err instanceof Error ? err.message : t.loadError);
@@ -40,18 +41,38 @@ export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictio
     };
   }, [t.loadError]);
 
+  useEffect(() => {
+    return () => {
+      if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    };
+  }, [avatarPreviewUrl]);
+
+  function handleAvatarFileChange(file: File | null) {
+    if (avatarPreviewUrl) URL.revokeObjectURL(avatarPreviewUrl);
+    setAvatarFile(file);
+    setAvatarPreviewUrl(file ? URL.createObjectURL(file) : null);
+  }
+
   async function handleSave() {
     setSaving(true);
     setError(null);
     try {
+      let avatarUrl = profile?.avatarUrl ?? null;
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("file", avatarFile);
+        const uploaded = await uploadMeAvatar(formData);
+        avatarUrl = uploaded.avatarUrl;
+      }
+
       const payload: UpdateMeProfileRequest = {
         displayName: displayName.trim(),
-        avatarUrl: avatarUrl.trim() || null,
+        avatarUrl,
       };
       const updated = await updateMeProfile(payload);
       setProfile(updated);
       setDisplayName(updated.displayName ?? "");
-      setAvatarUrl(updated.avatarUrl ?? "");
+      handleAvatarFileChange(null);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : t.saveError);
@@ -78,13 +99,22 @@ export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictio
         {profile ? (
           <div className="grid gap-5">
             <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
-              <p className="text-sm font-semibold text-white">
-                {profile.displayName || profile.email}
-              </p>
-              <p className="mt-1 text-sm text-slate-400">{profile.email}</p>
-              <p className="mt-1 text-xs text-slate-500">
-                {t.userIdLabel}: {profile.id}
-              </p>
+              <div className="flex items-center gap-3">
+                <Avatar
+                  className="h-14 w-14 ring-1 ring-white/10"
+                  src={avatarPreviewUrl || profile.avatarUrl}
+                  alt={profile.displayName || profile.email}
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-white">
+                    {profile.displayName || profile.email}
+                  </p>
+                  <p className="mt-1 truncate text-sm text-slate-400">{profile.email}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {t.userIdLabel}: {profile.id}
+                  </p>
+                </div>
+              </div>
             </div>
 
             <label className="block space-y-2">
@@ -99,13 +129,23 @@ export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictio
               />
             </label>
 
-            <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-200">{t.avatarUrlLabel}</span>
+            <label className="flex cursor-pointer items-center gap-3 rounded-3xl border border-white/10 bg-white/5 p-4">
+              <Avatar
+                className="h-16 w-16 ring-1 ring-cyan-400/30"
+                src={avatarPreviewUrl || profile.avatarUrl}
+                alt={profile.displayName || profile.email}
+              />
+              <span className="min-w-0 text-sm text-slate-300">
+                <span className="block font-medium text-white">{t.avatarLabel}</span>
+                <span className="block truncate text-xs text-slate-400">
+                  {avatarFile ? avatarFile.name : t.avatarUploadHint}
+                </span>
+              </span>
               <input
-                value={avatarUrl}
-                onChange={(event) => setAvatarUrl(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
-                placeholder="https://..."
+                className="sr-only"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={(event) => handleAvatarFileChange(event.target.files?.[0] ?? null)}
               />
             </label>
 
