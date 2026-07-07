@@ -50,12 +50,6 @@ export function ConversationSidebar({
           >
             {locale === "vi" ? "Tìm nhóm" : "Find group"}
           </Link>
-          <Link
-            href={`/${locale}/profile`}
-            className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-white transition hover:border-white/20 hover:bg-white/10"
-          >
-            {locale === "vi" ? "Hồ sơ" : "Profile"}
-          </Link>
         </div>
       </div>
 
