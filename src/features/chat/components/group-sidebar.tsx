@@ -78,11 +78,6 @@ function MemberRow({
               OWNER
             </span>
           ) : null}
-          {index % 4 === 2 ? (
-            <span className="shrink-0 rounded bg-indigo-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
-              APP
-            </span>
-          ) : null}
         </div>
         {active ? (
           <p className="mt-0.5 truncate text-xs italic text-slate-300">hello world~</p>
