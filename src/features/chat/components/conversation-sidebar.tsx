@@ -9,6 +9,7 @@ export type ConversationItem = {
   conversationId?: number;
   groupId: number;
   title: string;
+  avatarUrl?: string | null;
   preview: string;
   updatedAt: string;
   unreadCount?: number;
@@ -34,23 +35,24 @@ export function ConversationSidebar({
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
       <div className="border-b border-white/10 px-5 py-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-          {dictionary.appName}
-        </p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-400">{t.sidebarDescription}</p>
-        <div className="mt-4 flex gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
+              {dictionary.appName}
+            </p>
+            <h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>
+          </div>
           <Link
             href={`/${locale}/groups/match`}
-            className="inline-flex items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="inline-flex h-10 shrink-0 items-center rounded-full bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
             {t.findGroup}
           </Link>
         </div>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
-        <div className="space-y-2">
+      <div className="min-h-0 flex-1 overflow-y-auto px-2 py-2">
+        <div className="space-y-1">
           {conversations.map((conversation) => {
             const active = conversation.groupId === activeGroupId;
             const conversationId = conversation.conversationId ?? conversation.groupId;
@@ -58,31 +60,35 @@ export function ConversationSidebar({
               <Link
                 key={conversationId}
                 href={`/${locale}/conversations/${conversationId}`}
-                className={`block rounded-3xl border p-4 transition ${
+                className={`flex items-center gap-3 rounded-2xl border px-3 py-3 transition ${
                   active
                     ? "border-cyan-400/40 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]"
                     : "border-transparent bg-white/0 hover:border-white/10 hover:bg-white/5"
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold text-white">
+                <Avatar
+                  className="h-12 w-12 ring-1 ring-white/10"
+                  src={conversation.avatarUrl}
+                  alt={conversation.title}
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="min-w-0 flex-1 truncate text-sm font-semibold text-white">
                       {conversation.title}
                     </p>
-                    <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-400">
-                      {conversation.preview}
-                    </p>
-                  </div>
-                  {conversation.unreadCount ? (
-                    <span className="rounded-full bg-cyan-400 px-2.5 py-1 text-xs font-semibold text-slate-950">
-                      {conversation.unreadCount}
+                    <span className="shrink-0 text-[11px] font-medium text-slate-500">
+                      {conversation.updatedAt}
                     </span>
-                  ) : null}
+                  </div>
+                  <p className="mt-1 truncate text-sm leading-5 text-slate-400">
+                    {conversation.preview}
+                  </p>
                 </div>
-                <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                  <span>Group #{conversation.groupId}</span>
-                  <span>{conversation.updatedAt}</span>
-                </div>
+                {conversation.unreadCount ? (
+                  <span className="shrink-0 rounded-full bg-cyan-400 px-2 py-0.5 text-xs font-semibold text-slate-950">
+                    {conversation.unreadCount}
+                  </span>
+                ) : null}
               </Link>
             );
           })}

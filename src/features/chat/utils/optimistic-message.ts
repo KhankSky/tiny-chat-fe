@@ -22,7 +22,7 @@ export function createOptimisticMessage({
     groupId,
     senderId: currentUser?.userId ?? -1,
     senderName: currentUser?.displayName ?? currentUser?.email ?? fallbackSenderName,
-    senderAvatarUrl: null,
+    senderAvatarUrl: currentUser?.avatarUrl ?? null,
     content,
     sentAt: new Date().toISOString(),
   } satisfies LocalChatMessage;

@@ -3,6 +3,7 @@ export type ConversationResponse = {
   groupId: number;
   title: string;
   description: string | null;
+  avatarUrl: string | null;
   lastMessage: string | null;
   lastMessageAt: string | null;
   memberCount: number;

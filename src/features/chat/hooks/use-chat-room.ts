@@ -14,6 +14,9 @@ import { StompClient } from "@/shared/realtime/stomp";
 
 export type SocketStatus = "idle" | "connecting" | "connected" | "error";
 
+const messageHistoryCache = new Map<number, LocalChatMessage[]>();
+const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
+
 export function useChatRoom({
   currentUser,
   dictionary,
@@ -24,7 +27,9 @@ export function useChatRoom({
   groupId: number;
 }) {
   const copy = dictionary.chat;
-  const [messages, setMessages] = useState<LocalChatMessage[]>([]);
+  const [messages, setMessages] = useState<LocalChatMessage[]>(
+    () => messageHistoryCache.get(groupId) ?? [],
+  );
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +47,19 @@ export function useChatRoom({
 
     async function loadHistoryAndConnect() {
       try {
-        setLoading(true);
+        setLoading(!messageHistoryCache.has(groupId));
         setError(null);
-        const history = await getGroupMessages(groupId);
+
+        let historyRequest = messageHistoryRequests.get(groupId);
+        if (!historyRequest) {
+          historyRequest = getGroupMessages(groupId).then((history) => history.messages);
+          messageHistoryRequests.set(groupId, historyRequest);
+        }
+
+        const historyMessages = await historyRequest;
+        messageHistoryCache.set(groupId, historyMessages);
         if (active) {
-          setMessages(history.messages);
+          setMessages(historyMessages);
         }
 
         if (!client) {
@@ -71,7 +84,12 @@ export function useChatRoom({
           groupId,
           invalidDataMessage: copy.invalidChatData,
           onInvalidData: setSocketError,
-          setMessages,
+          setMessages: (updater) =>
+            setMessages((previousMessages) => {
+              const nextMessages = updater(previousMessages);
+              messageHistoryCache.set(groupId, nextMessages);
+              return nextMessages;
+            }),
           unknownErrorMessage: copy.unknownSocketError,
         });
       } catch (err) {
@@ -85,6 +103,7 @@ export function useChatRoom({
           }
         }
       } finally {
+        messageHistoryRequests.delete(groupId);
         if (active) {
           setLoading(false);
         }
@@ -123,7 +142,11 @@ export function useChatRoom({
       fallbackSenderName: dictionary.common.you,
       groupId,
     });
-    setMessages((previousMessages) => [...previousMessages, optimisticMessage]);
+    setMessages((previousMessages) => {
+      const nextMessages = [...previousMessages, optimisticMessage];
+      messageHistoryCache.set(groupId, nextMessages);
+      return nextMessages;
+    });
     setContent("");
 
     try {
@@ -133,16 +156,22 @@ export function useChatRoom({
         });
       } else {
         const newMessage = await sendGroupMessage(groupId, trimmed);
-        setMessages((previousMessages) =>
-          previousMessages.map((message) =>
+        setMessages((previousMessages) => {
+          const nextMessages = previousMessages.map((message) =>
             message.messageId === optimisticMessage.messageId ? newMessage : message,
-          ),
-        );
+          );
+          messageHistoryCache.set(groupId, nextMessages);
+          return nextMessages;
+        });
       }
     } catch (err) {
-      setMessages((previousMessages) =>
-        previousMessages.filter((message) => message.messageId !== optimisticMessage.messageId),
-      );
+      setMessages((previousMessages) => {
+        const nextMessages = previousMessages.filter(
+          (message) => message.messageId !== optimisticMessage.messageId,
+        );
+        messageHistoryCache.set(groupId, nextMessages);
+        return nextMessages;
+      });
       setContent(trimmed);
       setSocketError(err instanceof Error ? err.message : copy.sendMessageError);
     }

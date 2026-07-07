@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { useChatRoom } from "@/features/chat/hooks/use-chat-room";
+import { getGroupDetail } from "@/features/groups/api/groups-api";
 import { formatDateTime } from "@/i18n/format";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
@@ -23,6 +25,7 @@ export function ChatRoom({
   currentUser?: AuthUserResponse | null;
 }) {
   const t = dictionary.chat;
+  const [memberAvatars, setMemberAvatars] = useState<Record<number, string | null>>({});
   const {
     bottomRef,
     content,
@@ -34,6 +37,44 @@ export function ChatRoom({
     socketError,
     socketStatus,
   } = useChatRoom({ currentUser, dictionary, groupId });
+  const messagesWithAvatars = useMemo(
+    () =>
+      messages.map((message) => ({
+        ...message,
+        senderAvatarUrl:
+          message.senderAvatarUrl ??
+          (message.senderId === currentUser?.userId ? currentUser.avatarUrl : null) ??
+          memberAvatars[message.senderId] ??
+          null,
+      })),
+    [currentUser, memberAvatars, messages],
+  );
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadMemberAvatars() {
+      try {
+        const groupDetail = await getGroupDetail(groupId);
+        if (!active) return;
+
+        setMemberAvatars(
+          Object.fromEntries(
+            groupDetail.members.map((member) => [member.userId, member.avatarUrl]),
+          ),
+        );
+      } catch {
+        if (active) {
+          setMemberAvatars({});
+        }
+      }
+    }
+
+    void loadMemberAvatars();
+    return () => {
+      active = false;
+    };
+  }, [groupId]);
 
   return (
     <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
@@ -77,13 +118,13 @@ export function ChatRoom({
           <ErrorMessage tone="warning">{socketError}</ErrorMessage>
         ) : null}
 
-        {messages.map((message, index) => {
+        {messagesWithAvatars.map((message, index) => {
           const isMine = currentUser?.userId === message.senderId;
-          const previousMessage = messages[index - 1];
+          const previousMessage = messagesWithAvatars[index - 1];
           const startsSenderGroup = previousMessage?.senderId !== message.senderId;
           if (!startsSenderGroup) return null;
 
-          const groupMessages = messages.slice(index);
+          const groupMessages = messagesWithAvatars.slice(index);
           const nextSenderIndex = groupMessages.findIndex(
             (nextMessage) => nextMessage.senderId !== message.senderId,
           );

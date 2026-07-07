@@ -4,8 +4,11 @@ import { useEffect, useState } from "react";
 import { getConversations } from "@/features/chat/api/chat-api";
 import type { ConversationResponse } from "@/features/chat/types";
 import type { ConversationItem } from "@/features/chat/components/conversation-sidebar";
-import { formatDateTime } from "@/i18n/format";
+import { formatConversationTime } from "@/i18n/format";
 import type { Dictionary, Locale } from "@/i18n/types";
+
+let cachedConversations: ConversationResponse[] | null = null;
+let conversationsRequest: Promise<ConversationResponse[]> | null = null;
 
 function toConversationItem(
   conversation: ConversationResponse,
@@ -16,8 +19,9 @@ function toConversationItem(
     conversationId: conversation.conversationId,
     groupId: conversation.groupId,
     title: conversation.title,
+    avatarUrl: conversation.avatarUrl,
     preview: conversation.lastMessage || conversation.description || fallbackPreview,
-    updatedAt: formatDateTime(conversation.lastMessageAt, locale),
+    updatedAt: formatConversationTime(conversation.lastMessageAt, locale),
   };
 }
 
@@ -28,14 +32,31 @@ export function useConversations({
   dictionary: Dictionary;
   locale: Locale;
 }) {
-  const [conversations, setConversations] = useState<ConversationItem[]>([]);
+  const [conversations, setConversations] = useState<ConversationItem[]>(() =>
+    cachedConversations
+      ? cachedConversations.map((conversation) =>
+          toConversationItem(conversation, locale, dictionary.chat.noMessages),
+        )
+      : [],
+  );
 
   useEffect(() => {
     let active = true;
 
     async function loadConversations() {
       try {
-        const data = await getConversations();
+        if (cachedConversations) {
+          setConversations(
+            cachedConversations.map((conversation) =>
+              toConversationItem(conversation, locale, dictionary.chat.noMessages),
+            ),
+          );
+          return;
+        }
+
+        conversationsRequest ??= getConversations();
+        const data = await conversationsRequest;
+        cachedConversations = data;
         if (active) {
           setConversations(
             data.map((conversation) =>
@@ -44,6 +65,7 @@ export function useConversations({
           );
         }
       } catch {
+        conversationsRequest = null;
         if (active) {
           setConversations([]);
         }

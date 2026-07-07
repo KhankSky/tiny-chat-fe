@@ -34,12 +34,14 @@ export function ConversationThreadPage({
           onEditProfile={profileEditor.openProfileEditor}
         />
         <ChatRoom
+          key={`chat-${conversationId}`}
           locale={locale}
           dictionary={dictionary}
           groupId={conversationId}
           currentUser={profileEditor.currentUser}
         />
         <GroupSidebar
+          key={`group-${conversationId}`}
           dictionary={dictionary}
           groupId={conversationId}
         />
