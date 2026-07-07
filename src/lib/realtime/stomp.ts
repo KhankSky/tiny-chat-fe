@@ -1,3 +1,5 @@
+import { createRequestId, logClientError } from "@/lib/logger";
+
 type Headers = Record<string, string>;
 
 type Frame = {
@@ -71,6 +73,7 @@ export class StompClient {
   private connectResolve: (() => void) | null = null;
   private connectReject: ((error: Error) => void) | null = null;
   private disconnectRequested = false;
+  private connectionId: string | null = null;
 
   constructor(private readonly token: string) {}
 
@@ -84,6 +87,7 @@ export class StompClient {
     }
 
     this.disconnectRequested = false;
+    this.connectionId = createRequestId();
     this.connectPromise = new Promise<void>((resolve, reject) => {
       this.connectResolve = resolve;
       this.connectReject = reject;
@@ -92,11 +96,12 @@ export class StompClient {
       this.socket = socket;
 
       socket.onopen = () => {
-      socket.send(
-        buildFrame("CONNECT", {
+        socket.send(
+          buildFrame("CONNECT", {
             "accept-version": "1.2",
             host: window.location.host,
             Authorization: `Bearer ${this.token}`,
+            "X-Request-Id": this.connectionId ?? createRequestId(),
           }),
         );
       };
@@ -107,12 +112,20 @@ export class StompClient {
       };
 
       socket.onerror = () => {
+        logClientError("WebSocket connection failed", {
+          connectionId: this.connectionId,
+          url: getWebSocketBaseUrl(),
+        });
         this.failConnection(new Error("WebSocket connection failed"));
       };
 
       socket.onclose = () => {
         this.connected = false;
         if (!this.disconnectRequested) {
+          logClientError("WebSocket disconnected unexpectedly", {
+            connectionId: this.connectionId,
+            url: getWebSocketBaseUrl(),
+          });
           this.failConnection(new Error("WebSocket disconnected"));
         }
       };
@@ -164,10 +177,14 @@ export class StompClient {
     this.connectReject = null;
     this.buffer = "";
     this.subscriptions.clear();
+    this.connectionId = null;
   }
 
   private sendRaw(frame: string) {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      logClientError("WebSocket send attempted while disconnected", {
+        connectionId: this.connectionId,
+      });
       throw new Error("WebSocket is not connected");
     }
     this.socket.send(frame);
@@ -193,6 +210,10 @@ export class StompClient {
       }
 
       if (frame.command === "ERROR") {
+        logClientError("WebSocket error frame received", {
+          connectionId: this.connectionId,
+          message: frame.body || "WebSocket error",
+        });
         this.failConnection(new Error(frame.body || "WebSocket error"));
         continue;
       }

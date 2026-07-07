@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api/client";
 import { getAccessToken, getStoredAuthUser } from "@/lib/auth/session";
+import { logClientError } from "@/lib/logger";
 import { StompClient } from "@/lib/realtime/stomp";
 import type { Locale } from "@/i18n/types";
 
@@ -141,7 +142,11 @@ export function ChatRoom({
                 }
                 return [...prev, nextMessage];
               });
-            } catch {
+            } catch (error) {
+              logClientError("Received invalid chat data", {
+                groupId,
+                error: error instanceof Error ? error.message : "Unknown error",
+              });
               setSocketError(
                 locale === "vi"
                   ? "Nhận dữ liệu chat không hợp lệ."
