@@ -1,31 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AuthUserResponse } from "@/features/auth/types";
 import { getConversations } from "@/features/chat/api/chat-api";
 import type { ConversationResponse } from "@/features/chat/types";
-import type { AuthUserResponse } from "@/features/auth/types";
 import {
   getMeProfile,
   updateMeProfile,
   uploadMeAvatar,
 } from "@/features/profile/api/profile-api";
 import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
+import { formatDateTime } from "@/i18n/format";
+import type { Dictionary, Locale } from "@/i18n/types";
 import { apiAssetUrl } from "@/shared/api/client";
-import type { Locale } from "@/i18n/types";
 import { getStoredAuthUser, updateStoredAuthUser } from "@/shared/auth/session";
 import { ChatRoom } from "./chat-room";
 import { ConversationSidebar, type ConversationItem } from "./conversation-sidebar";
 import { GroupSidebar } from "./group-sidebar";
 
-function toConversationItem(conversation: ConversationResponse): ConversationItem {
+function toConversationItem(
+  conversation: ConversationResponse,
+  locale: Locale,
+  fallbackPreview: string,
+): ConversationItem {
   return {
     conversationId: conversation.conversationId,
     groupId: conversation.groupId,
     title: conversation.title,
-    preview: conversation.lastMessage || conversation.description || "No messages yet.",
-    updatedAt: conversation.lastMessageAt
-      ? new Date(conversation.lastMessageAt).toLocaleString()
-      : "",
+    preview: conversation.lastMessage || conversation.description || fallbackPreview,
+    updatedAt: formatDateTime(conversation.lastMessageAt, locale),
   };
 }
 
@@ -35,11 +38,14 @@ function readStoredUser() {
 
 export function ConversationThreadPage({
   locale,
+  dictionary,
   conversationId,
 }: {
   locale: Locale;
+  dictionary: Dictionary;
   conversationId: number;
 }) {
+  const profileCopy = dictionary.chat.profileModal;
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
   const [detailsOpen, setDetailsOpen] = useState(true);
   const [currentUser, setCurrentUser] = useState<AuthUserResponse | null>(() => readStoredUser());
@@ -59,7 +65,11 @@ export function ConversationThreadPage({
       try {
         const data = await getConversations();
         if (active) {
-          setConversations(data.map(toConversationItem));
+          setConversations(
+            data.map((conversation) =>
+              toConversationItem(conversation, locale, dictionary.chat.noMessages),
+            ),
+          );
         }
       } catch {
         if (active) {
@@ -73,7 +83,7 @@ export function ConversationThreadPage({
     return () => {
       active = false;
     };
-  }, []);
+  }, [dictionary.chat.noMessages, locale]);
 
   useEffect(() => {
     if (!profileOpen) return;
@@ -88,7 +98,7 @@ export function ConversationThreadPage({
         setProfileDraft({ displayName: data.displayName ?? "" });
       } catch (err) {
         if (active) {
-          setProfileError(err instanceof Error ? err.message : "Could not load profile");
+          setProfileError(err instanceof Error ? err.message : profileCopy.loadError);
         }
       } finally {
         if (active) {
@@ -102,7 +112,7 @@ export function ConversationThreadPage({
     return () => {
       active = false;
     };
-  }, [profileOpen]);
+  }, [profileOpen, profileCopy.loadError]);
 
   useEffect(() => {
     if (!profileOpen) return;
@@ -154,7 +164,7 @@ export function ConversationThreadPage({
       syncCurrentUser(updated);
       closeProfileEditor();
     } catch (err) {
-      setProfileError(err instanceof Error ? err.message : "Could not save profile");
+      setProfileError(err instanceof Error ? err.message : profileCopy.saveError);
     } finally {
       setProfileSaving(false);
     }
@@ -202,7 +212,7 @@ export function ConversationThreadPage({
       >
         <ConversationSidebar
           locale={locale}
-          appName="Tiny Chat"
+          dictionary={dictionary}
           conversations={conversations}
           activeGroupId={conversationId}
           currentUser={currentUser}
@@ -210,13 +220,14 @@ export function ConversationThreadPage({
         />
         <ChatRoom
           locale={locale}
+          dictionary={dictionary}
           groupId={conversationId}
           currentUser={currentUser}
           sidebarOpen={detailsOpen}
           onToggleSidebar={() => setDetailsOpen((value) => !value)}
         />
         <GroupSidebar
-          locale={locale}
+          dictionary={dictionary}
           groupId={conversationId}
           collapsed={!detailsOpen}
           onToggle={() => setDetailsOpen((value) => !value)}
@@ -232,34 +243,30 @@ export function ConversationThreadPage({
             <div
               role="dialog"
               aria-modal="true"
-              aria-label={locale === "vi" ? "Chỉnh sửa thông tin cá nhân" : "Edit profile"}
+              aria-label={profileCopy.ariaLabel}
               className="w-full max-w-xl rounded-[2rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
               onClick={(event) => event.stopPropagation()}
             >
               <div className="flex items-start justify-between border-b border-white/10 px-6 py-5">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-                    Tiny Chat
+                    {dictionary.appName}
                   </p>
-                  <h3 className="mt-2 text-2xl font-semibold">
-                    {locale === "vi" ? "Sửa thông tin cá nhân" : "Edit profile"}
-                  </h3>
+                  <h3 className="mt-2 text-2xl font-semibold">{profileCopy.title}</h3>
                 </div>
                 <button
                   type="button"
                   onClick={closeProfileEditor}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
-                  aria-label={locale === "vi" ? "Đóng" : "Close"}
+                  aria-label={dictionary.common.close}
                 >
-                  ×
+                  x
                 </button>
               </div>
 
               <div className="space-y-5 px-6 py-6">
                 {profileLoading ? (
-                  <p className="text-sm text-slate-400">
-                    {locale === "vi" ? "Đang tải..." : "Loading..."}
-                  </p>
+                  <p className="text-sm text-slate-400">{dictionary.common.loading}</p>
                 ) : null}
 
                 <div className="flex items-center gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
@@ -267,7 +274,7 @@ export function ConversationThreadPage({
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={profileAvatarSrc}
-                      alt={locale === "vi" ? "Avatar cá nhân" : "Profile avatar"}
+                      alt={profileCopy.avatarAlt}
                       className="h-full w-full object-cover"
                     />
                     <input
@@ -279,24 +286,23 @@ export function ConversationThreadPage({
                   </label>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-semibold text-white">
-                      {profileDraft.displayName || currentUser?.displayName || currentUser?.email || "User"}
+                      {profileDraft.displayName ||
+                        currentUser?.displayName ||
+                        currentUser?.email ||
+                        dictionary.common.userFallback}
                     </p>
                     <p className="mt-1 truncate text-sm text-slate-400">
                       {currentUser?.email || ""}
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
-                      {avatarFile
-                        ? avatarFile.name
-                        : locale === "vi"
-                          ? "Bấm avatar để tải ảnh lên"
-                          : "Click avatar to upload"}
+                      {avatarFile ? avatarFile.name : profileCopy.avatarUploadHint}
                     </p>
                   </div>
                 </div>
 
                 <label className="block space-y-2">
                   <span className="text-sm font-medium text-slate-200">
-                    {locale === "vi" ? "Tên hiển thị" : "Display name"}
+                    {profileCopy.displayNameLabel}
                   </span>
                   <input
                     value={profileDraft.displayName}
@@ -304,7 +310,7 @@ export function ConversationThreadPage({
                       setProfileDraft((prev) => ({ ...prev, displayName: event.target.value }))
                     }
                     className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-400/50"
-                    placeholder={locale === "vi" ? "Ví dụ: Sky" : "Example: Sky"}
+                    placeholder={profileCopy.displayNamePlaceholder}
                   />
                 </label>
 
@@ -321,7 +327,7 @@ export function ConversationThreadPage({
                   onClick={closeProfileEditor}
                   className="rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/10"
                 >
-                  {locale === "vi" ? "Hủy" : "Cancel"}
+                  {dictionary.common.cancel}
                 </button>
                 <button
                   type="button"
@@ -329,13 +335,7 @@ export function ConversationThreadPage({
                   disabled={profileSaving || profileLoading}
                   className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {profileSaving
-                    ? locale === "vi"
-                      ? "Đang lưu..."
-                      : "Saving..."
-                    : locale === "vi"
-                      ? "Lưu thay đổi"
-                      : "Save changes"}
+                  {profileSaving ? dictionary.common.saving : dictionary.common.saveChanges}
                 </button>
               </div>
             </div>

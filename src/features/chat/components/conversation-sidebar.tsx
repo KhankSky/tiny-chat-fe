@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { apiAssetUrl } from "@/shared/api/client";
 import type { AuthUserResponse } from "@/features/auth/types";
-import type { Locale } from "@/i18n/types";
+import { apiAssetUrl } from "@/shared/api/client";
+import type { Dictionary, Locale } from "@/i18n/types";
 
 export type ConversationItem = {
   conversationId?: number;
@@ -16,39 +16,35 @@ export type ConversationItem = {
 
 export function ConversationSidebar({
   locale,
-  appName,
+  dictionary,
   conversations,
   activeGroupId,
   currentUser,
   onEditProfile,
 }: {
   locale: Locale;
-  appName: string;
+  dictionary: Dictionary;
   conversations: ConversationItem[];
   activeGroupId: number;
   currentUser?: AuthUserResponse | null;
   onEditProfile?: () => void;
 }) {
+  const t = dictionary.chat;
+
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
       <div className="border-b border-white/10 px-5 py-4">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-          {appName}
+          {dictionary.appName}
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-white">
-          {locale === "vi" ? "Đoạn chat" : "Chats"}
-        </h1>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
-          {locale === "vi"
-            ? "Chọn một cuộc hội thoại để mở khung chat ở giữa màn hình."
-            : "Pick a conversation to open the center chat pane."}
-        </p>
+        <h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>
+        <p className="mt-2 text-sm leading-6 text-slate-400">{t.sidebarDescription}</p>
         <div className="mt-4 flex gap-3">
           <Link
             href={`/${locale}/groups/match`}
             className="inline-flex items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
-            {locale === "vi" ? "Tìm nhóm" : "Find group"}
+            {t.findGroup}
           </Link>
         </div>
       </div>
@@ -109,10 +105,10 @@ export function ConversationSidebar({
           </span>
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold text-white">
-              {currentUser?.displayName || currentUser?.email || (locale === "vi" ? "Bạn" : "You")}
+              {currentUser?.displayName || currentUser?.email || dictionary.common.you}
             </span>
             <span className="mt-1 block truncate text-xs text-slate-400">
-              {currentUser?.email || (locale === "vi" ? "Thông tin cá nhân" : "Personal info")}
+              {currentUser?.email || t.personalInfo}
             </span>
           </span>
         </button>

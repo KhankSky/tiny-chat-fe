@@ -13,13 +13,10 @@ export async function generateMetadata({
   const dictionary = getDictionary(locale);
 
   return {
-    title: locale === "vi" ? "Tìm nhóm" : "Find a group",
-    description:
-      locale === "vi"
-        ? "Ghép vào nhóm nhỏ phù hợp theo trình độ, mục tiêu và sở thích."
-        : "Match into a small group based on level, goals, and interests.",
+    title: dictionary.groups.metadataTitle,
+    description: dictionary.groups.metadataDescription,
     openGraph: {
-      title: `${dictionary.appName} | ${locale === "vi" ? "Tìm nhóm" : "Find a group"}`,
+      title: `${dictionary.appName} | ${dictionary.groups.metadataTitle}`,
     },
   };
 }
@@ -35,5 +32,5 @@ export default async function GroupMatchRoute({
     notFound();
   }
 
-  return <GroupMatchingPage locale={locale} />;
+  return <GroupMatchingPage locale={locale} dictionary={getDictionary(locale)} />;
 }

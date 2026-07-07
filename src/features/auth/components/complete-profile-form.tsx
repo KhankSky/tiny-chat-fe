@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { completeProfile } from "@/features/auth/api/auth-api";
 import type { CompleteProfileRequest } from "@/features/auth/types";
 import { persistAuthSession } from "@/shared/auth/session";
-import type { Locale } from "@/i18n/types";
+import type { Dictionary, Locale } from "@/i18n/types";
 
 type ProfileRequest = CompleteProfileRequest;
 
@@ -39,8 +39,15 @@ const interests = [
   "GAMES",
 ];
 
-export function CompleteProfileForm({ locale }: { locale: Locale }) {
+export function CompleteProfileForm({
+  locale,
+  dictionary,
+}: {
+  locale: Locale;
+  dictionary: Dictionary;
+}) {
   const router = useRouter();
+  const t = dictionary.auth;
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [bio, setBio] = useState("");
@@ -64,7 +71,7 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
     setError(null);
 
     if (!selectedInterests.length) {
-      setError(locale === "vi" ? "Chọn ít nhất một sở thích." : "Pick at least one interest.");
+      setError(t.pickInterestError);
       return;
     }
 
@@ -83,7 +90,7 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
       router.replace(`/${locale}/conversations`);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save profile");
+      setError(err instanceof Error ? err.message : t.saveProfileError);
     } finally {
       setLoading(false);
     }
@@ -92,17 +99,17 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={locale === "vi" ? "Tên hiển thị" : "Display name"}>
+        <Field label={t.displayNameLabel}>
           <input
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
             className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
-            placeholder={locale === "vi" ? "Nguyễn An" : "Alex Nguyen"}
+            placeholder={t.displayNamePlaceholder}
             required
           />
         </Field>
 
-        <Field label={locale === "vi" ? "Ảnh đại diện URL" : "Avatar URL"}>
+        <Field label={t.avatarUrlLabel}>
           <input
             value={avatarUrl}
             onChange={(event) => setAvatarUrl(event.target.value)}
@@ -113,7 +120,7 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field label={locale === "vi" ? "Trình độ tiếng Anh" : "English level"}>
+        <Field label={t.englishLevelLabel}>
           <select
             value={englishLevel}
             onChange={(event) =>
@@ -129,7 +136,7 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
           </select>
         </Field>
 
-        <Field label={locale === "vi" ? "Mục tiêu luyện tập" : "Practice goal"}>
+        <Field label={t.practiceGoalLabel}>
           <select
             value={practiceGoal}
             onChange={(event) =>
@@ -146,7 +153,7 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
         </Field>
       </div>
 
-      <Field label={locale === "vi" ? "Sở thích" : "Interests"}>
+      <Field label={t.interestsLabel}>
         <div className="flex flex-wrap gap-2">
           {interests.map((interest) => {
             const active = selectedInterests.includes(interest);
@@ -168,16 +175,12 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
         </div>
       </Field>
 
-      <Field label={locale === "vi" ? "Giới thiệu ngắn" : "Short bio"}>
+      <Field label={t.shortBioLabel}>
         <textarea
           value={bio}
           onChange={(event) => setBio(event.target.value)}
           className="min-h-24 w-full resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
-          placeholder={
-            locale === "vi"
-              ? "Mình muốn luyện nói tiếng Anh mỗi ngày."
-              : "I want to practice English every day."
-          }
+          placeholder={t.bioPlaceholder}
         />
       </Field>
 
@@ -192,13 +195,7 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
         disabled={loading}
         className="w-full rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {loading
-          ? locale === "vi"
-            ? "Đang lưu..."
-            : "Saving..."
-          : locale === "vi"
-            ? "Hoàn tất hồ sơ"
-            : "Complete profile"}
+        {loading ? dictionary.common.saving : t.completeProfileButton}
       </button>
     </form>
   );

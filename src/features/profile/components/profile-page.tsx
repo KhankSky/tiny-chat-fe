@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getMeProfile, updateMeProfile } from "@/features/profile/api/profile-api";
 import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
-import type { Locale } from "@/i18n/types";
+import type { Dictionary, Locale } from "@/i18n/types";
 
-export function ProfilePage({ locale }: { locale: Locale }) {
+export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictionary }) {
   const router = useRouter();
+  const t = dictionary.profile;
   const [profile, setProfile] = useState<MeProfileResponse | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
@@ -26,7 +27,7 @@ export function ProfilePage({ locale }: { locale: Locale }) {
         setAvatarUrl(data.avatarUrl ?? "");
       } catch (err) {
         if (active) {
-          setError(err instanceof Error ? err.message : "Could not load profile");
+          setError(err instanceof Error ? err.message : t.loadError);
         }
       } finally {
         if (active) setLoading(false);
@@ -37,7 +38,7 @@ export function ProfilePage({ locale }: { locale: Locale }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t.loadError]);
 
   async function handleSave() {
     setSaving(true);
@@ -53,7 +54,7 @@ export function ProfilePage({ locale }: { locale: Locale }) {
       setAvatarUrl(updated.avatarUrl ?? "");
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not save profile");
+      setError(err instanceof Error ? err.message : t.saveError);
     } finally {
       setSaving(false);
     }
@@ -63,23 +64,15 @@ export function ProfilePage({ locale }: { locale: Locale }) {
     <main className="mx-auto min-h-screen max-w-3xl px-4 py-8 text-white lg:px-6">
       <div className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300">
-          Tiny Chat
+          {dictionary.appName}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold">
-          {locale === "vi" ? "Hồ sơ cá nhân" : "My profile"}
-        </h1>
-        <p className="mt-2 text-sm leading-7 text-slate-400">
-          {locale === "vi"
-            ? "Cập nhật tên hiển thị và avatar cơ bản của bạn."
-            : "Update your display name and avatar URL."}
-        </p>
+        <h1 className="mt-3 text-3xl font-semibold">{t.title}</h1>
+        <p className="mt-2 text-sm leading-7 text-slate-400">{t.description}</p>
       </div>
 
       <div className="mt-6 rounded-[2rem] border border-white/10 bg-slate-950/80 p-6">
         {loading ? (
-          <p className="text-sm text-slate-400">
-            {locale === "vi" ? "Đang tải..." : "Loading..."}
-          </p>
+          <p className="text-sm text-slate-400">{dictionary.common.loading}</p>
         ) : null}
 
         {profile ? (
@@ -90,26 +83,24 @@ export function ProfilePage({ locale }: { locale: Locale }) {
               </p>
               <p className="mt-1 text-sm text-slate-400">{profile.email}</p>
               <p className="mt-1 text-xs text-slate-500">
-                {locale === "vi" ? "User ID" : "User ID"}: {profile.id}
+                {t.userIdLabel}: {profile.id}
               </p>
             </div>
 
             <label className="block space-y-2">
               <span className="text-sm font-medium text-slate-200">
-                {locale === "vi" ? "Tên hiển thị" : "Display name"}
+                {t.displayNameLabel}
               </span>
               <input
                 value={displayName}
                 onChange={(event) => setDisplayName(event.target.value)}
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
-                placeholder={locale === "vi" ? "Khanh" : "Khanh"}
+                placeholder={t.displayNamePlaceholder}
               />
             </label>
 
             <label className="block space-y-2">
-              <span className="text-sm font-medium text-slate-200">
-                {locale === "vi" ? "Avatar URL" : "Avatar URL"}
-              </span>
+              <span className="text-sm font-medium text-slate-200">{t.avatarUrlLabel}</span>
               <input
                 value={avatarUrl}
                 onChange={(event) => setAvatarUrl(event.target.value)}
@@ -130,7 +121,7 @@ export function ProfilePage({ locale }: { locale: Locale }) {
               disabled={saving}
               className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {saving ? (locale === "vi" ? "Đang lưu..." : "Saving...") : locale === "vi" ? "Lưu hồ sơ" : "Save profile"}
+              {saving ? dictionary.common.saving : t.saveButton}
             </button>
           </div>
         ) : null}

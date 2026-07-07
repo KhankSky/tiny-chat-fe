@@ -1,15 +1,12 @@
 import { dictionaries } from "./dictionaries";
 import type { Dictionary, Locale } from "./types";
 
-export function getDictionary(locale: string | undefined): Dictionary {
-  if (locale === "vi") {
-    return dictionaries.vi;
-  }
+export const locales: Locale[] = ["en", "vi"];
 
-  return dictionaries.en;
+export function getDictionary(locale: string | undefined): Dictionary {
+  return dictionaries[getLocaleFromParams(locale)];
 }
 
 export function getLocaleFromParams(locale: string | undefined): Locale {
-  return locale === "vi" ? "vi" : "en";
+  return locales.includes(locale as Locale) ? (locale as Locale) : "en";
 }
-

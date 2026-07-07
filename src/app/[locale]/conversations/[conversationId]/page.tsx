@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ConversationThreadPage } from "@/features/chat/components/conversation-thread-page";
-import { getLocaleFromParams } from "@/i18n/get-dictionary";
+import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function ConversationThreadRoute({
   params,
@@ -22,6 +22,7 @@ export default async function ConversationThreadRoute({
     <ConversationThreadPage
       locale={locale}
       conversationId={conversationId}
+      dictionary={getDictionary(locale)}
     />
   );
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupMessages, sendGroupMessage } from "@/features/chat/api/chat-api";
+import type { ChatMessage } from "@/features/chat/types";
+import { formatDateTime } from "@/i18n/format";
+import type { Dictionary, Locale } from "@/i18n/types";
 import { getAccessToken } from "@/shared/auth/session";
 import { logClientError } from "@/shared/lib/logger";
 import { StompClient } from "@/shared/realtime/stomp";
-import type { AuthUserResponse } from "@/features/auth/types";
-import type { ChatMessage } from "@/features/chat/types";
-import type { Locale } from "@/i18n/types";
 
 type LocalChatMessage = ChatMessage & {
   clientTempId?: string;
@@ -23,13 +24,14 @@ function createOptimisticMessage(
   content: string,
   currentUser: { userId?: number; displayName?: string | null; email?: string | null } | null,
   groupId: number,
+  fallbackSenderName: string,
 ) {
   return {
     messageId: -Date.now(),
     clientTempId: `temp-${Date.now()}`,
     groupId,
     senderId: currentUser?.userId ?? -1,
-    senderName: currentUser?.displayName ?? currentUser?.email ?? "You",
+    senderName: currentUser?.displayName ?? currentUser?.email ?? fallbackSenderName,
     senderAvatarUrl: null,
     content,
     sentAt: new Date().toISOString(),
@@ -38,17 +40,20 @@ function createOptimisticMessage(
 
 export function ChatRoom({
   locale,
+  dictionary,
   groupId,
   currentUser = null,
   sidebarOpen,
   onToggleSidebar,
 }: {
   locale: Locale;
+  dictionary: Dictionary;
   groupId: number;
   currentUser?: AuthUserResponse | null;
   sidebarOpen?: boolean;
   onToggleSidebar?: () => void;
 }) {
+  const t = dictionary.chat;
   const [messages, setMessages] = useState<LocalChatMessage[]>([]);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
@@ -77,11 +82,7 @@ export function ChatRoom({
         if (!client) {
           if (active) {
             setSocketStatus("error");
-            setSocketError(
-              locale === "vi"
-                ? "Bạn cần đăng nhập để chat realtime."
-                : "You need to sign in to chat in realtime.",
-            );
+            setSocketError(t.realtimeSignInRequired);
           }
           return;
         }
@@ -129,18 +130,14 @@ export function ChatRoom({
           } catch (messageError) {
             logClientError("Received invalid chat data", {
               groupId,
-              error: messageError instanceof Error ? messageError.message : "Unknown error",
+              error: messageError instanceof Error ? messageError.message : t.unknownSocketError,
             });
-            setSocketError(
-              locale === "vi"
-                ? "Nhận dữ liệu chat không hợp lệ."
-                : "Received invalid chat data.",
-            );
+            setSocketError(t.invalidChatData);
           }
         });
       } catch (err) {
         if (active) {
-          const message = err instanceof Error ? err.message : "Failed to load messages";
+          const message = err instanceof Error ? err.message : t.loadMessagesError;
           if (message.toLowerCase().includes("websocket")) {
             setSocketStatus("error");
             setSocketError(message);
@@ -164,7 +161,14 @@ export function ChatRoom({
       stompClientRef.current?.disconnect();
       stompClientRef.current = null;
     };
-  }, [accessToken, groupId, locale]);
+  }, [
+    accessToken,
+    groupId,
+    t.invalidChatData,
+    t.loadMessagesError,
+    t.realtimeSignInRequired,
+    t.unknownSocketError,
+  ]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -174,7 +178,12 @@ export function ChatRoom({
     const trimmed = content.trim();
     if (!trimmed) return;
 
-    const optimisticMessage = createOptimisticMessage(trimmed, currentUser, groupId);
+    const optimisticMessage = createOptimisticMessage(
+      trimmed,
+      currentUser,
+      groupId,
+      dictionary.common.you,
+    );
     setMessages((prev) => [...prev, optimisticMessage]);
     setContent("");
 
@@ -196,7 +205,7 @@ export function ChatRoom({
         prev.filter((message) => message.messageId !== optimisticMessage.messageId),
       );
       setContent(trimmed);
-      setSocketError(err instanceof Error ? err.message : "Failed to send message");
+      setSocketError(err instanceof Error ? err.message : t.sendMessageError);
     }
   }
 
@@ -205,7 +214,7 @@ export function ChatRoom({
       <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-            {locale === "vi" ? "Phòng trò chuyện" : "Conversation"}
+            {t.roomEyebrow}
           </p>
           <h2 className="mt-2 truncate text-xl font-semibold text-white">Group #{groupId}</h2>
         </div>
@@ -214,7 +223,9 @@ export function ChatRoom({
             <button
               type="button"
               onClick={onToggleSidebar}
-              aria-label={sidebarOpen ? "Collapse info sidebar" : "Open info sidebar"}
+              aria-label={
+                sidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open
+              }
               className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
             >
               {sidebarOpen ? ">" : "<"}
@@ -231,33 +242,17 @@ export function ChatRoom({
                     : "border-white/10 bg-white/5 text-slate-300"
             }`}
           >
-            {socketStatus === "connected"
-              ? locale === "vi"
-                ? "Đang realtime"
-                : "Live"
-              : socketStatus === "connecting"
-                ? locale === "vi"
-                  ? "Đang kết nối"
-                  : "Connecting"
-                : socketStatus === "error"
-                  ? locale === "vi"
-                    ? "Mất kết nối"
-                    : "Offline"
-                  : locale === "vi"
-                    ? "Chưa sẵn sàng"
-                    : "Idle"}
+            {t.socketStatus[socketStatus]}
           </span>
           <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
-            {currentUser ? currentUser.email ?? "Logged in" : "Anonymous"}
+            {currentUser ? currentUser.email ?? dictionary.common.loggedIn : dictionary.common.anonymous}
           </div>
         </div>
       </header>
 
       <div className="min-h-0 flex-1 space-y-4 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-4 py-5 sm:px-6">
         {loading ? (
-          <p className="text-sm text-slate-400">
-            {locale === "vi" ? "Đang tải..." : "Loading..."}
-          </p>
+          <p className="text-sm text-slate-400">{dictionary.common.loading}</p>
         ) : null}
 
         {error ? (
@@ -285,8 +280,8 @@ export function ChatRoom({
               >
                 <div className="mb-1 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] opacity-70">
                   <span>{message.senderName}</span>
-                  <span>·</span>
-                  <span>{new Date(message.sentAt).toLocaleString()}</span>
+                  <span>-</span>
+                  <span>{formatDateTime(message.sentAt, locale)}</span>
                 </div>
                 <p>{message.content}</p>
               </div>
@@ -308,15 +303,7 @@ export function ChatRoom({
               }
             }}
             className="min-h-12 flex-1 rounded-full border border-white/10 bg-white/5 px-5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50 disabled:cursor-not-allowed disabled:opacity-60"
-            placeholder={
-              socketStatus === "connected"
-                ? locale === "vi"
-                  ? "Nhập tin nhắn..."
-                  : "Write a message..."
-                : locale === "vi"
-                  ? "Đang chờ kết nối..."
-                  : "Waiting for connection..."
-            }
+            placeholder={socketStatus === "connected" ? t.writeMessage : t.waitingForConnection}
             disabled={false}
           />
           <button
@@ -324,7 +311,7 @@ export function ChatRoom({
             onClick={() => void handleSend()}
             className="rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {locale === "vi" ? "Gửi" : "Send"}
+            {t.send}
           </button>
         </div>
       </div>

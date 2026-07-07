@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
 import { apiAssetUrl } from "@/shared/api/client";
-import type { Locale } from "@/i18n/types";
+import type { Dictionary } from "@/i18n/types";
 
 function avatarFallback(name: string | null | undefined) {
   return (name?.trim()?.charAt(0) || "G").toUpperCase();
@@ -88,16 +88,17 @@ function MemberRow({
 }
 
 export function GroupSidebar({
-  locale,
+  dictionary,
   groupId,
   collapsed = false,
   onToggle,
 }: {
-  locale: Locale;
+  dictionary: Dictionary;
   groupId: number;
   collapsed?: boolean;
   onToggle?: () => void;
 }) {
+  const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -110,7 +111,7 @@ export function GroupSidebar({
         if (active) setGroup(data);
       } catch (err) {
         if (active) {
-          setError(err instanceof Error ? err.message : "Could not load group");
+          setError(err instanceof Error ? err.message : t.loadGroupError);
         }
       }
     }
@@ -119,7 +120,7 @@ export function GroupSidebar({
     return () => {
       active = false;
     };
-  }, [groupId]);
+  }, [groupId, t.loadGroupError]);
 
   const members = group?.members ?? [];
   const onlineCount = members.length <= 2 ? members.length : Math.ceil(members.length * 0.65);
@@ -133,7 +134,7 @@ export function GroupSidebar({
           <button
             type="button"
             onClick={onToggle}
-            aria-label={locale === "vi" ? "Mở sidebar phải" : "Open right sidebar"}
+            aria-label={t.openRightSidebar}
             className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
           >
             &lt;
@@ -148,12 +149,12 @@ export function GroupSidebar({
             className="text-[10px] uppercase tracking-[0.45em] text-slate-500"
             style={{ writingMode: "vertical-rl" }}
           >
-            {locale === "vi" ? "Thành viên" : "Members"}
+            {t.collapsedLabel}
           </div>
           <button
             type="button"
             onClick={onToggle}
-            aria-label={locale === "vi" ? "Mở sidebar phải" : "Open right sidebar"}
+            aria-label={t.openRightSidebar}
             className="mt-auto inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
           >
             &gt;
@@ -169,19 +170,19 @@ export function GroupSidebar({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-              {locale === "vi" ? "Thành viên nhóm" : "Members"}
+              {t.membersEyebrow}
             </p>
             <h2 className="mt-2 truncate text-xl font-semibold text-white">
-              {group?.groupName || (locale === "vi" ? "Đang tải nhóm" : "Loading group")}
+              {group?.groupName || t.loadingGroup}
             </h2>
             <p className="mt-1 text-sm text-slate-400">
-              {locale === "vi" ? "Group ID" : "Group ID"}: {groupId}
+              {t.groupIdLabel}: {groupId}
             </p>
           </div>
           <button
             type="button"
             onClick={onToggle}
-            aria-label={locale === "vi" ? "Thu gọn sidebar phải" : "Collapse right sidebar"}
+            aria-label={t.collapseRightSidebar}
             className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
           >
             &gt;
@@ -197,7 +198,7 @@ export function GroupSidebar({
         ) : null}
 
         <div className="mb-3 px-5 text-sm font-medium tracking-wide text-slate-400">
-          {locale === "vi" ? "Trực tuyến" : "Online"} — {onlineMembers.length}
+          {t.online} - {onlineMembers.length}
         </div>
         <div>
           {onlineMembers.map((member, index) => (
@@ -208,7 +209,7 @@ export function GroupSidebar({
         {offlineMembers.length > 0 ? (
           <>
             <div className="mb-3 mt-7 px-5 text-sm font-medium tracking-wide text-slate-400">
-              {locale === "vi" ? "Ngoại tuyến" : "Offline"} — {offlineMembers.length}
+              {t.offline} - {offlineMembers.length}
             </div>
             <div>
               {offlineMembers.map((member, index) => (

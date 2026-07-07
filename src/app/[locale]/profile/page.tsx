@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ProfilePage } from "@/features/profile/components/profile-page";
-import { getLocaleFromParams } from "@/i18n/get-dictionary";
+import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function ProfileRoute({
   params,
@@ -13,5 +13,5 @@ export default async function ProfileRoute({
     notFound();
   }
 
-  return <ProfilePage locale={locale} />;
+  return <ProfilePage locale={locale} dictionary={getDictionary(locale)} />;
 }

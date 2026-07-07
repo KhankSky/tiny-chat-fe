@@ -23,17 +23,15 @@ export default async function CompleteProfilePage({
             {dictionary.appName}
           </p>
           <h1 className="text-3xl font-semibold">
-            {locale === "vi" ? "Hoàn thiện hồ sơ" : "Complete your profile"}
+            {dictionary.auth.completeProfileTitle}
           </h1>
           <p className="text-sm leading-7 text-slate-300">
-            {locale === "vi"
-              ? "Thông tin này giúp Tiny Chat gợi ý chủ đề và kết nối bạn với những cuộc hội thoại phù hợp hơn."
-              : "This helps Tiny Chat match you with better topics and conversations."}
+            {dictionary.auth.completeProfileDescription}
           </p>
         </section>
 
         <section className="rounded-lg border border-white/10 bg-slate-950/85 p-6">
-          <CompleteProfileForm locale={locale} />
+          <CompleteProfileForm locale={locale} dictionary={dictionary} />
         </section>
       </div>
     </main>

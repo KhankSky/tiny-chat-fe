@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { ConversationListPage } from "@/features/chat/components/conversation-list-page";
-import { getLocaleFromParams } from "@/i18n/get-dictionary";
+import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function ConversationsPage({
   params,
@@ -16,12 +16,7 @@ export default async function ConversationsPage({
   return (
     <ConversationListPage
       locale={locale}
-      title={locale === "vi" ? "Doan chat" : "Messages"}
-      description={
-        locale === "vi"
-          ? "Chon mot cuoc hoi thoai de vao nhan tin."
-          : "Pick a conversation to start chatting."
-      }
+      dictionary={getDictionary(locale)}
     />
   );
 }
