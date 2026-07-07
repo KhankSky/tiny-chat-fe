@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { apiGet } from "@/lib/api/client";
+import { apiGet, apiPost } from "@/lib/api/client";
 import { getAccessToken, getStoredAuthUser } from "@/lib/auth/session";
 import { StompClient } from "@/lib/realtime/stomp";
 import type { Locale } from "@/i18n/types";
@@ -16,6 +16,10 @@ type ChatMessage = {
   sentAt: string;
 };
 
+type LocalChatMessage = ChatMessage & {
+  clientTempId?: string;
+};
+
 type HistoryResponse = {
   groupId: number;
   messages: ChatMessage[];
@@ -27,6 +31,23 @@ function parseChatMessage(payload: string) {
   return JSON.parse(payload) as ChatMessage;
 }
 
+function createOptimisticMessage(
+  content: string,
+  currentUser: { userId?: number; displayName?: string; email?: string } | null,
+  groupId: number,
+) {
+  return {
+    messageId: -Date.now(),
+    clientTempId: `temp-${Date.now()}`,
+    groupId,
+    senderId: currentUser?.userId ?? -1,
+    senderName: currentUser?.displayName ?? currentUser?.email ?? "You",
+    senderAvatarUrl: null,
+    content,
+    sentAt: new Date().toISOString(),
+  } satisfies LocalChatMessage;
+}
+
 export function ChatRoom({
   locale,
   groupId,
@@ -34,7 +55,7 @@ export function ChatRoom({
   locale: Locale;
   groupId: number;
 }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [messages, setMessages] = useState<LocalChatMessage[]>([]);
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -99,6 +120,25 @@ export function ChatRoom({
                 if (prev.some((message) => message.messageId === nextMessage.messageId)) {
                   return prev;
                 }
+                if (
+                  prev.some(
+                    (message) =>
+                      message.senderId === nextMessage.senderId &&
+                      message.content === nextMessage.content &&
+                      message.messageId < 0 &&
+                      Math.abs(
+                        new Date(message.sentAt).getTime() - new Date(nextMessage.sentAt).getTime(),
+                      ) < 15_000,
+                  )
+                ) {
+                  return prev.map((message) =>
+                    message.messageId < 0 &&
+                    message.senderId === nextMessage.senderId &&
+                    message.content === nextMessage.content
+                      ? nextMessage
+                      : message,
+                  );
+                }
                 return [...prev, nextMessage];
               });
             } catch {
@@ -146,20 +186,31 @@ export function ChatRoom({
     const trimmed = content.trim();
     if (!trimmed) return;
 
+    const optimisticMessage = createOptimisticMessage(trimmed, currentUser, groupId);
+    setMessages((prev) => [...prev, optimisticMessage]);
+    setContent("");
+
     try {
-      if (!stompClientRef.current) {
-        throw new Error(
-          locale === "vi"
-            ? "Chưa kết nối được realtime."
-            : "Realtime is not connected yet.",
+      if (stompClientRef.current && socketStatus === "connected") {
+        stompClientRef.current.send(`/app/groups/${groupId}/messages`, {
+          content: trimmed,
+        });
+      } else {
+        const newMessage = await apiPost<ChatMessage, { content: string }>(
+          `/api/groups/${groupId}/messages`,
+          { content: trimmed },
+        );
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.messageId === optimisticMessage.messageId ? newMessage : message,
+          ),
         );
       }
-
-      stompClientRef.current.send(`/app/groups/${groupId}/messages`, {
-        content: trimmed,
-      });
-      setContent("");
     } catch (err) {
+      setMessages((prev) =>
+        prev.filter((message) => message.messageId !== optimisticMessage.messageId),
+      );
+      setContent(trimmed);
       setSocketError(err instanceof Error ? err.message : "Failed to send message");
     }
   }
@@ -274,12 +325,11 @@ export function ChatRoom({
                   ? "Đang chờ kết nối..."
                   : "Waiting for connection..."
             }
-            disabled={socketStatus !== "connected"}
+            disabled={false}
           />
           <button
             type="button"
             onClick={() => void handleSend()}
-            disabled={socketStatus !== "connected"}
             className="rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {locale === "vi" ? "Gửi" : "Send"}
