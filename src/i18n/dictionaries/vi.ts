@@ -1,5 +1,3 @@
-import type { Dictionary } from "../types";
-
 export const vi = {
   appName: "Tiny Chat",
   appTagline: "Nói chuyện, học tập, kết nối",
@@ -255,4 +253,4 @@ export const vi = {
       GAMES: "Games",
     },
   },
-} satisfies Dictionary;
+};

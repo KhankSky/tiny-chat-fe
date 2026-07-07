@@ -3,8 +3,10 @@
 import { useEffect, useState } from "react";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
-import { apiAssetUrl } from "@/shared/api/client";
 import type { Dictionary } from "@/i18n/types";
+import { Avatar } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
+import { ErrorMessage } from "@/shared/ui/error-message";
 
 function avatarFallback(name: string | null | undefined) {
   return (name?.trim()?.charAt(0) || "G").toUpperCase();
@@ -40,22 +42,7 @@ function MemberRow({
       } ${offline ? "opacity-45" : ""}`}
     >
       <div className="relative h-11 w-11 shrink-0 overflow-visible">
-        <div className="h-11 w-11 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
-          {member.avatarUrl ? (
-            <>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={apiAssetUrl(member.avatarUrl)}
-                alt={displayName}
-                className="h-full w-full object-cover"
-              />
-            </>
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-slate-100">
-              {avatarFallback(displayName)}
-            </div>
-          )}
-        </div>
+        <Avatar className="h-11 w-11 ring-1 ring-white/10" src={member.avatarUrl} alt={displayName} />
         <span
           className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-[#0b111c] ${
             offline ? "bg-slate-600" : index % 3 === 1 ? "bg-amber-400" : "bg-emerald-400"
@@ -131,14 +118,14 @@ export function GroupSidebar({
     return (
       <aside className="flex h-full min-h-0 w-[72px] flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
         <div className="flex items-center justify-center border-b border-white/10 px-2 py-3">
-          <button
+          <Button
             type="button"
             onClick={onToggle}
             aria-label={t.openRightSidebar}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+            variant="icon"
           >
             &lt;
-          </button>
+          </Button>
         </div>
 
         <div className="flex flex-1 flex-col items-center gap-4 px-2 py-4">
@@ -151,14 +138,15 @@ export function GroupSidebar({
           >
             {t.collapsedLabel}
           </div>
-          <button
+          <Button
             type="button"
             onClick={onToggle}
             aria-label={t.openRightSidebar}
-            className="mt-auto inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+            className="mt-auto"
+            variant="icon"
           >
             &gt;
-          </button>
+          </Button>
         </div>
       </aside>
     );
@@ -179,22 +167,21 @@ export function GroupSidebar({
               {t.groupIdLabel}: {groupId}
             </p>
           </div>
-          <button
+          <Button
             type="button"
             onClick={onToggle}
             aria-label={t.collapseRightSidebar}
-            className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-sm font-semibold text-white transition hover:border-cyan-400/40 hover:bg-cyan-400/10"
+            className="shrink-0"
+            variant="icon"
           >
             &gt;
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto py-4">
         {error ? (
-          <p className="mx-5 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-            {error}
-          </p>
+          <ErrorMessage className="mx-5">{error}</ErrorMessage>
         ) : null}
 
         <div className="mb-3 px-5 text-sm font-medium tracking-wide text-slate-400">

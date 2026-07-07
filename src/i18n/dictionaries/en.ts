@@ -253,4 +253,4 @@ export const en = {
       GAMES: "Games",
     },
   },
-} as const;
+};

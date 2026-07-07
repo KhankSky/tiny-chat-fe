@@ -1,37 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { AuthUserResponse } from "@/features/auth/types";
-import { matchGroup } from "@/features/groups/api/groups-api";
-import type { MatchGroupResponse } from "@/features/groups/types";
-import { formatDateTime } from "@/i18n/format";
+import { getGroupMatchingCopy } from "@/features/groups/group-matching-copy";
+import { useGroupMatching } from "@/features/groups/hooks/use-group-matching";
+import { formatGroupLabel, formatJoinedAt } from "@/features/groups/utils/group-format";
 import type { Dictionary, Locale } from "@/i18n/types";
-import { getStoredAuthUser } from "@/shared/auth/session";
-
-type CurrentUser = Pick<
-  AuthUserResponse,
-  "displayName" | "englishLevel" | "practiceGoal" | "interests" | "profileCompleted" | "email"
->;
-
-function formatLabel(value: string | null | undefined, dictionary: Dictionary) {
-  if (!value) return null;
-
-  const labels: Record<string, string> = {
-    ...dictionary.enums.englishLevel,
-    ...dictionary.enums.practiceGoal,
-    ...dictionary.enums.interest,
-  };
-
-  return (
-    labels[value] ||
-    value
-      .split("_")
-      .map((part) => part.charAt(0) + part.slice(1).toLowerCase())
-      .join(" ")
-  );
-}
+import { Button } from "@/shared/ui/button";
+import { StatusBadge } from "@/shared/ui/status-badge";
 
 export function GroupMatchingPage({
   locale,
@@ -41,39 +17,9 @@ export function GroupMatchingPage({
   dictionary: Dictionary;
 }) {
   const router = useRouter();
-  const t = dictionary.groups;
-  const [matchResult, setMatchResult] = useState<MatchGroupResponse | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const currentUser = useMemo(() => {
-    const stored = getStoredAuthUser() as CurrentUser | null;
-    return stored;
-  }, []);
-
-  async function handleFindGroup() {
-    setError(null);
-    setLoading(true);
-
-    try {
-      const result = await matchGroup();
-      setMatchResult(result);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t.matchErrorFallback);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const currentLevel = currentUser?.englishLevel
-    ? formatLabel(currentUser.englishLevel, dictionary)
-    : t.levelUnknown;
-  const currentGoal = currentUser?.practiceGoal
-    ? formatLabel(currentUser.practiceGoal, dictionary)
-    : t.goalUnknown;
-  const currentInterests = currentUser?.interests?.length
-    ? `${currentUser.interests.length} ${t.interestsCount}`
-    : t.noInterests;
+  const t = getGroupMatchingCopy(dictionary);
+  const { currentUser, error, findGroup, loading, matchResult, profileSignals } =
+    useGroupMatching(dictionary);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.18),_transparent_36%),linear-gradient(180deg,_#020617_0%,_#020617_100%)] text-white">
@@ -95,14 +41,14 @@ export function GroupMatchingPage({
             >
               {t.secondary}
             </Link>
-            <button
+            <Button
               type="button"
-              onClick={() => void handleFindGroup()}
+              onClick={() => void findGroup()}
               disabled={loading}
-              className="rounded-full bg-cyan-400 px-5 py-2.5 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+              className="py-2.5"
             >
               {loading ? t.statusLoading : t.primary}
-            </button>
+            </Button>
           </div>
         </div>
 
@@ -145,13 +91,13 @@ export function GroupMatchingPage({
                   ) : null}
                   <div className="flex flex-wrap gap-2">
                     <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">
-                      {currentLevel}
+                      {profileSignals.currentLevel}
                     </span>
                     <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">
-                      {currentGoal}
+                      {profileSignals.currentGoal}
                     </span>
                     <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-slate-200">
-                      {currentInterests}
+                      {profileSignals.currentInterests}
                     </span>
                   </div>
                 </div>
@@ -201,15 +147,12 @@ export function GroupMatchingPage({
                 </h2>
               </div>
               {matchResult ? (
-                <span
-                  className={`rounded-full border px-3 py-1 text-xs font-semibold ${
-                    matchResult.createdNewGroup
-                      ? "border-cyan-400/30 bg-cyan-400/10 text-cyan-200"
-                      : "border-emerald-400/30 bg-emerald-400/10 text-emerald-200"
-                  }`}
+                <StatusBadge
+                  tone={matchResult.createdNewGroup ? "info" : "success"}
+                  className="font-semibold"
                 >
                   {matchResult.createdNewGroup ? t.newGroup : t.joinedGroup}
-                </span>
+                </StatusBadge>
               ) : null}
             </div>
 
@@ -219,15 +162,15 @@ export function GroupMatchingPage({
                   <p className="text-sm leading-7 text-slate-300">{t.loadingHint}</p>
                 </div>
 
-                <button
+                <Button
                   type="button"
-                  onClick={() => void handleFindGroup()}
+                  onClick={() => void findGroup()}
                   disabled={loading}
-                  className="inline-flex w-full items-center justify-center rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="w-full"
                   aria-busy={loading}
                 >
                   {loading ? t.statusLoading : t.primary}
-                </button>
+                </Button>
 
                 {loading ? (
                   <div className="space-y-3 rounded-[1.5rem] border border-cyan-400/20 bg-cyan-400/5 p-5">
@@ -273,12 +216,12 @@ export function GroupMatchingPage({
                   <div className="mt-4 flex flex-wrap gap-2">
                     {matchResult.targetLevel ? (
                       <span className="rounded-full border border-white/10 bg-slate-950/80 px-3 py-1 text-xs text-slate-200">
-                        {t.levelLabel}: {formatLabel(matchResult.targetLevel, dictionary)}
+                        {t.levelLabel}: {formatGroupLabel(matchResult.targetLevel, dictionary)}
                       </span>
                     ) : null}
                     {matchResult.matchedGoal ? (
                       <span className="rounded-full border border-white/10 bg-slate-950/80 px-3 py-1 text-xs text-slate-200">
-                        {t.goalLabel}: {formatLabel(matchResult.matchedGoal, dictionary)}
+                        {t.goalLabel}: {formatGroupLabel(matchResult.matchedGoal, dictionary)}
                       </span>
                     ) : null}
                     {matchResult.sharedInterests?.length ? (
@@ -315,7 +258,7 @@ export function GroupMatchingPage({
                           key={interest}
                           className="rounded-full border border-white/10 bg-slate-950/80 px-3 py-1 text-xs text-slate-200"
                         >
-                          {formatLabel(interest, dictionary)}
+                          {formatGroupLabel(interest, dictionary)}
                         </span>
                       ))}
                     </div>
@@ -323,26 +266,25 @@ export function GroupMatchingPage({
                 ) : null}
 
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <button
+                  <Button
                     type="button"
                     onClick={() => router.push(`/${locale}/conversations/${matchResult.groupId}`)}
-                    className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
                   >
                     {t.openChat}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    onClick={() => void handleFindGroup()}
+                    onClick={() => void findGroup()}
                     disabled={loading}
-                    className="rounded-full border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-70"
+                    variant="secondary"
                   >
                     {t.searchAgain}
-                  </button>
+                  </Button>
                 </div>
 
                 {matchResult.joinedAt ? (
                   <p className="text-xs text-slate-500">
-                    {t.joinedAtLabel}: {formatDateTime(matchResult.joinedAt, locale)}
+                    {t.joinedAtLabel}: {formatJoinedAt(matchResult.joinedAt, locale)}
                   </p>
                 ) : null}
               </div>

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
-import { apiAssetUrl } from "@/shared/api/client";
 import type { Dictionary, Locale } from "@/i18n/types";
+import { Avatar } from "@/shared/ui/avatar";
 
 export type ConversationItem = {
   conversationId?: number;
@@ -95,14 +95,10 @@ export function ConversationSidebar({
           onClick={onEditProfile}
           className="flex h-[52px] w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 px-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
         >
-          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={apiAssetUrl(currentUser?.avatarUrl)}
-              alt={currentUser?.displayName || currentUser?.email || "User avatar"}
-              className="h-full w-full object-cover"
-            />
-          </span>
+          <Avatar
+            src={currentUser?.avatarUrl}
+            alt={currentUser?.displayName || currentUser?.email || "User avatar"}
+          />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold text-white">
               {currentUser?.displayName || currentUser?.email || dictionary.common.you}

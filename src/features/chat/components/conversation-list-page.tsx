@@ -1,11 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { getConversations } from "@/features/chat/api/chat-api";
-import type { ConversationResponse } from "@/features/chat/types";
-import { formatDateTime } from "@/i18n/format";
+import { ConversationListItem } from "@/features/chat/components/conversation-list-item";
+import { useConversationList } from "@/features/chat/hooks/use-conversation-list";
 import type { Dictionary, Locale } from "@/i18n/types";
+import { ErrorMessage } from "@/shared/ui/error-message";
+import { LoadingState } from "@/shared/ui/loading-state";
 
 export function ConversationListPage({
   locale,
@@ -15,37 +15,7 @@ export function ConversationListPage({
   dictionary: Dictionary;
 }) {
   const t = dictionary.chat;
-  const [conversations, setConversations] = useState<ConversationResponse[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-
-    async function loadConversations() {
-      try {
-        setLoading(true);
-        const data = await getConversations();
-        if (active) {
-          setConversations(data);
-        }
-      } catch (err) {
-        if (active) {
-          setError(err instanceof Error ? err.message : t.loadConversationsError);
-        }
-      } finally {
-        if (active) {
-          setLoading(false);
-        }
-      }
-    }
-
-    void loadConversations();
-
-    return () => {
-      active = false;
-    };
-  }, [t.loadConversationsError]);
+  const { conversations, error, loading } = useConversationList(t.loadConversationsError);
 
   return (
     <div className="min-h-screen w-full bg-[#070d18] text-white">
@@ -78,15 +48,11 @@ export function ConversationListPage({
 
           <div className="flex-1 overflow-y-auto p-3">
             {loading ? (
-              <p className="px-3 py-4 text-sm text-slate-400">
-                {dictionary.common.loading}
-              </p>
+              <LoadingState className="px-3 py-4" label={dictionary.common.loading} />
             ) : null}
 
             {error ? (
-              <p className="rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                {error}
-              </p>
+              <ErrorMessage className="rounded-lg">{error}</ErrorMessage>
             ) : null}
 
             {!loading && !error && conversations.length === 0 ? (
@@ -97,29 +63,12 @@ export function ConversationListPage({
 
             <div className="space-y-2">
               {conversations.map((conversation) => (
-                <Link
+                <ConversationListItem
                   key={conversation.conversationId}
-                  href={`/${locale}/conversations/${conversation.conversationId}`}
-                  className="block rounded-3xl border border-transparent p-4 transition hover:border-white/10 hover:bg-white/5"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-white">
-                        {conversation.title}
-                      </p>
-                      <p className="mt-1 line-clamp-2 text-sm leading-6 text-slate-400">
-                        {conversation.lastMessage || conversation.description || t.noMessages}
-                      </p>
-                    </div>
-                    <span className="shrink-0 rounded-full border border-white/10 px-2 py-1 text-xs text-slate-400">
-                      {conversation.memberCount}
-                    </span>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between text-xs text-slate-500">
-                    <span>#{conversation.conversationId}</span>
-                    <span>{formatDateTime(conversation.lastMessageAt, locale)}</span>
-                  </div>
-                </Link>
+                  conversation={conversation}
+                  locale={locale}
+                  noMessages={t.noMessages}
+                />
               ))}
             </div>
           </div>
