@@ -1,4 +1,4 @@
-import type { AuthUserResponse } from "../api/types";
+import type { AuthUserResponse } from "@/features/auth/types";
 
 const ACCESS_TOKEN_KEY = "tiny-chat.access-token";
 const AUTH_USER_KEY = "tiny-chat.auth-user";

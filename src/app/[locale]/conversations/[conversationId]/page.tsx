@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ConversationThreadPage } from "@/components/chat/conversation-thread-page";
+import { ConversationThreadPage } from "@/features/chat/components/conversation-thread-page";
 import { getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function ConversationThreadRoute({

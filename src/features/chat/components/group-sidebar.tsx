@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiAssetUrl, apiGet } from "@/lib/api/client";
-import type { GroupDetailResponse, GroupMemberResponse } from "@/lib/api/types";
+import { getGroupDetail } from "@/features/groups/api/groups-api";
+import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
+import { apiAssetUrl } from "@/shared/api/client";
 import type { Locale } from "@/i18n/types";
 
 function avatarFallback(name: string | null | undefined) {
@@ -105,7 +106,7 @@ export function GroupSidebar({
 
     async function loadGroup() {
       try {
-        const data = await apiGet<GroupDetailResponse>(`/api/groups/${groupId}/detail`);
+        const data = await getGroupDetail(groupId);
         if (active) setGroup(data);
       } catch (err) {
         if (active) {

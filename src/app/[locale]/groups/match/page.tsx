@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { GroupMatchingPage } from "@/components/groups/group-matching-page";
+import { GroupMatchingPage } from "@/features/groups/components/group-matching-page";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export async function generateMetadata({

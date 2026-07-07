@@ -1,23 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiAssetUrl, apiGet, apiPut, apiUpload } from "@/lib/api/client";
-import type { AuthUserResponse, MeProfileResponse, UpdateMeProfileRequest } from "@/lib/api/types";
+import { getConversations } from "@/features/chat/api/chat-api";
+import type { ConversationResponse } from "@/features/chat/types";
+import type { AuthUserResponse } from "@/features/auth/types";
+import {
+  getMeProfile,
+  updateMeProfile,
+  uploadMeAvatar,
+} from "@/features/profile/api/profile-api";
+import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
+import { apiAssetUrl } from "@/shared/api/client";
 import type { Locale } from "@/i18n/types";
-import { getStoredAuthUser, updateStoredAuthUser } from "@/lib/auth/session";
+import { getStoredAuthUser, updateStoredAuthUser } from "@/shared/auth/session";
 import { ChatRoom } from "./chat-room";
 import { ConversationSidebar, type ConversationItem } from "./conversation-sidebar";
 import { GroupSidebar } from "./group-sidebar";
-
-type ConversationResponse = {
-  conversationId: number;
-  groupId: number;
-  title: string;
-  description: string | null;
-  lastMessage: string | null;
-  lastMessageAt: string | null;
-  memberCount: number;
-};
 
 function toConversationItem(conversation: ConversationResponse): ConversationItem {
   return {
@@ -59,7 +57,7 @@ export function ConversationThreadPage({
 
     async function loadConversations() {
       try {
-        const data = await apiGet<ConversationResponse[]>("/api/conversations");
+        const data = await getConversations();
         if (active) {
           setConversations(data.map(toConversationItem));
         }
@@ -84,7 +82,7 @@ export function ConversationThreadPage({
 
     async function loadProfile() {
       try {
-        const data = await apiGet<MeProfileResponse>("/api/me/profile");
+        const data = await getMeProfile();
         if (!active) return;
         setLoadedProfile(data);
         setProfileDraft({ displayName: data.displayName ?? "" });
@@ -142,7 +140,7 @@ export function ConversationThreadPage({
       if (avatarFile) {
         const formData = new FormData();
         formData.append("file", avatarFile);
-        const uploaded = await apiUpload<MeProfileResponse>("/api/me/avatar", formData);
+        const uploaded = await uploadMeAvatar(formData);
         avatarUrl = uploaded.avatarUrl;
       }
 
@@ -150,10 +148,7 @@ export function ConversationThreadPage({
         displayName: profileDraft.displayName.trim(),
         avatarUrl,
       };
-      const updated = await apiPut<MeProfileResponse, UpdateMeProfileRequest>(
-        "/api/me/profile",
-        payload,
-      );
+      const updated = await updateMeProfile(payload);
 
       setLoadedProfile(updated);
       syncCurrentUser(updated);

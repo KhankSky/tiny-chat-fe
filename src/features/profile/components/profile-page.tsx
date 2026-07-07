@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiGet, apiPut } from "@/lib/api/client";
-import type { MeProfileResponse, UpdateMeProfileRequest } from "@/lib/api/types";
+import { getMeProfile, updateMeProfile } from "@/features/profile/api/profile-api";
+import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
 import type { Locale } from "@/i18n/types";
 
 export function ProfilePage({ locale }: { locale: Locale }) {
@@ -19,7 +19,7 @@ export function ProfilePage({ locale }: { locale: Locale }) {
     let active = true;
     async function loadProfile() {
       try {
-        const data = await apiGet<MeProfileResponse>("/api/me/profile");
+        const data = await getMeProfile();
         if (!active) return;
         setProfile(data);
         setDisplayName(data.displayName ?? "");
@@ -43,13 +43,11 @@ export function ProfilePage({ locale }: { locale: Locale }) {
     setSaving(true);
     setError(null);
     try {
-      const updated = await apiPut<MeProfileResponse, UpdateMeProfileRequest>(
-        "/api/me/profile",
-        {
-          displayName: displayName.trim(),
-          avatarUrl: avatarUrl.trim() || null,
-        },
-      );
+      const payload: UpdateMeProfileRequest = {
+        displayName: displayName.trim(),
+        avatarUrl: avatarUrl.trim() || null,
+      };
+      const updated = await updateMeProfile(payload);
       setProfile(updated);
       setDisplayName(updated.displayName ?? "");
       setAvatarUrl(updated.avatarUrl ?? "");

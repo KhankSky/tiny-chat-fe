@@ -1,6 +1,6 @@
 import type { ApiResponse } from "./types";
-import { getAccessToken } from "@/lib/auth/session";
-import { createRequestId, logClientError } from "@/lib/logger";
+import { getAccessToken } from "@/shared/auth/session";
+import { createRequestId, logClientError } from "@/shared/lib/logger";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";

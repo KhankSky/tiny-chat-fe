@@ -4,24 +4,12 @@ import type { FormEvent } from "react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiPost } from "@/lib/api/client";
-import type { AuthUserResponse } from "@/lib/api/types";
-import { persistAuthSession } from "@/lib/auth/session";
+import { completeProfile } from "@/features/auth/api/auth-api";
+import type { CompleteProfileRequest } from "@/features/auth/types";
+import { persistAuthSession } from "@/shared/auth/session";
 import type { Locale } from "@/i18n/types";
 
-type ProfileRequest = {
-  displayName: string;
-  avatarUrl: string | null;
-  englishLevel: "LEVEL_A" | "LEVEL_B" | "LEVEL_C";
-  practiceGoal:
-    | "DAILY_CHAT"
-    | "IMPROVE_WRITING"
-    | "MAKE_FRIENDS"
-    | "TOEIC_BASIC"
-    | "IELTS_BASIC";
-  interests: string[];
-  bio: string | null;
-};
+type ProfileRequest = CompleteProfileRequest;
 
 const englishLevels = [
   { value: "LEVEL_A", label: "Beginner" },
@@ -82,17 +70,14 @@ export function CompleteProfileForm({ locale }: { locale: Locale }) {
 
     setLoading(true);
     try {
-      const user = await apiPost<AuthUserResponse, ProfileRequest>(
-        "/api/auth/profile/complete",
-        {
-          displayName,
-          avatarUrl: avatarUrl.trim() || null,
-          englishLevel,
-          practiceGoal,
-          interests: selectedInterests,
-          bio: bio.trim() || null,
-        },
-      );
+      const user = await completeProfile({
+        displayName,
+        avatarUrl: avatarUrl.trim() || null,
+        englishLevel,
+        practiceGoal,
+        interests: selectedInterests,
+        bio: bio.trim() || null,
+      });
 
       persistAuthSession(user);
       router.replace(`/${locale}/conversations`);

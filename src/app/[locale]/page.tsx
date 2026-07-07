@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { SiteHeader } from "@/components/layout/site-header";
-import { LandingHero } from "@/components/landing/landing-hero";
-import { LandingFeatures } from "@/components/landing/landing-features";
+import { SiteHeader } from "@/features/layout/components/site-header";
+import { LandingHero } from "@/features/landing/components/landing-hero";
+import { LandingFeatures } from "@/features/landing/components/landing-features";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export async function generateMetadata({

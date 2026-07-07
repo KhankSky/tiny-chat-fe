@@ -2,9 +2,8 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { apiGet } from "@/lib/api/client";
-import type { AuthUserResponse } from "@/lib/api/types";
-import { clearAuthSession, getAccessToken, persistAuthSession } from "@/lib/auth/session";
+import { getCurrentUser } from "@/features/auth/api/auth-api";
+import { clearAuthSession, getAccessToken, persistAuthSession } from "@/shared/auth/session";
 import type { Locale } from "@/i18n/types";
 
 export function SessionRedirect({ locale }: { locale: Locale }) {
@@ -17,7 +16,7 @@ export function SessionRedirect({ locale }: { locale: Locale }) {
       if (!getAccessToken()) return;
 
       try {
-        const user = await apiGet<AuthUserResponse>("/api/auth/me");
+        const user = await getCurrentUser();
         if (!active) return;
 
         persistAuthSession(user);
@@ -40,4 +39,3 @@ export function SessionRedirect({ locale }: { locale: Locale }) {
 
   return null;
 }
-

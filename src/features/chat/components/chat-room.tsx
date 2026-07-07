@@ -1,30 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { apiGet, apiPost } from "@/lib/api/client";
-import { getAccessToken } from "@/lib/auth/session";
-import { logClientError } from "@/lib/logger";
-import { StompClient } from "@/lib/realtime/stomp";
-import type { AuthUserResponse } from "@/lib/api/types";
+import { getGroupMessages, sendGroupMessage } from "@/features/chat/api/chat-api";
+import { getAccessToken } from "@/shared/auth/session";
+import { logClientError } from "@/shared/lib/logger";
+import { StompClient } from "@/shared/realtime/stomp";
+import type { AuthUserResponse } from "@/features/auth/types";
+import type { ChatMessage } from "@/features/chat/types";
 import type { Locale } from "@/i18n/types";
-
-type ChatMessage = {
-  messageId: number;
-  groupId: number;
-  senderId: number;
-  senderName: string;
-  senderAvatarUrl: string | null;
-  content: string;
-  sentAt: string;
-};
 
 type LocalChatMessage = ChatMessage & {
   clientTempId?: string;
-};
-
-type HistoryResponse = {
-  groupId: number;
-  messages: ChatMessage[];
 };
 
 type SocketStatus = "idle" | "connecting" | "connected" | "error";
@@ -83,7 +69,7 @@ export function ChatRoom({
       try {
         setLoading(true);
         setError(null);
-        const history = await apiGet<HistoryResponse>(`/api/groups/${groupId}/messages`);
+        const history = await getGroupMessages(groupId);
         if (active) {
           setMessages(history.messages);
         }
@@ -198,10 +184,7 @@ export function ChatRoom({
           content: trimmed,
         });
       } else {
-        const newMessage = await apiPost<ChatMessage, { content: string }>(
-          `/api/groups/${groupId}/messages`,
-          { content: trimmed },
-        );
+        const newMessage = await sendGroupMessage(groupId, trimmed);
         setMessages((prev) =>
           prev.map((message) =>
             message.messageId === optimisticMessage.messageId ? newMessage : message,

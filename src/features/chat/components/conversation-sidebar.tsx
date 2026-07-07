@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { apiAssetUrl } from "@/lib/api/client";
-import type { AuthUserResponse } from "@/lib/api/types";
+import { apiAssetUrl } from "@/shared/api/client";
+import type { AuthUserResponse } from "@/features/auth/types";
 import type { Locale } from "@/i18n/types";
 
 export type ConversationItem = {

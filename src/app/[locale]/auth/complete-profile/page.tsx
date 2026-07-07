@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { CompleteProfileForm } from "@/components/auth/complete-profile-form";
+import { CompleteProfileForm } from "@/features/auth/components/complete-profile-form";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function CompleteProfilePage({

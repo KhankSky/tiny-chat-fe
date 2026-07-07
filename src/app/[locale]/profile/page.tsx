@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ProfilePage } from "@/components/profile/profile-page";
+import { ProfilePage } from "@/features/profile/components/profile-page";
 import { getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function ProfileRoute({

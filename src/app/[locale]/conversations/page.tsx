@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { ConversationListPage } from "@/components/chat/conversation-list-page";
+import { ConversationListPage } from "@/features/chat/components/conversation-list-page";
 import { getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function ConversationsPage({

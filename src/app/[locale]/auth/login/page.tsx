@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { AuthCard } from "@/components/auth/auth-card";
-import { AuthForm } from "@/components/auth/auth-form";
-import { SessionRedirect } from "@/components/auth/session-redirect";
+import { AuthCard } from "@/features/auth/components/auth-card";
+import { AuthForm } from "@/features/auth/components/auth-form";
+import { SessionRedirect } from "@/features/auth/components/session-redirect";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function LoginPage({

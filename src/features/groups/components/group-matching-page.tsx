@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiPost } from "@/lib/api/client";
-import type { MatchGroupResponse, AuthUserResponse } from "@/lib/api/types";
-import { getStoredAuthUser } from "@/lib/auth/session";
+import { matchGroup } from "@/features/groups/api/groups-api";
+import type { AuthUserResponse } from "@/features/auth/types";
+import type { MatchGroupResponse } from "@/features/groups/types";
+import { getStoredAuthUser } from "@/shared/auth/session";
 import type { Locale } from "@/i18n/types";
 
 type CurrentUser = Pick<
@@ -162,9 +163,7 @@ export function GroupMatchingPage({ locale }: { locale: Locale }) {
     setLoading(true);
 
     try {
-      const result = await apiPost<MatchGroupResponse, Record<string, never>>(
-        "/api/groups/match",
-      );
+      const result = await matchGroup();
       setMatchResult(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unable to match group");

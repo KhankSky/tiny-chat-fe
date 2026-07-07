@@ -2,18 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { apiGet } from "@/lib/api/client";
+import { getConversations } from "@/features/chat/api/chat-api";
+import type { ConversationResponse } from "@/features/chat/types";
 import type { Locale } from "@/i18n/types";
-
-type ConversationResponse = {
-  conversationId: number;
-  groupId: number;
-  title: string;
-  description: string | null;
-  lastMessage: string | null;
-  lastMessageAt: string | null;
-  memberCount: number;
-};
 
 export function ConversationListPage({
   locale,
@@ -34,7 +25,7 @@ export function ConversationListPage({
     async function loadConversations() {
       try {
         setLoading(true);
-        const data = await apiGet<ConversationResponse[]>("/api/conversations");
+        const data = await getConversations();
         if (active) {
           setConversations(data);
         }

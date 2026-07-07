@@ -3,9 +3,8 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { apiPost } from "@/lib/api/client";
-import type { AuthUserResponse } from "@/lib/api/types";
-import { persistAuthSession } from "@/lib/auth/session";
+import { login, register } from "@/features/auth/api/auth-api";
+import { persistAuthSession } from "@/shared/auth/session";
 import type { Dictionary, Locale } from "@/i18n/types";
 
 type Mode = "login" | "register";
@@ -33,13 +32,7 @@ export function AuthForm({
     setLoading(true);
 
     try {
-      const user = await apiPost<AuthUserResponse, { email: string; password: string }>(
-        isLogin ? "/api/auth/login" : "/api/auth/register",
-        {
-          email,
-          password,
-        },
-      );
+      const user = await (isLogin ? login : register)({ email, password });
 
       persistAuthSession(user);
       router.push(

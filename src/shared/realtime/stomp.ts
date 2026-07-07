@@ -1,4 +1,4 @@
-import { createRequestId, logClientError } from "@/lib/logger";
+import { createRequestId, logClientError } from "@/shared/lib/logger";
 
 type Headers = Record<string, string>;
 
