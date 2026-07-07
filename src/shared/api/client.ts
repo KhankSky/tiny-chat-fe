@@ -9,7 +9,12 @@ type HttpMethod = "GET" | "POST" | "PUT";
 
 export function apiAssetUrl(path: string | null | undefined, fallback = "/image/logo-default.jpg") {
   const assetPath = path || fallback;
-  if (assetPath.startsWith("http://") || assetPath.startsWith("https://") || assetPath.startsWith("data:")) {
+  if (
+    assetPath.startsWith("http://") ||
+    assetPath.startsWith("https://") ||
+    assetPath.startsWith("data:") ||
+    assetPath.startsWith("blob:")
+  ) {
     return assetPath;
   }
   return `${API_BASE_URL}${assetPath.startsWith("/") ? assetPath : `/${assetPath}`}`;

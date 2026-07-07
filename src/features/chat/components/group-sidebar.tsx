@@ -1,16 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getGroupDetail } from "@/features/groups/api/groups-api";
+import { getGroupDetail, updateGroupDetail, uploadGroupAvatar } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
 import type { Dictionary } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
-
-function avatarFallback(name: string | null | undefined) {
-  return (name?.trim()?.charAt(0) || "G").toUpperCase();
-}
+import { Input } from "@/shared/ui/input";
 
 function nameColor(index: number, offline: boolean) {
   const colors = [
@@ -88,6 +85,14 @@ export function GroupSidebar({
   const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [groupName, setGroupName] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
+  const [groupAvatarUrl, setGroupAvatarUrl] = useState("");
+  const [groupAvatarFile, setGroupAvatarFile] = useState<File | null>(null);
+  const [groupAvatarPreviewUrl, setGroupAvatarPreviewUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -95,7 +100,12 @@ export function GroupSidebar({
     async function loadGroup() {
       try {
         const data = await getGroupDetail(groupId);
-        if (active) setGroup(data);
+        if (active) {
+          setGroup(data);
+          setGroupName(data.groupName ?? "");
+          setGroupDescription(data.groupDescription ?? "");
+          setGroupAvatarUrl(data.groupAvatarUrl ?? "");
+        }
       } catch (err) {
         if (active) {
           setError(err instanceof Error ? err.message : t.loadGroupError);
@@ -109,10 +119,65 @@ export function GroupSidebar({
     };
   }, [groupId, t.loadGroupError]);
 
+  useEffect(() => {
+    return () => {
+      if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);
+    };
+  }, [groupAvatarPreviewUrl]);
+
   const members = group?.members ?? [];
   const onlineCount = members.length <= 2 ? members.length : Math.ceil(members.length * 0.65);
   const onlineMembers = members.slice(0, onlineCount);
   const offlineMembers = members.slice(onlineCount);
+
+  function handleGroupAvatarChange(file: File | null) {
+    if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);
+    setGroupAvatarFile(file);
+    setGroupAvatarPreviewUrl(file ? URL.createObjectURL(file) : null);
+  }
+
+  function cancelEdit() {
+    setIsEditing(false);
+    setSaveError(null);
+    setGroupName(group?.groupName ?? "");
+    setGroupDescription(group?.groupDescription ?? "");
+    setGroupAvatarUrl(group?.groupAvatarUrl ?? "");
+    handleGroupAvatarChange(null);
+  }
+
+  async function saveGroupDetail() {
+    setIsSaving(true);
+    setSaveError(null);
+
+    try {
+      let updated = group;
+      if (groupAvatarFile) {
+        const formData = new FormData();
+        formData.append("file", groupAvatarFile);
+        updated = await uploadGroupAvatar(groupId, formData);
+      } else {
+        updated = await updateGroupDetail(groupId, {
+          groupAvatarUrl: groupAvatarUrl.trim() || null,
+        });
+      }
+
+      const nextGroup = await updateGroupDetail(groupId, {
+        groupName: groupName.trim() || null,
+        groupDescription: groupDescription.trim() || null,
+        groupAvatarUrl: updated?.groupAvatarUrl ?? (groupAvatarUrl.trim() || null),
+      });
+      setGroup(nextGroup);
+      setGroupName(nextGroup.groupName ?? "");
+      setGroupDescription(nextGroup.groupDescription ?? "");
+      setGroupAvatarUrl(nextGroup.groupAvatarUrl ?? "");
+      handleGroupAvatarChange(null);
+      setIsEditing(false);
+    } catch (err) {
+      setSaveError(err instanceof Error ? err.message : t.saveGroupError);
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   if (collapsed) {
     return (
@@ -129,9 +194,7 @@ export function GroupSidebar({
         </div>
 
         <div className="flex flex-1 flex-col items-center gap-4 px-2 py-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-400/15 text-lg font-semibold text-cyan-200 ring-1 ring-inset ring-cyan-400/30">
-            {avatarFallback(group?.groupName)}
-          </div>
+          <Avatar className="h-12 w-12 ring-1 ring-cyan-400/30" src={group?.groupAvatarUrl} alt={group?.groupName || t.loadingGroup} />
           <div
             className="text-[10px] uppercase tracking-[0.45em] text-slate-500"
             style={{ writingMode: "vertical-rl" }}
@@ -156,7 +219,13 @@ export function GroupSidebar({
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
+          <div className="flex min-w-0 gap-3">
+            <Avatar
+              className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30"
+              src={group?.groupAvatarUrl}
+              alt={group?.groupName || t.loadingGroup}
+            />
+            <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
               {t.membersEyebrow}
             </p>
@@ -166,7 +235,17 @@ export function GroupSidebar({
             <p className="mt-1 text-sm text-slate-400">
               {t.groupIdLabel}: {groupId}
             </p>
+            </div>
           </div>
+          <Button
+            type="button"
+            onClick={() => setIsEditing((value) => !value)}
+            aria-label={t.editGroup}
+            className="shrink-0"
+            variant="secondary"
+          >
+            {t.editGroup}
+          </Button>
           <Button
             type="button"
             onClick={onToggle}
@@ -177,6 +256,50 @@ export function GroupSidebar({
             &gt;
           </Button>
         </div>
+        {isEditing ? (
+          <div className="mt-4 space-y-3 rounded border border-white/10 bg-white/[0.03] p-3">
+            <label className="flex cursor-pointer items-center gap-3">
+              <Avatar className="h-14 w-14 shrink-0 ring-1 ring-cyan-400/30" src={groupAvatarPreviewUrl || group?.groupAvatarUrl} alt={group?.groupName || t.loadingGroup} />
+              <span className="min-w-0 text-sm text-slate-300">
+                <span className="block font-medium text-white">{t.groupAvatarLabel}</span>
+                <span className="block truncate text-xs text-slate-400">
+                  {groupAvatarFile ? groupAvatarFile.name : t.groupAvatarUploadHint}
+                </span>
+              </span>
+              <input
+                className="sr-only"
+                type="file"
+                accept="image/png,image/jpeg,image/webp,image/gif"
+                onChange={(event) => handleGroupAvatarChange(event.target.files?.[0] ?? null)}
+              />
+            </label>
+            <Input
+              value={groupName}
+              onChange={(event) => setGroupName(event.target.value)}
+              placeholder={t.groupNamePlaceholder}
+            />
+            <Input
+              value={groupDescription}
+              onChange={(event) => setGroupDescription(event.target.value)}
+              placeholder={t.groupDescriptionPlaceholder}
+            />
+            <Input
+              value={groupAvatarUrl}
+              onChange={(event) => setGroupAvatarUrl(event.target.value)}
+              placeholder={t.groupAvatarUrlPlaceholder}
+              disabled={Boolean(groupAvatarFile)}
+            />
+            {saveError ? <ErrorMessage>{saveError}</ErrorMessage> : null}
+            <div className="flex gap-2">
+              <Button type="button" onClick={saveGroupDetail} disabled={isSaving}>
+                {isSaving ? dictionary.common.saving : dictionary.common.saveChanges}
+              </Button>
+              <Button type="button" onClick={cancelEdit} disabled={isSaving} variant="secondary">
+                {dictionary.common.cancel}
+              </Button>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto py-4">

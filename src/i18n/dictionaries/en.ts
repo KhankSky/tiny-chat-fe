@@ -147,6 +147,13 @@ export const en = {
       online: "Online",
       offline: "Offline",
       loadGroupError: "Could not load group",
+      editGroup: "Edit group",
+      groupAvatarLabel: "Group avatar",
+      groupAvatarUploadHint: "Click to upload an image",
+      groupNamePlaceholder: "Group name",
+      groupDescriptionPlaceholder: "Group description",
+      groupAvatarUrlPlaceholder: "Avatar URL fallback",
+      saveGroupError: "Could not save group",
     },
     profileModal: {
       ariaLabel: "Edit profile",

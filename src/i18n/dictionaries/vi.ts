@@ -147,6 +147,13 @@ export const vi = {
       online: "Trực tuyến",
       offline: "Ngoại tuyến",
       loadGroupError: "Không thể tải nhóm",
+      editGroup: "Sửa nhóm",
+      groupAvatarLabel: "Avatar nhóm",
+      groupAvatarUploadHint: "Bấm để tải ảnh lên",
+      groupNamePlaceholder: "Tên nhóm",
+      groupDescriptionPlaceholder: "Mô tả nhóm",
+      groupAvatarUrlPlaceholder: "Avatar URL dự phòng",
+      saveGroupError: "Không thể lưu nhóm",
     },
     profileModal: {
       ariaLabel: "Chỉnh sửa thông tin cá nhân",
