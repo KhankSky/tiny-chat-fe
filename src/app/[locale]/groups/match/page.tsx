@@ -3,12 +3,13 @@ import { notFound } from "next/navigation";
 import { GroupMatchingPage } from "@/components/groups/group-matching-page";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { locale: string };
-}): Metadata {
-  const locale = getLocaleFromParams(params.locale);
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = getLocaleFromParams(rawLocale);
   const dictionary = getDictionary(locale);
 
   return {
@@ -23,12 +24,13 @@ export function generateMetadata({
   };
 }
 
-export default function GroupMatchRoute({
+export default async function GroupMatchRoute({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const locale = getLocaleFromParams(params.locale);
+  const { locale: rawLocale } = await params;
+  const locale = getLocaleFromParams(rawLocale);
   if (!["en", "vi"].includes(locale)) {
     notFound();
   }

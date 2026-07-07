@@ -5,12 +5,13 @@ import { LandingHero } from "@/components/landing/landing-hero";
 import { LandingFeatures } from "@/components/landing/landing-features";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
-  params: { locale: string };
-}): Metadata {
-  const locale = getLocaleFromParams(params.locale);
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale: rawLocale } = await params;
+  const locale = getLocaleFromParams(rawLocale);
   const dictionary = getDictionary(locale);
 
   return {
@@ -19,12 +20,13 @@ export function generateMetadata({
   };
 }
 
-export default function LocaleHomePage({
+export default async function LocaleHomePage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const locale = getLocaleFromParams(params.locale);
+  const { locale: rawLocale } = await params;
+  const locale = getLocaleFromParams(rawLocale);
   if (!["en", "vi"].includes(locale)) {
     notFound();
   }
@@ -41,4 +43,3 @@ export default function LocaleHomePage({
     </div>
   );
 }
-

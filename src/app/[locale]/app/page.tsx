@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
 
-export default function AppRedirectPage({
+export default async function AppRedirectPage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  redirect(`/${params.locale}/conversations`);
+  const { locale } = await params;
+  redirect(`/${locale}/conversations`);
 }

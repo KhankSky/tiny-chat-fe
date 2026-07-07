@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
 
-export default function GroupRedirectPage({
+export default async function GroupRedirectPage({
   params,
 }: {
-  params: { locale: string; groupId: string };
+  params: Promise<{ locale: string; groupId: string }>;
 }) {
-  redirect(`/${params.locale}/conversations/${params.groupId}`);
+  const { locale, groupId } = await params;
+  redirect(`/${locale}/conversations/${groupId}`);
 }
-

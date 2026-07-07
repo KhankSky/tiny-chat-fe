@@ -4,12 +4,13 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { SessionRedirect } from "@/components/auth/session-redirect";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
-export default function LoginPage({
+export default async function LoginPage({
   params,
 }: {
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
-  const locale = getLocaleFromParams(params.locale);
+  const { locale: rawLocale } = await params;
+  const locale = getLocaleFromParams(rawLocale);
   if (!["en", "vi"].includes(locale)) {
     notFound();
   }

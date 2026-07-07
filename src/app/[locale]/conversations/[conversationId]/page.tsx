@@ -2,17 +2,18 @@ import { notFound } from "next/navigation";
 import { ConversationThreadPage } from "@/components/chat/conversation-thread-page";
 import { getLocaleFromParams } from "@/i18n/get-dictionary";
 
-export default function ConversationThreadRoute({
+export default async function ConversationThreadRoute({
   params,
 }: {
-  params: { locale: string; conversationId: string };
+  params: Promise<{ locale: string; conversationId: string }>;
 }) {
-  const locale = getLocaleFromParams(params.locale);
+  const { locale: rawLocale, conversationId: rawConversationId } = await params;
+  const locale = getLocaleFromParams(rawLocale);
   if (!["en", "vi"].includes(locale)) {
     notFound();
   }
 
-  const conversationId = Number(params.conversationId);
+  const conversationId = Number(rawConversationId);
   if (Number.isNaN(conversationId)) {
     notFound();
   }
