@@ -93,13 +93,13 @@ export function ConversationSidebar({
         </div>
       </div>
 
-      <div className="shrink-0 border-t border-white/10 p-3">
+      <div className="flex h-[81px] shrink-0 items-center border-t border-white/10 px-3">
         <button
           type="button"
           onClick={onEditProfile}
-          className="flex w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 p-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
+          className="flex h-[52px] w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 px-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
         >
-          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
+          <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={apiAssetUrl(currentUser?.avatarUrl)}
