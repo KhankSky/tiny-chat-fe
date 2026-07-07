@@ -21,6 +21,28 @@ function nameColor(index: number, offline: boolean) {
   return colors[index % colors.length];
 }
 
+function CameraIcon() {
+  return (
+    <svg aria-hidden="true" style={{ display: "block", height: 20, width: 20 }} viewBox="0 0 24 24">
+      <path
+        fill="currentColor"
+        d="M8.75 4.5a1 1 0 0 0-.8.4L6.38 7H4.5A2.5 2.5 0 0 0 2 9.5v7A2.5 2.5 0 0 0 4.5 19h15a2.5 2.5 0 0 0 2.5-2.5v-7A2.5 2.5 0 0 0 19.5 7h-1.88l-1.57-2.1a1 1 0 0 0-.8-.4h-6.5ZM12 9a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"
+      />
+    </svg>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg aria-hidden="true" style={{ display: "block", height: 20, width: 20 }} viewBox="0 0 24 24">
+      <path
+        fill="currentColor"
+        d="M16.86 3.64a2.2 2.2 0 0 1 3.11 3.11L8.87 17.85a1 1 0 0 1-.46.26l-4.13 1.1a1 1 0 0 1-1.22-1.22l1.1-4.13a1 1 0 0 1 .26-.46L16.86 3.64Zm1.7 1.41a.2.2 0 0 0-.29 0L6.03 17.29l-.36 1.34 1.34-.36L19.25 6.03a.2.2 0 0 0 0-.29l-.69-.69ZM12 20a1 1 0 0 1 1-1h7a1 1 0 1 1 0 2h-7a1 1 0 0 1-1-1Z"
+      />
+    </svg>
+  );
+}
+
 function MemberRow({
   member,
   index,
@@ -35,16 +57,14 @@ function MemberRow({
 
   return (
     <div
-      className={`flex h-13 items-center gap-3 px-5 transition ${
-        active ? "bg-[#111a35]" : "hover:bg-white/[0.04]"
-      } ${offline ? "opacity-45" : ""}`}
+      className={`flex h-13 items-center gap-3 px-5 transition ${active ? "bg-[#111a35]" : "hover:bg-white/[0.04]"
+        } ${offline ? "opacity-45" : ""}`}
     >
       <div className="relative h-11 w-11 shrink-0 overflow-visible">
         <Avatar className="h-11 w-11 ring-1 ring-white/10" src={member.avatarUrl} alt={displayName} />
         <span
-          className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-[#0b111c] ${
-            offline ? "bg-slate-600" : index % 3 === 1 ? "bg-amber-400" : "bg-emerald-400"
-          }`}
+          className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-[#0b111c] ${offline ? "bg-slate-600" : index % 3 === 1 ? "bg-amber-400" : "bg-emerald-400"
+            }`}
         />
       </div>
 
@@ -171,26 +191,35 @@ export function GroupSidebar({
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 gap-3">
-            <Avatar
-              className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30"
-              src={group?.groupAvatarUrl}
-              alt={group?.groupName || t.loadingGroup}
-            />
+            <button
+              type="button"
+              onClick={() => setIsEditing(true)}
+              className="group/avatar relative h-13 w-13 shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
+              aria-label={t.editGroup}
+            >
+              <Avatar
+                className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30 transition-opacity group-hover/avatar:opacity-75"
+                src={group?.groupAvatarUrl}
+                alt={group?.groupName || t.loadingGroup}
+              />
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-full bg-slate-950/55 text-cyan-100 opacity-0 transition-opacity duration-200 group-hover/avatar:opacity-100">
+                <CameraIcon />
+              </div>
+            </button>
             <div className="min-w-0">
-              <h2 className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
+              <h2 className="mt-2 truncate text-xl font-semibold text-white">
                 {group?.groupName || t.loadingGroup}
               </h2>
             </div>
           </div>
-          <Button
+          <button
             type="button"
             onClick={() => setIsEditing(true)}
             aria-label={t.editGroup}
-            className="shrink-0 px-4 py-2"
-            variant="secondary"
+            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
           >
-            {t.editGroup}
-          </Button>
+            <PencilIcon />
+          </button>
         </div>
       </div>
 
