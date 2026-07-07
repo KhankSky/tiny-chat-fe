@@ -1,12 +1,89 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { apiGet } from "@/lib/api/client";
-import type { GroupDetailResponse } from "@/lib/api/types";
+import { apiAssetUrl, apiGet } from "@/lib/api/client";
+import type { GroupDetailResponse, GroupMemberResponse } from "@/lib/api/types";
 import type { Locale } from "@/i18n/types";
 
 function avatarFallback(name: string | null | undefined) {
   return (name?.trim()?.charAt(0) || "G").toUpperCase();
+}
+
+function nameColor(index: number, offline: boolean) {
+  const colors = [
+    offline ? "text-slate-500" : "text-sky-400",
+    offline ? "text-emerald-800" : "text-emerald-400",
+    offline ? "text-cyan-800" : "text-cyan-400",
+    offline ? "text-violet-800" : "text-violet-400",
+    offline ? "text-amber-800" : "text-amber-300",
+  ];
+  return colors[index % colors.length];
+}
+
+function MemberRow({
+  member,
+  index,
+  offline = false,
+}: {
+  member: GroupMemberResponse;
+  index: number;
+  offline?: boolean;
+}) {
+  const displayName = member.displayName || `User ${member.userId}`;
+  const active = !offline && index === 1;
+
+  return (
+    <div
+      className={`flex h-13 items-center gap-3 px-5 transition ${
+        active ? "bg-[#111a35]" : "hover:bg-white/[0.04]"
+      } ${offline ? "opacity-45" : ""}`}
+    >
+      <div className="relative h-11 w-11 shrink-0 overflow-visible">
+        <div className="h-11 w-11 overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
+          {member.avatarUrl ? (
+            <>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={apiAssetUrl(member.avatarUrl)}
+                alt={displayName}
+                className="h-full w-full object-cover"
+              />
+            </>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-slate-100">
+              {avatarFallback(displayName)}
+            </div>
+          )}
+        </div>
+        <span
+          className={`absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-[#0b111c] ${
+            offline ? "bg-slate-600" : index % 3 === 1 ? "bg-amber-400" : "bg-emerald-400"
+          }`}
+        />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <div className="flex min-w-0 items-center gap-2">
+          <p className={`truncate text-[15px] font-semibold leading-5 ${nameColor(index, offline)}`}>
+            {displayName}
+          </p>
+          {member.role === "OWNER" ? (
+            <span className="shrink-0 rounded bg-amber-400/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300">
+              OWNER
+            </span>
+          ) : null}
+          {index % 4 === 2 ? (
+            <span className="shrink-0 rounded bg-indigo-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              APP
+            </span>
+          ) : null}
+        </div>
+        {active ? (
+          <p className="mt-0.5 truncate text-xs italic text-slate-300">hello world~</p>
+        ) : null}
+      </div>
+    </div>
+  );
 }
 
 export function GroupSidebar({
@@ -43,6 +120,11 @@ export function GroupSidebar({
     };
   }, [groupId]);
 
+  const members = group?.members ?? [];
+  const onlineCount = members.length <= 2 ? members.length : Math.ceil(members.length * 0.65);
+  const onlineMembers = members.slice(0, onlineCount);
+  const offlineMembers = members.slice(onlineCount);
+
   if (collapsed) {
     return (
       <aside className="flex h-full min-h-0 w-[72px] flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
@@ -65,7 +147,7 @@ export function GroupSidebar({
             className="text-[10px] uppercase tracking-[0.45em] text-slate-500"
             style={{ writingMode: "vertical-rl" }}
           >
-            {locale === "vi" ? "Thông tin" : "Info"}
+            {locale === "vi" ? "Thành viên" : "Members"}
           </div>
           <button
             type="button"
@@ -86,9 +168,9 @@ export function GroupSidebar({
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-              {locale === "vi" ? "Thông tin nhóm" : "Group info"}
+              {locale === "vi" ? "Thành viên nhóm" : "Members"}
             </p>
-            <h2 className="mt-2 truncate text-2xl font-semibold text-white">
+            <h2 className="mt-2 truncate text-xl font-semibold text-white">
               {group?.groupName || (locale === "vi" ? "Đang tải nhóm" : "Loading group")}
             </h2>
             <p className="mt-1 text-sm text-slate-400">
@@ -104,53 +186,41 @@ export function GroupSidebar({
             &gt;
           </button>
         </div>
-        {group?.groupDescription ? (
-          <p className="mt-4 text-sm leading-7 text-slate-400">{group.groupDescription}</p>
-        ) : null}
       </div>
 
-      <div className="border-b border-white/10 px-5 py-4">
-        <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
-          {locale === "vi" ? "Số thành viên" : "Members"}
-        </p>
-        <p className="mt-2 text-2xl font-semibold text-white">{group?.memberCount ?? 0}</p>
-      </div>
-
-      <div className="min-h-0 flex-1 overflow-y-auto p-3">
+      <div className="min-h-0 flex-1 overflow-y-auto py-4">
         {error ? (
-          <p className="rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <p className="mx-5 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {error}
           </p>
         ) : null}
 
-        <div className="space-y-2">
-          {group?.members?.map((member) => (
-            <div
-              key={member.userId}
-              className="rounded-3xl border border-white/10 bg-white/5 p-4"
-            >
-              <div className="flex items-start gap-3">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-sm font-semibold text-white">
-                  {avatarFallback(member.displayName)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="truncate text-sm font-semibold text-white">
-                      {member.displayName || member.userId}
-                    </p>
-                    <span className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-slate-300">
-                      {member.role}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-xs text-slate-500">ID: {member.userId}</p>
-                  <p className="mt-1 truncate text-xs text-slate-500">
-                    {member.avatarUrl || (locale === "vi" ? "Chưa có avatar" : "No avatar")}
-                  </p>
-                </div>
-              </div>
-            </div>
+        <div className="mb-3 px-5 text-sm font-medium tracking-wide text-slate-400">
+          {locale === "vi" ? "Trực tuyến" : "Online"} — {onlineMembers.length}
+        </div>
+        <div>
+          {onlineMembers.map((member, index) => (
+            <MemberRow key={member.userId} member={member} index={index} />
           ))}
         </div>
+
+        {offlineMembers.length > 0 ? (
+          <>
+            <div className="mb-3 mt-7 px-5 text-sm font-medium tracking-wide text-slate-400">
+              {locale === "vi" ? "Ngoại tuyến" : "Offline"} — {offlineMembers.length}
+            </div>
+            <div>
+              {offlineMembers.map((member, index) => (
+                <MemberRow
+                  key={member.userId}
+                  member={member}
+                  index={index + onlineMembers.length}
+                  offline
+                />
+              ))}
+            </div>
+          </>
+        ) : null}
       </div>
     </aside>
   );
