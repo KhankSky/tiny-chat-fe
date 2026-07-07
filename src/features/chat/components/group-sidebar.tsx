@@ -171,68 +171,31 @@ export function GroupSidebar({
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 gap-3">
-            <button
-              type="button"
-              onClick={() => setIsEditing(true)}
-              className="group/avatar relative h-13 w-13 shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
-              aria-label={t.editGroup}
-            >
-              <Avatar
-                className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30 transition-all duration-200 group-hover/avatar:opacity-60"
-                src={group?.groupAvatarUrl}
-                alt={group?.groupName || t.loadingGroup}
-              />
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity duration-200 group-hover/avatar:opacity-100 pointer-events-none">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="h-5 w-5 text-white"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316A2.192 2.192 0 0 0 14.502 4h-5.004c-.53 0-1.027.27-1.316.732l-.822 1.317a2.3 2.3 0 0 1-1.64 1.055L6.827 6.175ZM12 9.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"
-                  />
-                </svg>
-              </div>
-            </button>
+            <Avatar
+              className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30"
+              src={group?.groupAvatarUrl}
+              alt={group?.groupName || t.loadingGroup}
+            />
             <div className="min-w-0">
-            {/*<p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">*/}
-            {/*  {t.membersEyebrow}*/}
-            {/*</p>*/}
-            <h2 className="mt-2 truncate text-xl font-semibold text-white">
-              {group?.groupName || t.loadingGroup}
-            </h2>
-            {/*<p className="mt-1 text-sm text-slate-400">*/}
-            {/*  {t.groupIdLabel}: {groupId}*/}
-            {/*</p>*/}
+              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
+                {t.membersEyebrow}
+              </p>
+              <h2 className="mt-2 truncate text-xl font-semibold text-white">
+                {group?.groupName || t.loadingGroup}
+              </h2>
+              <p className="mt-1 text-sm text-slate-400">
+                {t.groupIdLabel}: {groupId}
+              </p>
             </div>
           </div>
           <Button
             type="button"
             onClick={() => setIsEditing(true)}
             aria-label={t.editGroup}
-            className="shrink-0"
-            variant="icon"
+            className="shrink-0 px-4 py-2"
+            variant="secondary"
           >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-5 w-5 text-slate-200"
-            >
-              <path d="M12 20h9" />
-              <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-            </svg>
+            {t.editGroup}
           </Button>
         </div>
       </div>
