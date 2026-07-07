@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { apiAssetUrl } from "@/lib/api/client";
+import type { AuthUserResponse } from "@/lib/api/types";
 import type { Locale } from "@/i18n/types";
 
 export type ConversationItem = {
@@ -17,11 +19,15 @@ export function ConversationSidebar({
   appName,
   conversations,
   activeGroupId,
+  currentUser,
+  onEditProfile,
 }: {
   locale: Locale;
   appName: string;
   conversations: ConversationItem[];
   activeGroupId: number;
+  currentUser?: AuthUserResponse | null;
+  onEditProfile?: () => void;
 }) {
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
@@ -91,6 +97,31 @@ export function ConversationSidebar({
             );
           })}
         </div>
+      </div>
+
+      <div className="shrink-0 border-t border-white/10 p-3">
+        <button
+          type="button"
+          onClick={onEditProfile}
+          className="flex w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 p-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
+        >
+          <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={apiAssetUrl(currentUser?.avatarUrl)}
+              alt={currentUser?.displayName || currentUser?.email || "User avatar"}
+              className="h-full w-full object-cover"
+            />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-sm font-semibold text-white">
+              {currentUser?.displayName || currentUser?.email || (locale === "vi" ? "Bạn" : "You")}
+            </span>
+            <span className="mt-1 block truncate text-xs text-slate-400">
+              {currentUser?.email || (locale === "vi" ? "Thông tin cá nhân" : "Personal info")}
+            </span>
+          </span>
+        </button>
       </div>
     </aside>
   );

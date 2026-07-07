@@ -26,6 +26,23 @@ export function getStoredAuthUser() {
   }
 }
 
+export function updateStoredAuthUser(
+  updater: (current: AuthUserResponse | null) => AuthUserResponse | null,
+) {
+  if (typeof window === "undefined") return null;
+
+  const current = getStoredAuthUser() as AuthUserResponse | null;
+  const next = updater(current);
+  if (next) {
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(next));
+  } else {
+    localStorage.removeItem(AUTH_USER_KEY);
+  }
+
+  window.dispatchEvent(new Event("storage"));
+  return next;
+}
+
 export function clearAuthSession() {
   if (typeof window === "undefined") return;
   localStorage.removeItem(ACCESS_TOKEN_KEY);

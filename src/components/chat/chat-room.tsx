@@ -2,9 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { apiGet, apiPost } from "@/lib/api/client";
-import { getAccessToken, getStoredAuthUser } from "@/lib/auth/session";
+import { getAccessToken } from "@/lib/auth/session";
 import { logClientError } from "@/lib/logger";
 import { StompClient } from "@/lib/realtime/stomp";
+import type { AuthUserResponse } from "@/lib/api/types";
 import type { Locale } from "@/i18n/types";
 
 type ChatMessage = {
@@ -34,7 +35,7 @@ function parseChatMessage(payload: string) {
 
 function createOptimisticMessage(
   content: string,
-  currentUser: { userId?: number; displayName?: string; email?: string } | null,
+  currentUser: { userId?: number; displayName?: string | null; email?: string | null } | null,
   groupId: number,
 ) {
   return {
@@ -52,11 +53,13 @@ function createOptimisticMessage(
 export function ChatRoom({
   locale,
   groupId,
+  currentUser = null,
   sidebarOpen,
   onToggleSidebar,
 }: {
   locale: Locale;
   groupId: number;
+  currentUser?: AuthUserResponse | null;
   sidebarOpen?: boolean;
   onToggleSidebar?: () => void;
 }) {
@@ -69,15 +72,6 @@ export function ChatRoom({
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const stompClientRef = useRef<StompClient | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
-  const currentUser = useMemo(
-    () =>
-      getStoredAuthUser() as {
-        userId?: number;
-        email?: string;
-        displayName?: string;
-      } | null,
-    [],
-  );
   const accessToken = useMemo(() => getAccessToken(), []);
 
   useEffect(() => {
