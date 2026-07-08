@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { FeedbackModal } from "@/features/feedback/components/feedback-modal";
 import type { Dictionary } from "@/i18n/types";
 import type { Locale } from "@/i18n/types";
 import { Button } from "@/shared/ui/button";
@@ -26,10 +28,12 @@ export function ProfileEditorModal({
   onThemeChange?: (theme: ThemeMode) => void;
 }) {
   const profileCopy = dictionary.chat.profileModal;
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
 
   if (!editor.profileOpen) return null;
 
   return (
+    <>
     <Modal ariaLabel={profileCopy.ariaLabel} onClose={editor.closeProfileEditor}>
       <div className="flex items-start justify-between border-b border-white/10 px-6 py-5">
         <div>
@@ -132,7 +136,11 @@ export function ProfileEditorModal({
         {editor.profileError ? <ErrorMessage>{editor.profileError}</ErrorMessage> : null}
       </div>
 
-      <div className="flex items-center justify-end gap-3 border-t border-white/10 px-6 py-5">
+      <div className="flex flex-col gap-3 border-t border-white/10 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <Button type="button" onClick={() => setFeedbackOpen(true)} variant="ghost">
+          {dictionary.feedback.entryLabel}
+        </Button>
+        <div className="flex items-center justify-end gap-3">
         <Button type="button" onClick={editor.closeProfileEditor} variant="ghost">
           {dictionary.common.cancel}
         </Button>
@@ -143,7 +151,16 @@ export function ProfileEditorModal({
         >
           {editor.profileSaving ? dictionary.common.saving : dictionary.common.saveChanges}
         </Button>
+        </div>
       </div>
     </Modal>
+    <FeedbackModal
+      dictionary={dictionary}
+      locale={locale}
+      onClose={() => setFeedbackOpen(false)}
+      open={feedbackOpen}
+      theme={theme}
+    />
+    </>
   );
 }
