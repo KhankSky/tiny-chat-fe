@@ -24,6 +24,14 @@ export type HistoryResponse = {
   messages: ChatMessage[];
 };
 
+export type DailyTopicResponse = {
+  groupId: number;
+  topicId: number;
+  topicDate: string;
+  title: string;
+  content: string;
+};
+
 export type UserStreakResponse = {
   userId: number;
   currentStreak: number;

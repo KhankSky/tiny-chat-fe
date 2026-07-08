@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
+import { getDailyTopicCached } from "@/features/chat/api/chat-api";
 import { useChatRoom } from "@/features/chat/hooks/use-chat-room";
+import type { DailyTopicResponse } from "@/features/chat/types";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
 import { formatDateTime } from "@/i18n/format";
 import type { Dictionary, Locale } from "@/i18n/types";
@@ -32,6 +34,8 @@ export function ChatRoom({
   const t = dictionary.chat;
   const [memberAvatars, setMemberAvatars] = useState<Record<number, string | null>>({});
   const [conversationTitle, setConversationTitle] = useState(t.roomEyebrow);
+  const [dailyTopic, setDailyTopic] = useState<DailyTopicResponse | null>(null);
+  const [dailyTopicError, setDailyTopicError] = useState<string | null>(null);
   const {
     bottomRef,
     content,
@@ -56,6 +60,30 @@ export function ChatRoom({
     [currentUser, memberAvatars, messages],
   );
   const [conversationAvatarUrl, setConversationAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadDailyTopic() {
+      try {
+        setDailyTopicError(null);
+        const topic = await getDailyTopicCached(groupId);
+        if (active) {
+          setDailyTopic(topic);
+        }
+      } catch {
+        if (active) {
+          setDailyTopic(null);
+          setDailyTopicError(t.loadDailyTopicError);
+        }
+      }
+    }
+
+    void loadDailyTopic();
+    return () => {
+      active = false;
+    };
+  }, [groupId, t.loadDailyTopicError]);
 
   useEffect(() => {
     let active = true;
@@ -139,6 +167,36 @@ export function ChatRoom({
           ) : null}
         </div>
       </header>
+
+      {dailyTopic ? (
+        <div className="shrink-0 border-b border-white/10 bg-[#0b111c] px-3 py-3 sm:px-6">
+          <div className="flex flex-col gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-cyan-200/80">
+                {t.dailyTopicTitle}
+              </p>
+              <p className="mt-1 text-sm font-semibold leading-6 text-white sm:text-base">
+                {dailyTopic.content}
+              </p>
+            </div>
+            <Button
+              type="button"
+              className="min-h-10 shrink-0 px-4"
+              onClick={() => {
+                setContent((previousContent) =>
+                  previousContent.trim()
+                    ? previousContent
+                    : `${t.dailyTopicQuotePrefix} ${dailyTopic.content}\n\n`,
+                );
+              }}
+            >
+              {t.dailyTopicAction}
+            </Button>
+          </div>
+        </div>
+      ) : dailyTopicError ? (
+        <ErrorMessage className="mx-3 mt-3 sm:mx-6">{dailyTopicError}</ErrorMessage>
+      ) : null}
 
       <div className="tc-chat-canvas min-h-0 flex-1 overscroll-contain overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-3 py-4 sm:px-6 sm:py-5">
         {loading ? (

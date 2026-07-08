@@ -2,6 +2,7 @@ import { apiGet, apiPost } from "@/shared/api/client";
 import type {
   ChatMessage,
   ConversationResponse,
+  DailyTopicResponse,
   GroupStreakResponse,
   HistoryResponse,
   UserStreakResponse,
@@ -11,6 +12,8 @@ let myStreakCache: UserStreakResponse | null = null;
 let myStreakRequest: Promise<UserStreakResponse> | null = null;
 const groupStreakCache = new Map<number, GroupStreakResponse>();
 const groupStreakRequests = new Map<number, Promise<GroupStreakResponse>>();
+const dailyTopicCache = new Map<number, DailyTopicResponse>();
+const dailyTopicRequests = new Map<number, Promise<DailyTopicResponse>>();
 
 export function getConversations() {
   return apiGet<ConversationResponse[]>("/api/conversations");
@@ -18,6 +21,29 @@ export function getConversations() {
 
 export function getGroupMessages(groupId: number) {
   return apiGet<HistoryResponse>(`/api/groups/${groupId}/messages`);
+}
+
+export function getDailyTopic(groupId: number) {
+  return apiGet<DailyTopicResponse>(`/api/groups/${groupId}/daily-topic`);
+}
+
+export function getDailyTopicCached(groupId: number) {
+  const cached = dailyTopicCache.get(groupId);
+  const activeRequest = dailyTopicRequests.get(groupId);
+  if (activeRequest) return activeRequest;
+  if (cached) return Promise.resolve(cached);
+
+  const request = getDailyTopic(groupId)
+    .then((topic) => {
+      dailyTopicCache.set(groupId, topic);
+      return topic;
+    })
+    .finally(() => {
+      dailyTopicRequests.delete(groupId);
+    });
+
+  dailyTopicRequests.set(groupId, request);
+  return request;
 }
 
 export function getMyStreak() {
