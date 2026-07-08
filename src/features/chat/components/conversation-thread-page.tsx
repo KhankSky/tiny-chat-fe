@@ -5,6 +5,7 @@ import { useConversations } from "@/features/chat/hooks/use-conversations";
 import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
 import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
 import type { Dictionary, Locale } from "@/i18n/types";
+import type { ThemeMode } from "@/theme/use-theme-preference";
 import { ChatRoom } from "./chat-room";
 import { ConversationSidebar } from "./conversation-sidebar";
 import { GroupSidebar } from "./group-sidebar";
@@ -14,11 +15,15 @@ export function ConversationThreadPage({
   dictionary,
   conversationId,
   onLocaleChange,
+  onThemeChange,
+  theme,
 }: {
   locale: Locale;
   dictionary: Dictionary;
   conversationId: number;
   onLocaleChange?: (locale: Locale) => void;
+  theme?: ThemeMode;
+  onThemeChange?: (theme: ThemeMode) => void;
 }) {
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
@@ -65,6 +70,8 @@ export function ConversationThreadPage({
         editor={profileEditor}
         locale={locale}
         onLocaleChange={onLocaleChange}
+        theme={theme}
+        onThemeChange={onThemeChange}
       />
     </div>
   );

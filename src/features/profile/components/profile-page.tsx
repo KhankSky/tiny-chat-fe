@@ -6,15 +6,20 @@ import { getMeProfile, updateMeProfile, uploadMeAvatar } from "@/features/profil
 import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
+import type { ThemeMode } from "@/theme/use-theme-preference";
 
 export function ProfilePage({
   dictionary,
   locale,
   onLocaleChange,
+  onThemeChange,
+  theme,
 }: {
   locale: Locale;
   dictionary: Dictionary;
   onLocaleChange?: (locale: Locale) => void;
+  theme?: ThemeMode;
+  onThemeChange?: (theme: ThemeMode) => void;
 }) {
   const router = useRouter();
   const t = dictionary.profile;
@@ -149,6 +154,22 @@ export function ProfilePage({
                 >
                   <option value="en">{dictionary.chat.profileModal.languageEnglish}</option>
                   <option value="vi">{dictionary.chat.profileModal.languageVietnamese}</option>
+                </select>
+              </label>
+            ) : null}
+
+            {theme && onThemeChange ? (
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-slate-200">
+                  {dictionary.chat.profileModal.themeLabel}
+                </span>
+                <select
+                  value={theme}
+                  onChange={(event) => onThemeChange(event.target.value as ThemeMode)}
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
+                >
+                  <option value="dark">{dictionary.chat.profileModal.themeDark}</option>
+                  <option value="light">{dictionary.chat.profileModal.themeLight}</option>
                 </select>
               </label>
             ) : null}

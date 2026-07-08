@@ -8,17 +8,22 @@ import { Input } from "@/shared/ui/input";
 import { LoadingState } from "@/shared/ui/loading-state";
 import { Modal } from "@/shared/ui/modal";
 import type { ProfileEditorState } from "@/features/profile/hooks/use-profile-editor";
+import type { ThemeMode } from "@/theme/use-theme-preference";
 
 export function ProfileEditorModal({
   dictionary,
   editor,
   locale,
   onLocaleChange,
+  onThemeChange,
+  theme,
 }: {
   dictionary: Dictionary;
   editor: ProfileEditorState;
   locale?: Locale;
   onLocaleChange?: (locale: Locale) => void;
+  theme?: ThemeMode;
+  onThemeChange?: (theme: ThemeMode) => void;
 }) {
   const profileCopy = dictionary.chat.profileModal;
 
@@ -104,6 +109,22 @@ export function ProfileEditorModal({
             >
               <option value="en">{profileCopy.languageEnglish}</option>
               <option value="vi">{profileCopy.languageVietnamese}</option>
+            </select>
+          </label>
+        ) : null}
+
+        {theme && onThemeChange ? (
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-200">
+              {profileCopy.themeLabel}
+            </span>
+            <select
+              value={theme}
+              onChange={(event) => onThemeChange(event.target.value as ThemeMode)}
+              className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/50"
+            >
+              <option value="dark">{profileCopy.themeDark}</option>
+              <option value="light">{profileCopy.themeLight}</option>
             </select>
           </label>
         ) : null}
