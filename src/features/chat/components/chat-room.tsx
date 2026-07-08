@@ -55,6 +55,7 @@ export function ChatRoom({
       })),
     [currentUser, memberAvatars, messages],
   );
+  const [conversationAvatarUrl, setConversationAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -64,13 +65,14 @@ export function ChatRoom({
         const groupDetail = await getGroupDetail(groupId);
         if (!active) return;
 
-        const directChatTitle = groupDetail.directChat
+        const directChatMember = groupDetail.directChat
           ? groupDetail.members.find((member) => member.userId !== currentUser?.userId)
-              ?.displayName
           : null;
+        const directChatTitle = directChatMember?.displayName;
         setConversationTitle(
           directChatTitle || groupDetail.groupName || groupDetail.groupDescription || t.roomEyebrow,
         );
+        setConversationAvatarUrl(groupDetail.groupAvatarUrl || directChatMember?.avatarUrl || null);
         setMemberAvatars(
           Object.fromEntries(
             groupDetail.members.map((member) => [member.userId, member.avatarUrl]),
@@ -78,6 +80,7 @@ export function ChatRoom({
         );
       } catch {
         if (active) {
+          setConversationAvatarUrl(null);
           setMemberAvatars({});
         }
       }
@@ -104,6 +107,11 @@ export function ChatRoom({
               <span aria-hidden="true">‹</span>
             </button>
           ) : null}
+          <Avatar
+            className="h-10 w-10 ring-1 ring-white/10 sm:h-11 sm:w-11"
+            src={conversationAvatarUrl}
+            alt={conversationTitle}
+          />
           <div className="min-w-0">
             <h2 className="truncate text-lg font-semibold text-white sm:text-xl">
               {conversationTitle}
