@@ -18,6 +18,7 @@ export type SocketStatus = "idle" | "connecting" | "connected" | "error";
 const messageHistoryCache = new Map<number, LocalChatMessage[]>();
 const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
 export const GROUP_STREAK_CHANGED_EVENT = "tiny-chat:group-streak-changed";
+export const PERSONAL_STREAK_CHANGED_EVENT = "tiny-chat:personal-streak-changed";
 
 export function useChatRoom({
   currentUser,
@@ -56,7 +57,11 @@ export function useChatRoom({
 
     try {
       setStreakError(null);
-      setUserStreak(await getMyStreak());
+      const nextStreak = await getMyStreak();
+      setUserStreak(nextStreak);
+      window.dispatchEvent(
+        new CustomEvent(PERSONAL_STREAK_CHANGED_EVENT, { detail: nextStreak }),
+      );
     } catch (err) {
       setStreakError(err instanceof Error ? err.message : copy.loadStreakError);
     }

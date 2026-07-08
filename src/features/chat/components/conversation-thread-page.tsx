@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useConversations } from "@/features/chat/hooks/use-conversations";
 import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
 import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
@@ -19,11 +20,16 @@ export function ConversationThreadPage({
 }) {
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   return (
     <div className="h-screen w-full overflow-hidden bg-[#070d18] text-white">
       <div
-        className="grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]"
+        className={
+          rightSidebarOpen
+            ? "grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]"
+            : "grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)]"
+        }
       >
         <ConversationSidebar
           locale={locale}
@@ -39,13 +45,17 @@ export function ConversationThreadPage({
           dictionary={dictionary}
           groupId={conversationId}
           currentUser={profileEditor.currentUser}
+          rightSidebarOpen={rightSidebarOpen}
+          onToggleRightSidebar={() => setRightSidebarOpen((open) => !open)}
         />
-        <GroupSidebar
-          key={`group-${conversationId}`}
-          dictionary={dictionary}
-          groupId={conversationId}
-          locale={locale}
-        />
+        {rightSidebarOpen ? (
+          <GroupSidebar
+            key={`group-${conversationId}`}
+            dictionary={dictionary}
+            groupId={conversationId}
+            locale={locale}
+          />
+        ) : null}
       </div>
 
       <ProfileEditorModal dictionary={dictionary} editor={profileEditor} />

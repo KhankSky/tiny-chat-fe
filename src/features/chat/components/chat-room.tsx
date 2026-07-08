@@ -18,14 +18,19 @@ export function ChatRoom({
   dictionary,
   groupId,
   currentUser = null,
+  onToggleRightSidebar,
+  rightSidebarOpen = true,
 }: {
   locale: Locale;
   dictionary: Dictionary;
   groupId: number;
   currentUser?: AuthUserResponse | null;
+  onToggleRightSidebar?: () => void;
+  rightSidebarOpen?: boolean;
 }) {
   const t = dictionary.chat;
   const [memberAvatars, setMemberAvatars] = useState<Record<number, string | null>>({});
+  const [conversationTitle, setConversationTitle] = useState(t.roomEyebrow);
   const {
     bottomRef,
     content,
@@ -36,8 +41,6 @@ export function ChatRoom({
     setContent,
     socketError,
     socketStatus,
-    streakError,
-    userStreak,
   } = useChatRoom({ currentUser, dictionary, groupId });
   const messagesWithAvatars = useMemo(
     () =>
@@ -60,6 +63,13 @@ export function ChatRoom({
         const groupDetail = await getGroupDetail(groupId);
         if (!active) return;
 
+        const directChatTitle = groupDetail.directChat
+          ? groupDetail.members.find((member) => member.userId !== currentUser?.userId)
+              ?.displayName
+          : null;
+        setConversationTitle(
+          directChatTitle || groupDetail.groupName || groupDetail.groupDescription || t.roomEyebrow,
+        );
         setMemberAvatars(
           Object.fromEntries(
             groupDetail.members.map((member) => [member.userId, member.avatarUrl]),
@@ -76,29 +86,30 @@ export function ChatRoom({
     return () => {
       active = false;
     };
-  }, [groupId]);
+  }, [currentUser?.userId, groupId, t.roomEyebrow]);
 
   return (
     <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
       <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-            {t.roomEyebrow}
-          </p>
-          <h2 className="mt-2 truncate text-xl font-semibold text-white">Group #{groupId}</h2>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <StatusBadge tone="warning">
-              {t.personalStreak}: {userStreak?.currentStreak ?? 0} {t.streakDays}
-            </StatusBadge>
-            <StatusBadge tone="info">
-              {t.messagesToday}: {userStreak?.todayMessageCount ?? 0}
-            </StatusBadge>
-            {streakError ? (
-              <StatusBadge tone="neutral">{t.streakUnavailable}</StatusBadge>
-            ) : null}
-          </div>
+          <h2 className="truncate text-xl font-semibold text-white">{conversationTitle}</h2>
         </div>
         <div className="flex items-center gap-2">
+          {onToggleRightSidebar ? (
+            <button
+              type="button"
+              onClick={onToggleRightSidebar}
+              aria-label={
+                rightSidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open
+              }
+              title={rightSidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open}
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322]"
+            >
+              <span className="text-base leading-none" aria-hidden="true">
+                {rightSidebarOpen ? ">" : "<"}
+              </span>
+            </button>
+          ) : null}
           <StatusBadge
             tone={
               socketStatus === "connected"
@@ -112,9 +123,6 @@ export function ChatRoom({
           >
             {t.socketStatus[socketStatus]}
           </StatusBadge>
-          <div className="rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-slate-300">
-            {currentUser ? currentUser.email ?? dictionary.common.loggedIn : dictionary.common.anonymous}
-          </div>
         </div>
       </header>
 

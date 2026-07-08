@@ -95,6 +95,63 @@ function MemberRow({
   );
 }
 
+function GroupStreakCard({
+  streak,
+  streakError,
+  t,
+}: {
+  streak: GroupStreakResponse | null;
+  streakError: string | null;
+  t: Dictionary["chat"]["groupSidebar"];
+}) {
+  const currentStreak = streak?.currentStreak ?? 0;
+  const activeMemberCount = streak?.todayActiveMemberCount ?? 0;
+  const activeProgress = Math.min(activeMemberCount / 2, 1) * 100;
+  const countedToday = Boolean(streak?.todayStreakCounted);
+
+  return (
+    <div className="mx-5 mb-5 overflow-hidden rounded-2xl border border-amber-300/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,0.22),transparent_34%),linear-gradient(145deg,rgba(34,211,238,0.12),rgba(15,23,42,0.95))] p-4 shadow-[0_18px_45px_rgba(0,0,0,0.25)]">
+      <div className="flex items-center gap-3">
+        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-300/10">
+          <span className="absolute inset-1 animate-streak-glow rounded-2xl bg-amber-300/20 blur-md" />
+          <span className="streak-flame relative" aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-amber-200">
+            {t.groupStreakTitle}
+          </p>
+          <div className="mt-1 flex items-end gap-2">
+            <p className="text-3xl font-bold leading-none text-white">{currentStreak}</p>
+            <p className="pb-1 text-xs font-medium text-slate-300">{t.currentStreak}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <div className="flex items-center justify-between text-xs font-medium text-slate-300">
+          <span>{t.activeToday}</span>
+          <span className={countedToday ? "text-amber-200" : "text-slate-400"}>
+            {activeMemberCount}/2
+          </span>
+        </div>
+        <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-amber-300 via-orange-300 to-cyan-300 transition-[width] duration-500"
+            style={{ width: `${activeProgress}%` }}
+          />
+        </div>
+      </div>
+
+      <p className="mt-4 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs leading-5 text-slate-300">
+        {countedToday ? t.groupStreakCounted : t.groupStreakNeedsMembers}
+      </p>
+      {streakError ? (
+        <p className="mt-2 text-xs text-amber-200">{t.streakUnavailable}</p>
+      ) : null}
+    </div>
+  );
+}
+
 export function GroupSidebar({
   dictionary,
   groupId,
@@ -317,31 +374,7 @@ export function GroupSidebar({
         ) : null}
 
         {group && !group.directChat ? (
-          <div className="mx-5 mb-5 rounded-lg border border-cyan-400/20 bg-cyan-400/[0.06] p-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300">
-              {t.groupStreakTitle}
-            </p>
-            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-              <div>
-                <p className="text-lg font-semibold text-white">{groupStreak?.currentStreak ?? 0}</p>
-                <p className="mt-0.5 text-[11px] text-slate-400">{t.currentStreak}</p>
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-white">{groupStreak?.todayActiveMemberCount ?? 0}/2</p>
-                <p className="mt-0.5 text-[11px] text-slate-400">{t.activeToday}</p>
-              </div>
-              <div>
-                <p className="text-lg font-semibold text-white">{groupStreak?.todayMessageCount ?? 0}</p>
-                <p className="mt-0.5 text-[11px] text-slate-400">{t.messagesToday}</p>
-              </div>
-            </div>
-            <p className="mt-3 text-xs text-slate-300">
-              {groupStreak?.todayStreakCounted ? t.groupStreakCounted : t.groupStreakNeedsMembers}
-            </p>
-            {streakError ? (
-              <p className="mt-2 text-xs text-amber-200">{t.streakUnavailable}</p>
-            ) : null}
-          </div>
+          <GroupStreakCard streak={groupStreak} streakError={streakError} t={t} />
         ) : null}
 
         <div className="mb-3 px-5 text-sm font-medium tracking-wide text-slate-400">

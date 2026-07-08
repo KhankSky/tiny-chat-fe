@@ -1,7 +1,11 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
+import { getMyStreak } from "@/features/chat/api/chat-api";
+import { PERSONAL_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
+import type { UserStreakResponse } from "@/features/chat/types";
 import { FriendsPanel } from "@/features/friends/components/friends-panel";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
@@ -32,6 +36,42 @@ export function ConversationSidebar({
   onEditProfile?: () => void;
 }) {
   const t = dictionary.chat;
+  const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadUserStreak() {
+      try {
+        const streak = await getMyStreak();
+        if (active) {
+          setUserStreak(streak);
+        }
+      } catch {
+        if (active) {
+          setUserStreak(null);
+        }
+      }
+    }
+
+    if (currentUser) {
+      void loadUserStreak();
+    }
+
+    function handlePersonalStreakChanged(event: Event) {
+      const nextStreak = (event as CustomEvent<UserStreakResponse>).detail;
+      if (nextStreak?.userId === currentUser?.userId) {
+        setUserStreak(nextStreak);
+      }
+    }
+
+    window.addEventListener(PERSONAL_STREAK_CHANGED_EVENT, handlePersonalStreakChanged);
+
+    return () => {
+      active = false;
+      window.removeEventListener(PERSONAL_STREAK_CHANGED_EVENT, handlePersonalStreakChanged);
+    };
+  }, [currentUser]);
 
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
@@ -97,11 +137,11 @@ export function ConversationSidebar({
         <FriendsPanel dictionary={dictionary} locale={locale} />
       </div>
 
-      <div className="flex h-[81px] shrink-0 items-center border-t border-white/10 px-3">
+      <div className="shrink-0 border-t border-white/10 px-3 py-3">
         <button
           type="button"
           onClick={onEditProfile}
-          className="flex h-[52px] w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 px-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
+          className="flex w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 px-3 py-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
         >
           <Avatar
             src={currentUser?.avatarUrl}
@@ -115,6 +155,15 @@ export function ConversationSidebar({
               {currentUser?.email || t.personalInfo}
             </span>
           </span>
+          {userStreak ? (
+            <span
+              className="relative shrink-0 overflow-hidden rounded-full border border-amber-300/30 bg-amber-300/10 px-2.5 py-1 text-xs font-semibold text-amber-100 shadow-[0_0_18px_rgba(251,191,36,0.12)]"
+              title={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`}
+            >
+              <span className="absolute inset-0 animate-streak-shimmer bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)]" />
+              <span className="relative">{userStreak.currentStreak}d</span>
+            </span>
+          ) : null}
         </button>
       </div>
     </aside>
