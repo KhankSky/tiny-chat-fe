@@ -217,10 +217,23 @@ export const vi = {
     profileMissing: "Hoàn thiện hồ sơ trước",
     profileHint:
       "Hồ sơ đầy đủ giúp hệ thống ghép chính xác hơn, nhất là ở trình độ, mục tiêu và sở thích.",
+    profileChecklistTitle: "Tín hiệu hồ sơ",
+    readyLabel: "Sẵn sàng",
+    improveLabel: "Bổ sung",
     statusIdle: "Sẵn sàng khi bạn muốn",
     statusLoading: "Đang tìm nhóm phù hợp nhất",
     loadingHint:
       "Mình đang kiểm tra trình độ, chỗ trống còn lại và độ khớp về mục tiêu/sở thích.",
+    actionPanelTitle: "Phòng ghép",
+    actionPanelHeading: "Bắt đầu tìm nhóm",
+    actionPanelHint: "Bấm một lần, hệ thống sẽ tìm phòng phù hợp với hồ sơ của bạn.",
+    howItWorksTitle: "Cách ghép",
+    rulesSummary: "Quy tắc ghép nhóm",
+    matchingSteps: [
+      "Kiểm tra hồ sơ của bạn",
+      "Tìm người học gần trình độ",
+      "Vào phòng hoặc tạo phòng mới",
+    ],
     successTitle: "Bạn đã vào nhóm",
     openChat: "Mở chat",
     searchAgain: "Tìm lại nhóm",

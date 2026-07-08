@@ -66,12 +66,41 @@ a {
   }
 }
 
+@keyframes match-sweep {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes match-pulse {
+  0%,
+  100% {
+    opacity: 0.78;
+    transform: scale(0.96);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
 .animate-streak-glow {
   animation: streak-glow 1.8s ease-in-out infinite;
 }
 
 .animate-streak-shimmer {
   animation: streak-shimmer 2.6s ease-in-out infinite;
+}
+
+.animate-match-sweep {
+  animation: match-sweep 2.4s linear infinite;
+}
+
+.animate-match-pulse {
+  animation: match-pulse 1.35s ease-in-out infinite;
 }
 
 .streak-flame {

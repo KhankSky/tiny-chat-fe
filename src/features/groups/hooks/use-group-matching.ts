@@ -39,13 +39,13 @@ export function useGroupMatching(dictionary: Dictionary) {
 
   const profileSignals = {
     currentGoal: currentUser?.practiceGoal
-      ? formatGroupLabel(currentUser.practiceGoal, dictionary)
+      ? (formatGroupLabel(currentUser.practiceGoal, dictionary) ?? copy.goalUnknown)
       : copy.goalUnknown,
     currentInterests: currentUser?.interests?.length
       ? `${currentUser.interests.length} ${copy.interestsCount}`
       : copy.noInterests,
     currentLevel: currentUser?.englishLevel
-      ? formatGroupLabel(currentUser.englishLevel, dictionary)
+      ? (formatGroupLabel(currentUser.englishLevel, dictionary) ?? copy.levelUnknown)
       : copy.levelUnknown,
   };
 

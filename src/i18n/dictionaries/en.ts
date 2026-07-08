@@ -217,10 +217,23 @@ export const en = {
     profileMissing: "Complete your profile first",
     profileHint:
       "A filled-in profile gives the matcher stronger signals, especially for level, goal, and shared interests.",
+    profileChecklistTitle: "Profile signals",
+    readyLabel: "Ready",
+    improveLabel: "Improve",
     statusIdle: "Ready when you are",
     statusLoading: "Looking for the best fit",
     loadingHint:
       "We are checking level, room for one more person, and whether there is a useful overlap.",
+    actionPanelTitle: "Match room",
+    actionPanelHeading: "Start matching",
+    actionPanelHint: "Tap once and we will look for a room that fits your profile.",
+    howItWorksTitle: "How it works",
+    rulesSummary: "Matching rules",
+    matchingSteps: [
+      "Check your profile",
+      "Find learners near your level",
+      "Join or create a practice room",
+    ],
     successTitle: "You are in",
     openChat: "Open chat",
     searchAgain: "Match again",
