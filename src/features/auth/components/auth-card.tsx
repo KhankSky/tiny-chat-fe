@@ -19,13 +19,13 @@ export function AuthCard({
   children: ReactNode;
 }) {
   return (
-    <section className="mx-auto flex min-h-[calc(100vh-5rem)] max-w-6xl items-center px-6 py-10 lg:px-8">
-      <div className="grid w-full gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-6 rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl shadow-black/20">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
+    <section className="mx-auto flex min-h-[calc(100dvh-5rem)] max-w-6xl items-center px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+      <div className="grid w-full gap-4 sm:gap-8 lg:grid-cols-[0.95fr_1.05fr]">
+        <div className="space-y-4 rounded-2xl border border-white/10 bg-white/5 p-5 shadow-2xl shadow-black/20 sm:space-y-6 sm:rounded-[2rem] sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300 sm:text-sm sm:tracking-[0.3em]">
             {dictionary.appName}
           </p>
-          <h1 className="max-w-md text-4xl font-semibold tracking-tight text-white">
+          <h1 className="max-w-md text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             {title}
           </h1>
           <p className="max-w-lg text-sm leading-7 text-slate-300">
@@ -56,7 +56,7 @@ export function AuthCard({
           </div>
         </div>
 
-        <div className="rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-cyan-950/20">
+        <div className="rounded-2xl border border-white/10 bg-slate-950/80 p-4 shadow-2xl shadow-cyan-950/20 sm:rounded-[2rem] sm:p-6">
           {children}
         </div>
       </div>

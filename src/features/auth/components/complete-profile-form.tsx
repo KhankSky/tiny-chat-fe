@@ -127,18 +127,18 @@ export function CompleteProfileForm({
   }
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit}>
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
+      <div className="grid gap-4 md:grid-cols-2">
         <Field label={t.displayNameLabel}>
           <input
             value={displayName}
             onChange={(event) => setDisplayName(event.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
+            className="min-h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50 sm:rounded-lg"
             placeholder={t.displayNamePlaceholder}
             required
           />
         </Field>
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-white/10 bg-white/5 p-3">
+        <label className="flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-3 sm:rounded-lg">
           <Avatar
             className="h-11 w-11 ring-1 ring-cyan-400/30"
             src={avatarPreviewUrl}
@@ -163,7 +163,7 @@ export function CompleteProfileForm({
             onChange={(event) =>
               setEnglishLevel(event.target.value as ProfileRequest["englishLevel"])
             }
-            className="w-full rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
+            className="min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50 sm:rounded-lg"
           >
             {englishLevels.map((level) => (
               <option key={level.value} value={level.value}>
@@ -179,7 +179,7 @@ export function CompleteProfileForm({
             onChange={(event) =>
               setPracticeGoal(event.target.value as ProfileRequest["practiceGoal"])
             }
-            className="w-full rounded-lg border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
+            className="min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50 sm:rounded-lg"
           >
             {practiceGoals.map((goal) => (
               <option key={goal.value} value={goal.value}>
@@ -199,7 +199,7 @@ export function CompleteProfileForm({
                 key={interest}
                 type="button"
                 onClick={() => toggleInterest(interest)}
-                className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                className={`min-h-10 rounded-full border px-3 py-2 text-xs font-semibold transition ${
                   active
                     ? "border-cyan-400 bg-cyan-400 text-slate-950"
                     : "border-white/10 bg-white/5 text-slate-300 hover:border-white/25"
@@ -216,13 +216,13 @@ export function CompleteProfileForm({
         <textarea
           value={bio}
           onChange={(event) => setBio(event.target.value)}
-          className="min-h-24 w-full resize-none rounded-lg border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50"
+          className="min-h-24 w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50 sm:rounded-lg"
           placeholder={t.bioPlaceholder}
         />
       </Field>
 
       {error ? (
-        <p className="tc-alert-danger rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+        <p className="tc-alert-danger rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 sm:rounded-lg">
           {error}
         </p>
       ) : null}
@@ -230,7 +230,7 @@ export function CompleteProfileForm({
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+        className="min-h-12 w-full rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
       >
         {loading ? dictionary.common.saving : t.completeProfileButton}
       </button>

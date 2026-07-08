@@ -63,7 +63,7 @@ function ProfileSignal({
 
 function MatchingRadar({ active }: { active: boolean }) {
   return (
-    <div className="relative mx-auto flex aspect-square w-full max-w-[19rem] items-center justify-center overflow-hidden rounded-full border border-cyan-300/20 bg-[radial-gradient(circle,rgba(34,211,238,0.18)_0%,rgba(34,211,238,0.04)_42%,transparent_70%)]">
+    <div className="relative mx-auto flex aspect-square w-full max-w-[15rem] items-center justify-center overflow-hidden rounded-full border border-cyan-300/20 bg-[radial-gradient(circle,rgba(34,211,238,0.18)_0%,rgba(34,211,238,0.04)_42%,transparent_70%)] sm:max-w-[19rem]">
       <div className="absolute inset-8 rounded-full border border-cyan-300/15" />
       <div className="absolute inset-16 rounded-full border border-cyan-300/20" />
       <div className="absolute inset-24 rounded-full border border-cyan-300/25" />
@@ -137,17 +137,17 @@ export function GroupMatchingPage({
 
   return (
     <main className="tc-match-page min-h-screen bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(180deg,#020617_0%,#050816_58%,#020617_100%)] text-white">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 lg:px-6 lg:py-7">
-        <header className="mb-5 flex items-center justify-between gap-3">
+      <div className="mx-auto flex min-h-dvh w-full max-w-7xl flex-col px-4 py-4 sm:py-5 lg:px-6 lg:py-7">
+        <header className="mb-4 flex items-center justify-between gap-3 sm:mb-5">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-300 sm:text-xs sm:tracking-[0.35em]">
               {dictionary.appName}
             </p>
-            <h1 className="mt-2 text-xl font-semibold sm:text-2xl">{t.eyebrow}</h1>
+            <h1 className="mt-2 text-lg font-semibold sm:text-2xl">{t.eyebrow}</h1>
           </div>
           <Link
             href="/conversations"
-            className="rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-slate-100 transition hover:border-cyan-300/50 hover:bg-cyan-300/10"
+            className="shrink-0 rounded-full border border-white/15 px-3 py-2 text-sm font-semibold text-slate-100 transition hover:border-cyan-300/50 hover:bg-cyan-300/10 sm:px-4"
           >
             {t.secondary}
           </Link>
@@ -155,13 +155,13 @@ export function GroupMatchingPage({
 
         <section className="grid flex-1 gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(26rem,0.72fr)]">
           <div className="flex min-h-0 flex-col gap-5">
-            <div className="tc-card relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20 sm:p-7">
+            <div className="tc-card relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20 sm:rounded-[2rem] sm:p-7">
               <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-cyan-300/10 blur-3xl" />
               <div className="relative max-w-3xl">
                 <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">
                   {profileReady ? t.profileReady : t.profileMissing}
                 </span>
-                <h2 className="mt-5 max-w-2xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl">
+                <h2 className="mt-5 max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
                   {t.title}
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-8 text-slate-300">
@@ -172,7 +172,7 @@ export function GroupMatchingPage({
                     type="button"
                     onClick={() => void findGroup()}
                     disabled={loading}
-                    className="h-12 px-7 text-base"
+                    className="h-12 w-full px-7 text-base sm:w-auto"
                     aria-busy={loading}
                   >
                     {loading ? t.statusLoading : t.primary}
@@ -180,7 +180,7 @@ export function GroupMatchingPage({
                   {!profileReady ? (
                     <Link
                       href="/auth/complete-profile"
-                      className="inline-flex h-12 items-center justify-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white transition hover:border-cyan-300/40 hover:bg-cyan-300/10"
+                      className="inline-flex h-12 w-full items-center justify-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white transition hover:border-cyan-300/40 hover:bg-cyan-300/10 sm:w-auto"
                     >
                       {t.completeProfileNow}
                     </Link>
@@ -190,7 +190,7 @@ export function GroupMatchingPage({
             </div>
 
             <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-              <aside className="tc-card rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
+              <aside className="tc-card rounded-2xl border border-white/10 bg-slate-950/70 p-5 sm:rounded-[1.75rem]">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
@@ -224,7 +224,7 @@ export function GroupMatchingPage({
                 </div>
               </aside>
 
-              <section className="tc-card rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
+              <section className="tc-card rounded-2xl border border-white/10 bg-slate-950/70 p-5 sm:rounded-[1.75rem]">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
@@ -264,7 +264,7 @@ export function GroupMatchingPage({
           </div>
 
           <section
-            className="tc-card flex min-h-[38rem] flex-col rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-2xl shadow-black/30 sm:p-6"
+            className="tc-card flex flex-col rounded-2xl border border-white/10 bg-slate-950/80 p-5 shadow-2xl shadow-black/30 sm:rounded-[2rem] sm:p-6 lg:min-h-[38rem]"
             aria-live="polite"
           >
             <div className="flex items-start justify-between gap-3">
@@ -285,7 +285,7 @@ export function GroupMatchingPage({
 
             {!matchResult ? (
               <div className="flex flex-1 flex-col">
-                <div className="py-8">
+                <div className="py-5 sm:py-8">
                   <MatchingRadar active={loading} />
                 </div>
                 <ProgressSteps active={loading} labels={t.matchingSteps} />
@@ -304,7 +304,7 @@ export function GroupMatchingPage({
               </div>
             ) : (
               <div className="mt-5 flex flex-1 flex-col gap-4">
-                <div className="rounded-[1.75rem] border border-cyan-300/25 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.18),transparent_34%),rgba(255,255,255,0.05)] p-5">
+                <div className="rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.18),transparent_34%),rgba(255,255,255,0.05)] p-4 sm:rounded-[1.75rem] sm:p-5">
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <p className="text-sm text-slate-400">
