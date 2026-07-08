@@ -12,11 +12,10 @@ type Mode = "login" | "register";
 export function AuthForm({
   mode,
   dictionary,
-  locale,
 }: {
   mode: Mode;
   dictionary: Dictionary;
-  locale: Locale;
+  locale?: Locale;
 }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -36,7 +35,7 @@ export function AuthForm({
 
       persistAuthSession(user);
       router.push(
-        user.profileCompleted ? `/${locale}/conversations` : `/${locale}/auth/complete-profile`,
+        user.profileCompleted ? "/conversations" : "/auth/complete-profile",
       );
       router.refresh();
     } catch (err) {

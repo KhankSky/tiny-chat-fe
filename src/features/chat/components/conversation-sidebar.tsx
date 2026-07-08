@@ -106,7 +106,7 @@ export function ConversationSidebar({
             <h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>
           </div>
           <Link
-            href={`/${locale}/groups/match`}
+            href="/groups/match"
             className="inline-flex h-10 shrink-0 items-center rounded-full bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
             {t.findGroup}
@@ -122,7 +122,7 @@ export function ConversationSidebar({
             return (
               <Link
                 key={conversationId}
-                href={`/${locale}/conversations/${conversationId}`}
+                href={`/conversations/${conversationId}`}
                 className={`flex items-center gap-3 rounded-2xl border px-3 py-3 transition ${
                   active
                     ? "border-cyan-400/40 bg-cyan-400/10 shadow-[0_0_0_1px_rgba(34,211,238,0.08)]"

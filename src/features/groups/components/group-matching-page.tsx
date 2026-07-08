@@ -36,7 +36,7 @@ export function GroupMatchingPage({
           </div>
           <div className="flex items-center gap-3">
             <Link
-              href={`/${locale}/conversations`}
+              href="/conversations"
               className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5"
             >
               {t.secondary}
@@ -83,7 +83,7 @@ export function GroupMatchingPage({
                   <p className="text-sm leading-7 text-slate-300">{t.profileHint}</p>
                   {!currentUser?.profileCompleted ? (
                     <Link
-                      href={`/${locale}/auth/complete-profile`}
+                      href="/auth/complete-profile"
                       className="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-400/30 hover:bg-cyan-400/15"
                     >
                       {t.completeProfileNow}
@@ -268,7 +268,7 @@ export function GroupMatchingPage({
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Button
                     type="button"
-                    onClick={() => router.push(`/${locale}/conversations/${matchResult.groupId}`)}
+                    onClick={() => router.push(`/conversations/${matchResult.groupId}`)}
                   >
                     {t.openChat}
                   </Button>

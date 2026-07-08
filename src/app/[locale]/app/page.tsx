@@ -5,6 +5,6 @@ export default async function AppRedirectPage({
 }: {
   params: Promise<{ locale: string }>;
 }) {
-  const { locale } = await params;
-  redirect(`/${locale}/conversations`);
+  await params;
+  redirect("/conversations");
 }

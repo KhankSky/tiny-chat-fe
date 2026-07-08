@@ -1,133 +1,82 @@
 "use client";
 
 import Link from "next/link";
-import { ConversationListItem } from "@/features/chat/components/conversation-list-item";
-import { useConversationList } from "@/features/chat/hooks/use-conversation-list";
-import { FriendsPanel } from "@/features/friends/components/friends-panel";
+import { useConversations } from "@/features/chat/hooks/use-conversations";
+import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
+import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { LoadingState } from "@/shared/ui/loading-state";
+import { ConversationSidebar } from "./conversation-sidebar";
 
 export function ConversationListPage({
-  locale,
   dictionary,
+  locale,
+  onLocaleChange,
 }: {
-  locale: Locale;
   dictionary: Dictionary;
+  locale: Locale;
+  onLocaleChange?: (locale: Locale) => void;
 }) {
   const t = dictionary.chat;
-  const { conversations, error, loading } = useConversationList(t.loadConversationsError);
+  const conversations = useConversations({ dictionary, locale });
+  const profileEditor = useProfileEditor(dictionary);
 
   return (
-    <div className="min-h-screen w-full bg-[#070d18] text-white">
-      <div className="grid min-h-screen w-full lg:grid-cols-[360px_minmax(0,1fr)_320px]">
-        <aside className="flex min-h-screen flex-col border-r border-white/10 bg-[#0b111c]">
-          <div className="border-b border-white/10 p-5">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
-              {dictionary.appName}
-            </p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">
-              {t.conversationsTitle}
-            </h1>
-            <p className="mt-2 text-sm leading-7 text-slate-400">
-              {t.conversationsDescription}
-            </p>
+    <div className="h-screen w-full overflow-hidden bg-[#070d18] text-white">
+      <div className="grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]">
+        <ConversationSidebar
+          locale={locale}
+          dictionary={dictionary}
+          conversations={conversations}
+          activeGroupId={-1}
+          currentUser={profileEditor.currentUser}
+          onEditProfile={profileEditor.openProfileEditor}
+        />
 
-            <div className="mt-5 rounded-2xl border border-cyan-400/20 bg-cyan-400/5 p-4">
-              <p className="text-sm font-semibold text-white">{t.needGroupTitle}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                {t.needGroupDescription}
-              </p>
-              <Link
-                href={`/${locale}/groups/match`}
-                className="mt-4 inline-flex rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-              >
-                {t.findGroup}
-              </Link>
-            </div>
-          </div>
-
-          <div className="flex-1 overflow-y-auto p-3">
-            {loading ? (
-              <LoadingState className="px-3 py-4" label={dictionary.common.loading} />
-            ) : null}
-
-            {error ? (
-              <ErrorMessage className="rounded-lg">{error}</ErrorMessage>
-            ) : null}
-
-            {!loading && !error && conversations.length === 0 ? (
-              <p className="px-3 py-4 text-sm leading-7 text-slate-400">
-                {t.noConversations}
-              </p>
-            ) : null}
-
-            <div className="space-y-2">
-              {conversations.map((conversation) => (
-                <ConversationListItem
-                  key={conversation.conversationId}
-                  conversation={conversation}
-                  locale={locale}
-                  noMessages={t.noMessages}
-                />
-              ))}
-            </div>
-
-            <FriendsPanel dictionary={dictionary} locale={locale} />
-          </div>
-        </aside>
-
-        <main className="flex min-h-screen min-w-0 flex-col justify-between border-x border-white/10 bg-[#0d1322] p-6 text-white sm:p-8">
-          <div className="max-w-2xl">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-              {dictionary.appName}
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold">
+        <main className="flex min-h-0 min-w-0 flex-col overflow-hidden border-r border-white/10 bg-[#0d1322]">
+          <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
+            <h2 className="truncate text-xl font-semibold text-white">
               {t.selectConversationTitle}
             </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-slate-300">
-              {t.selectConversationDescription}
-            </p>
-          </div>
+            <Link
+              href="/groups/match"
+              className="inline-flex h-9 shrink-0 items-center rounded-full bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              {t.findGroup}
+            </Link>
+          </header>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-sm font-semibold text-white">{t.layoutTitle}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                {t.layoutDescription}
+          <div className="flex min-h-0 flex-1 items-center justify-center bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-6">
+            <div className="max-w-md text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-400/20 bg-cyan-400/10 text-2xl font-semibold text-cyan-200">
+                TC
+              </div>
+              <h1 className="mt-5 text-2xl font-semibold text-white">
+                {t.selectConversationTitle}
+              </h1>
+              <p className="mt-3 text-sm leading-7 text-slate-400">
+                {t.conversationsDescription}
+              </p>
+              <p className="mt-2 text-sm leading-7 text-slate-500">
+                {t.quickTipDescription}
               </p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
-              <p className="text-sm font-semibold text-white">{t.focusTitle}</p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                {t.focusDescription}
-              </p>
-            </div>
-          </div>
-
-          <div className="rounded-3xl border border-cyan-400/15 bg-cyan-400/5 p-5">
-            <p className="text-sm font-semibold text-white">{t.quickTipTitle}</p>
-            <p className="mt-2 text-sm leading-6 text-slate-300">
-              {t.quickTipDescription}
-            </p>
           </div>
         </main>
 
-        <aside className="hidden min-h-screen flex-col border-l border-white/10 bg-[#0b111c] xl:flex">
+        <aside className="hidden h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c] lg:flex">
           <div className="border-b border-white/10 px-5 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-              {t.shortcutsEyebrow}
+              {t.workspaceTitle}
             </p>
-            <h3 className="mt-2 text-xl font-semibold text-white">{t.workspaceTitle}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
-              {t.workspaceDescription}
-            </p>
+            <h3 className="mt-2 text-xl font-semibold text-white">{t.needGroupTitle}</h3>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto p-4">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4">
             <Link
-              href={`/${locale}/groups/match`}
-              className="block rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
+              href="/groups/match"
+              className="block rounded-2xl border border-cyan-400/20 bg-cyan-400/[0.06] p-4 transition hover:border-cyan-300/40 hover:bg-cyan-400/10"
             >
               <p className="text-sm font-semibold text-white">{t.findNewGroup}</p>
               <p className="mt-2 text-sm leading-6 text-slate-400">
@@ -135,20 +84,29 @@ export function ConversationListPage({
               </p>
             </Link>
 
-            <Link
-              href={`/${locale}/profile`}
-              className="block rounded-3xl border border-white/10 bg-white/5 p-4 transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
-            >
-              <p className="text-sm font-semibold text-white">
-                {t.completeProfileTitle}
+            {conversations.length === 0 ? (
+              <p className="mt-5 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-slate-400">
+                {t.noConversations}
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                {t.completeProfileDescription}
-              </p>
-            </Link>
+            ) : null}
+
+            {profileEditor.profileLoading ? (
+              <LoadingState className="mt-5" label={dictionary.common.loading} />
+            ) : null}
+
+            {profileEditor.profileError ? (
+              <ErrorMessage className="mt-5">{profileEditor.profileError}</ErrorMessage>
+            ) : null}
           </div>
         </aside>
       </div>
+
+      <ProfileEditorModal
+        dictionary={dictionary}
+        editor={profileEditor}
+        locale={locale}
+        onLocaleChange={onLocaleChange}
+      />
     </div>
   );
 }

@@ -16,10 +16,9 @@ import { Avatar } from "@/shared/ui/avatar";
 
 export function FriendsPanel({
   dictionary,
-  locale,
 }: {
   dictionary: Dictionary;
-  locale: Locale;
+  locale?: Locale;
 }) {
   const router = useRouter();
   const t = dictionary.chat.friends;
@@ -93,7 +92,7 @@ export function FriendsPanel({
       setError(null);
       const conversation = await openDirectConversation(friendId);
       clearConversationCache();
-      router.push(`/${locale}/conversations/${conversation.conversationId}`);
+      router.push(`/conversations/${conversation.conversationId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : t.actionError);
     } finally {

@@ -26,13 +26,12 @@ function enumLabel(labels: Record<string, string>, value: string | null) {
 export function MemberProfileModal({
   dictionary,
   groupId,
-  locale,
   memberUserId,
   onClose,
 }: {
   dictionary: Dictionary;
   groupId: number;
-  locale: Locale;
+  locale?: Locale;
   memberUserId: number;
   onClose: () => void;
 }) {
@@ -103,7 +102,7 @@ export function MemberProfileModal({
       setActionError(null);
       const conversation = await openDirectConversation(profile.userId);
       clearConversationCache();
-      router.push(`/${locale}/conversations/${conversation.conversationId}`);
+      router.push(`/conversations/${conversation.conversationId}`);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : t.actionError);
     } finally {

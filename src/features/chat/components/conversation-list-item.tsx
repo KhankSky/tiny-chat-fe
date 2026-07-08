@@ -14,7 +14,7 @@ export function ConversationListItem({
 }) {
   return (
     <Link
-      href={`/${locale}/conversations/${conversation.conversationId}`}
+      href={`/conversations/${conversation.conversationId}`}
       className="block rounded-3xl border border-transparent p-4 transition hover:border-white/10 hover:bg-white/5"
     >
       <div className="flex items-start justify-between gap-3">

@@ -3,10 +3,9 @@ import type { Dictionary, Locale } from "@/i18n/types";
 
 export function LandingHero({
   dictionary,
-  locale,
 }: {
   dictionary: Dictionary;
-  locale: Locale;
+  locale?: Locale;
 }) {
   return (
     <section className="mx-auto grid max-w-6xl gap-14 px-6 pb-20 pt-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-24">
@@ -27,7 +26,7 @@ export function LandingHero({
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href={`/${locale}/auth/register`}
+            href="/auth/register"
             className="inline-flex items-center justify-center rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
             {dictionary.landing.primaryCta}

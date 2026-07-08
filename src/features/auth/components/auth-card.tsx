@@ -8,14 +8,13 @@ export function AuthCard({
   title,
   description,
   dictionary,
-  locale,
   activeTab,
   children,
 }: {
   title: string;
   description: string;
   dictionary: Dictionary;
-  locale: Locale;
+  locale?: Locale;
   activeTab: "login" | "register";
   children: ReactNode;
 }) {
@@ -35,7 +34,7 @@ export function AuthCard({
 
           <div className="flex gap-3">
             <Link
-              href={`/${locale}/auth/login`}
+              href="/auth/login"
               className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                 activeTab === "login"
                   ? "bg-cyan-400 text-slate-950"
@@ -45,7 +44,7 @@ export function AuthCard({
               {dictionary.header.login}
             </Link>
             <Link
-              href={`/${locale}/auth/register`}
+              href="/auth/register"
               className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                 activeTab === "register"
                   ? "bg-cyan-400 text-slate-950"

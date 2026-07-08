@@ -6,7 +6,8 @@ import { getCurrentUser } from "@/features/auth/api/auth-api";
 import { clearAuthSession, getAccessToken, persistAuthSession } from "@/shared/auth/session";
 import type { Locale } from "@/i18n/types";
 
-export function SessionRedirect({ locale }: { locale: Locale }) {
+export function SessionRedirect(_props: { locale?: Locale } = {}) {
+  void _props;
   const router = useRouter();
 
   useEffect(() => {
@@ -22,8 +23,8 @@ export function SessionRedirect({ locale }: { locale: Locale }) {
         persistAuthSession(user);
         router.replace(
           user.profileCompleted
-            ? `/${locale}/conversations`
-            : `/${locale}/auth/complete-profile`,
+            ? "/conversations"
+            : "/auth/complete-profile",
         );
       } catch {
         clearAuthSession();
@@ -35,7 +36,7 @@ export function SessionRedirect({ locale }: { locale: Locale }) {
     return () => {
       active = false;
     };
-  }, [locale, router]);
+  }, [router]);
 
   return null;
 }

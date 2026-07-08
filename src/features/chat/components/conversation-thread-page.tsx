@@ -13,10 +13,12 @@ export function ConversationThreadPage({
   locale,
   dictionary,
   conversationId,
+  onLocaleChange,
 }: {
   locale: Locale;
   dictionary: Dictionary;
   conversationId: number;
+  onLocaleChange?: (locale: Locale) => void;
 }) {
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
@@ -58,7 +60,12 @@ export function ConversationThreadPage({
         ) : null}
       </div>
 
-      <ProfileEditorModal dictionary={dictionary} editor={profileEditor} />
+      <ProfileEditorModal
+        dictionary={dictionary}
+        editor={profileEditor}
+        locale={locale}
+        onLocaleChange={onLocaleChange}
+      />
     </div>
   );
 }

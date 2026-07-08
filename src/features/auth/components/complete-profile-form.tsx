@@ -42,10 +42,9 @@ const interests = [
 ];
 
 export function CompleteProfileForm({
-  locale,
   dictionary,
 }: {
-  locale: Locale;
+  locale?: Locale;
   dictionary: Dictionary;
 }) {
   const router = useRouter();
@@ -118,7 +117,7 @@ export function CompleteProfileForm({
           ) ?? user,
         );
       }
-      router.replace(`/${locale}/conversations`);
+      router.replace("/conversations");
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : t.saveProfileError);

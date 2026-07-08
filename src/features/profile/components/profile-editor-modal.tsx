@@ -1,6 +1,7 @@
 "use client";
 
 import type { Dictionary } from "@/i18n/types";
+import type { Locale } from "@/i18n/types";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Input } from "@/shared/ui/input";
@@ -11,9 +12,13 @@ import type { ProfileEditorState } from "@/features/profile/hooks/use-profile-ed
 export function ProfileEditorModal({
   dictionary,
   editor,
+  locale,
+  onLocaleChange,
 }: {
   dictionary: Dictionary;
   editor: ProfileEditorState;
+  locale?: Locale;
+  onLocaleChange?: (locale: Locale) => void;
 }) {
   const profileCopy = dictionary.chat.profileModal;
 
@@ -86,6 +91,22 @@ export function ProfileEditorModal({
             placeholder={profileCopy.displayNamePlaceholder}
           />
         </label>
+
+        {locale && onLocaleChange ? (
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-slate-200">
+              {profileCopy.languageLabel}
+            </span>
+            <select
+              value={locale}
+              onChange={(event) => onLocaleChange(event.target.value as Locale)}
+              className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-400/50"
+            >
+              <option value="en">{profileCopy.languageEnglish}</option>
+              <option value="vi">{profileCopy.languageVietnamese}</option>
+            </select>
+          </label>
+        ) : null}
 
         {editor.profileError ? <ErrorMessage>{editor.profileError}</ErrorMessage> : null}
       </div>

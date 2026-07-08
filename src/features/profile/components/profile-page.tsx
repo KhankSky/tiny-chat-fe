@@ -7,7 +7,15 @@ import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profi
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 
-export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictionary }) {
+export function ProfilePage({
+  dictionary,
+  locale,
+  onLocaleChange,
+}: {
+  locale: Locale;
+  dictionary: Dictionary;
+  onLocaleChange?: (locale: Locale) => void;
+}) {
   const router = useRouter();
   const t = dictionary.profile;
   const [profile, setProfile] = useState<MeProfileResponse | null>(null);
@@ -128,6 +136,22 @@ export function ProfilePage({ dictionary }: { locale: Locale; dictionary: Dictio
                 placeholder={t.displayNamePlaceholder}
               />
             </label>
+
+            {onLocaleChange ? (
+              <label className="block space-y-2">
+                <span className="text-sm font-medium text-slate-200">
+                  {dictionary.chat.profileModal.languageLabel}
+                </span>
+                <select
+                  value={locale}
+                  onChange={(event) => onLocaleChange(event.target.value as Locale)}
+                  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
+                >
+                  <option value="en">{dictionary.chat.profileModal.languageEnglish}</option>
+                  <option value="vi">{dictionary.chat.profileModal.languageVietnamese}</option>
+                </select>
+              </label>
+            ) : null}
 
             <label className="flex cursor-pointer items-center gap-3 rounded-3xl border border-white/10 bg-white/5 p-4">
               <Avatar
