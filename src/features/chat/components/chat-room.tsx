@@ -36,6 +36,8 @@ export function ChatRoom({
     setContent,
     socketError,
     socketStatus,
+    streakError,
+    userStreak,
   } = useChatRoom({ currentUser, dictionary, groupId });
   const messagesWithAvatars = useMemo(
     () =>
@@ -84,6 +86,17 @@ export function ChatRoom({
             {t.roomEyebrow}
           </p>
           <h2 className="mt-2 truncate text-xl font-semibold text-white">Group #{groupId}</h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <StatusBadge tone="warning">
+              {t.personalStreak}: {userStreak?.currentStreak ?? 0} {t.streakDays}
+            </StatusBadge>
+            <StatusBadge tone="info">
+              {t.messagesToday}: {userStreak?.todayMessageCount ?? 0}
+            </StatusBadge>
+            {streakError ? (
+              <StatusBadge tone="neutral">{t.streakUnavailable}</StatusBadge>
+            ) : null}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <StatusBadge

@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getGroupStreak } from "@/features/chat/api/chat-api";
+import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
+import type { GroupStreakResponse } from "@/features/chat/types";
 import { getGroupDetail, updateGroupDetail, uploadGroupAvatar } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
 import type { Dictionary } from "@/i18n/types";
@@ -96,7 +99,9 @@ export function GroupSidebar({
 }) {
   const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
+  const [groupStreak, setGroupStreak] = useState<GroupStreakResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [streakError, setStreakError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
@@ -128,6 +133,39 @@ export function GroupSidebar({
       active = false;
     };
   }, [groupId, t.loadGroupError]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadGroupStreak() {
+      try {
+        const data = await getGroupStreak(groupId);
+        if (active) {
+          setGroupStreak(data);
+          setStreakError(null);
+        }
+      } catch (err) {
+        if (active) {
+          setStreakError(err instanceof Error ? err.message : t.loadStreakError);
+        }
+      }
+    }
+
+    function handleGroupStreakChanged(event: Event) {
+      const detail = (event as CustomEvent<{ groupId?: number }>).detail;
+      if (detail?.groupId === groupId) {
+        void loadGroupStreak();
+      }
+    }
+
+    void loadGroupStreak();
+    window.addEventListener(GROUP_STREAK_CHANGED_EVENT, handleGroupStreakChanged);
+
+    return () => {
+      active = false;
+      window.removeEventListener(GROUP_STREAK_CHANGED_EVENT, handleGroupStreakChanged);
+    };
+  }, [groupId, t.loadStreakError]);
 
   useEffect(() => {
     return () => {
@@ -269,6 +307,32 @@ export function GroupSidebar({
         {error ? (
           <ErrorMessage className="mx-5">{error}</ErrorMessage>
         ) : null}
+
+        <div className="mx-5 mb-5 rounded-lg border border-cyan-400/20 bg-cyan-400/[0.06] p-4">
+          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300">
+            {t.groupStreakTitle}
+          </p>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+            <div>
+              <p className="text-lg font-semibold text-white">{groupStreak?.currentStreak ?? 0}</p>
+              <p className="mt-0.5 text-[11px] text-slate-400">{t.currentStreak}</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-white">{groupStreak?.todayActiveMemberCount ?? 0}/2</p>
+              <p className="mt-0.5 text-[11px] text-slate-400">{t.activeToday}</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-white">{groupStreak?.todayMessageCount ?? 0}</p>
+              <p className="mt-0.5 text-[11px] text-slate-400">{t.messagesToday}</p>
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-slate-300">
+            {groupStreak?.todayStreakCounted ? t.groupStreakCounted : t.groupStreakNeedsMembers}
+          </p>
+          {streakError ? (
+            <p className="mt-2 text-xs text-amber-200">{t.streakUnavailable}</p>
+          ) : null}
+        </div>
 
         <div className="mb-3 px-5 text-sm font-medium tracking-wide text-slate-400">
           {t.online} - {onlineMembers.length}

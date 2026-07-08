@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
-import { getGroupMessages, sendGroupMessage } from "@/features/chat/api/chat-api";
+import { getGroupMessages, getMyStreak, sendGroupMessage } from "@/features/chat/api/chat-api";
 import { subscribeToGroupMessages } from "@/features/chat/realtime/group-message-subscription";
+import type { UserStreakResponse } from "@/features/chat/types";
 import {
   createOptimisticMessage,
   type LocalChatMessage,
@@ -16,6 +17,7 @@ export type SocketStatus = "idle" | "connecting" | "connected" | "error";
 
 const messageHistoryCache = new Map<number, LocalChatMessage[]>();
 const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
+export const GROUP_STREAK_CHANGED_EVENT = "tiny-chat:group-streak-changed";
 
 export function useChatRoom({
   currentUser,
@@ -35,10 +37,30 @@ export function useChatRoom({
   const [error, setError] = useState<string | null>(null);
   const [socketStatus, setSocketStatus] = useState<SocketStatus>("idle");
   const [socketError, setSocketError] = useState<string | null>(null);
+  const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
+  const [streakError, setStreakError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const stompClientRef = useRef<StompClient | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const accessToken = useMemo(() => getAccessToken(), []);
+
+  const notifyGroupStreakChanged = useCallback(() => {
+    window.dispatchEvent(new CustomEvent(GROUP_STREAK_CHANGED_EVENT, { detail: { groupId } }));
+  }, [groupId]);
+
+  const refreshPersonalStreak = useCallback(async () => {
+    if (!accessToken) {
+      setUserStreak(null);
+      return;
+    }
+
+    try {
+      setStreakError(null);
+      setUserStreak(await getMyStreak());
+    } catch (err) {
+      setStreakError(err instanceof Error ? err.message : copy.loadStreakError);
+    }
+  }, [accessToken, copy.loadStreakError]);
 
   useEffect(() => {
     let active = true;
@@ -61,6 +83,7 @@ export function useChatRoom({
         if (active) {
           setMessages(historyMessages);
         }
+        void refreshPersonalStreak();
 
         if (!client) {
           if (active) {
@@ -83,6 +106,12 @@ export function useChatRoom({
           client,
           groupId,
           invalidDataMessage: copy.invalidChatData,
+          onMessage: (message) => {
+            notifyGroupStreakChanged();
+            if (message.senderId === currentUser?.userId) {
+              void refreshPersonalStreak();
+            }
+          },
           onInvalidData: setSocketError,
           setMessages: (updater) =>
             setMessages((previousMessages) => {
@@ -121,11 +150,14 @@ export function useChatRoom({
     };
   }, [
     accessToken,
+    currentUser?.userId,
     copy.invalidChatData,
     copy.loadMessagesError,
     copy.realtimeSignInRequired,
     copy.unknownSocketError,
     groupId,
+    notifyGroupStreakChanged,
+    refreshPersonalStreak,
   ]);
 
   useEffect(() => {
@@ -163,6 +195,8 @@ export function useChatRoom({
           messageHistoryCache.set(groupId, nextMessages);
           return nextMessages;
         });
+        await refreshPersonalStreak();
+        notifyGroupStreakChanged();
       }
     } catch (err) {
       setMessages((previousMessages) => {
@@ -187,5 +221,7 @@ export function useChatRoom({
     setContent,
     socketError,
     socketStatus,
+    streakError,
+    userStreak,
   };
 }

@@ -23,3 +23,21 @@ export type HistoryResponse = {
   groupId: number;
   messages: ChatMessage[];
 };
+
+export type UserStreakResponse = {
+  userId: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string | null;
+  todayMessageCount: number;
+};
+
+export type GroupStreakResponse = {
+  groupId: number;
+  currentStreak: number;
+  longestStreak: number;
+  lastActiveDate: string | null;
+  todayMessageCount: number;
+  todayActiveMemberCount: number;
+  todayStreakCounted: boolean;
+};

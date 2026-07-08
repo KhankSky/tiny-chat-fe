@@ -11,6 +11,7 @@ export function subscribeToGroupMessages({
   client,
   groupId,
   invalidDataMessage,
+  onMessage,
   onInvalidData,
   setMessages,
   unknownErrorMessage,
@@ -18,6 +19,7 @@ export function subscribeToGroupMessages({
   client: StompClient;
   groupId: number;
   invalidDataMessage: string;
+  onMessage?: (message: ChatMessage) => void;
   onInvalidData: (message: string) => void;
   setMessages: (updater: (messages: LocalChatMessage[]) => LocalChatMessage[]) => void;
   unknownErrorMessage: string;
@@ -26,6 +28,7 @@ export function subscribeToGroupMessages({
     try {
       const nextMessage = parseChatMessage(body);
       setMessages((messages) => reconcileIncomingMessage(messages, nextMessage));
+      onMessage?.(nextMessage);
     } catch (messageError) {
       logClientError("Received invalid chat data", {
         groupId,
