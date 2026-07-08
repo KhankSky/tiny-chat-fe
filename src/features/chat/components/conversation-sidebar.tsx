@@ -101,10 +101,10 @@ export function ConversationSidebar({
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
+            <p className="text-xl font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
               {dictionary.appName}
             </p>
-            <h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>
+            {/*<h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>*/}
           </div>
           <Link
             href="/groups/match"
