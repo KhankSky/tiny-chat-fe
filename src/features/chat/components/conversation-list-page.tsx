@@ -28,7 +28,7 @@ export function ConversationListPage({
   const profileEditor = useProfileEditor(dictionary);
 
   return (
-    <div className="tc-app-shell h-screen w-full overflow-hidden bg-[#070d18] text-white">
+    <div className="tc-app-shell h-dvh w-full overflow-hidden bg-[#070d18] text-white">
       <div className="grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]">
         <ConversationSidebar
           locale={locale}
@@ -39,7 +39,7 @@ export function ConversationListPage({
           onEditProfile={profileEditor.openProfileEditor}
         />
 
-        <main className="tc-panel flex min-h-0 min-w-0 flex-col overflow-hidden border-r border-white/10 bg-[#0d1322]">
+        <main className="tc-panel hidden min-h-0 min-w-0 flex-col overflow-hidden border-r border-white/10 bg-[#0d1322] lg:flex">
           <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
             <h2 className="truncate text-xl font-semibold text-white">
               {t.selectConversationTitle}

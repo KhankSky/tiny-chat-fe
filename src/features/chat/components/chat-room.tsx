@@ -17,6 +17,7 @@ export function ChatRoom({
   dictionary,
   groupId,
   currentUser = null,
+  onOpenConversationList,
   onToggleRightSidebar,
   rightSidebarOpen = true,
 }: {
@@ -24,6 +25,7 @@ export function ChatRoom({
   dictionary: Dictionary;
   groupId: number;
   currentUser?: AuthUserResponse | null;
+  onOpenConversationList?: () => void;
   onToggleRightSidebar?: () => void;
   rightSidebarOpen?: boolean;
 }) {
@@ -89,9 +91,24 @@ export function ChatRoom({
 
   return (
     <section className="tc-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
-      <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
-        <div className="min-w-0">
-          <h2 className="truncate text-xl font-semibold text-white">{conversationTitle}</h2>
+      <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-3 py-3 sm:px-6 sm:py-4">
+        <div className="flex min-w-0 items-center gap-3">
+          {onOpenConversationList ? (
+            <button
+              type="button"
+              onClick={onOpenConversationList}
+              aria-label={t.sidebarTitle}
+              title={t.sidebarTitle}
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg leading-none text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322] lg:hidden"
+            >
+              <span aria-hidden="true">‹</span>
+            </button>
+          ) : null}
+          <div className="min-w-0">
+            <h2 className="truncate text-lg font-semibold text-white sm:text-xl">
+              {conversationTitle}
+            </h2>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {onToggleRightSidebar ? (
@@ -105,14 +122,14 @@ export function ChatRoom({
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322]"
             >
               <span className="text-base leading-none" aria-hidden="true">
-                {rightSidebarOpen ? ">" : "<"}
+                {rightSidebarOpen ? ">" : "i"}
               </span>
             </button>
           ) : null}
         </div>
       </header>
 
-      <div className="tc-chat-canvas min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-4 py-5 sm:px-6">
+      <div className="tc-chat-canvas min-h-0 flex-1 overscroll-contain overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-3 py-4 sm:px-6 sm:py-5">
         {loading ? (
           <LoadingState label={dictionary.common.loading} />
         ) : null}
@@ -153,7 +170,7 @@ export function ChatRoom({
                 />
               ) : null}
 
-              <div className={`flex max-w-[72%] flex-col ${isMine ? "items-end" : "items-start"}`}>
+              <div className={`flex max-w-[82%] flex-col sm:max-w-[72%] ${isMine ? "items-end" : "items-start"}`}>
                 {!isMine ? (
                   <p className="mb-1 max-w-full truncate px-2 text-xs font-medium text-slate-300">
                     {message.senderName}
@@ -213,8 +230,14 @@ export function ChatRoom({
         <div ref={bottomRef} />
       </div>
 
-      <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-4">
-        <div className="flex gap-3">
+      <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
+        <form
+          className="flex gap-2 sm:gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void sendMessage();
+          }}
+        >
           <Input
             value={content}
             onChange={(event) => setContent(event.target.value)}
@@ -229,13 +252,12 @@ export function ChatRoom({
             disabled={false}
           />
           <Button
-            type="button"
-            onClick={() => void sendMessage()}
-            className="px-6"
+            type="submit"
+            className="min-h-12 shrink-0 px-4 sm:px-6"
           >
             {t.send}
           </Button>
-        </div>
+        </form>
       </div>
     </section>
   );

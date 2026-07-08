@@ -27,10 +27,12 @@ export function ConversationThreadPage({
 }) {
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
+  const [mobileGroupInfoOpen, setMobileGroupInfoOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   return (
-    <div className="tc-app-shell h-screen w-full overflow-hidden bg-[#070d18] text-white">
+    <div className="tc-app-shell h-dvh w-full overflow-hidden bg-[#070d18] text-white">
       <div
         className={
           rightSidebarOpen
@@ -38,32 +40,86 @@ export function ConversationThreadPage({
             : "grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)]"
         }
       >
-        <ConversationSidebar
-          locale={locale}
-          dictionary={dictionary}
-          conversations={conversations}
-          activeGroupId={conversationId}
-          currentUser={profileEditor.currentUser}
-          onEditProfile={profileEditor.openProfileEditor}
-        />
+        <div className="hidden min-h-0 lg:block">
+          <ConversationSidebar
+            locale={locale}
+            dictionary={dictionary}
+            conversations={conversations}
+            activeGroupId={conversationId}
+            currentUser={profileEditor.currentUser}
+            onEditProfile={profileEditor.openProfileEditor}
+          />
+        </div>
         <ChatRoom
           key={`chat-${conversationId}`}
           locale={locale}
           dictionary={dictionary}
           groupId={conversationId}
           currentUser={profileEditor.currentUser}
-          rightSidebarOpen={rightSidebarOpen}
-          onToggleRightSidebar={() => setRightSidebarOpen((open) => !open)}
+          rightSidebarOpen={rightSidebarOpen || mobileGroupInfoOpen}
+          onOpenConversationList={() => setLeftSidebarOpen(true)}
+          onToggleRightSidebar={() => {
+            if (window.matchMedia("(min-width: 1024px)").matches) {
+              setRightSidebarOpen((open) => !open);
+            } else {
+              setMobileGroupInfoOpen(true);
+            }
+          }}
         />
         {rightSidebarOpen ? (
-          <GroupSidebar
-            key={`group-${conversationId}`}
-            dictionary={dictionary}
-            groupId={conversationId}
-            locale={locale}
-          />
+          <div className="hidden min-h-0 lg:block">
+            <GroupSidebar
+              key={`group-${conversationId}`}
+              dictionary={dictionary}
+              groupId={conversationId}
+              locale={locale}
+            />
+          </div>
         ) : null}
       </div>
+
+      {leftSidebarOpen ? (
+        <div
+          className="fixed inset-0 z-40 bg-slate-950/65 backdrop-blur-sm lg:hidden"
+          onClick={() => setLeftSidebarOpen(false)}
+        >
+          <div
+            className="h-full w-[min(22rem,88vw)] overflow-hidden border-r border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <ConversationSidebar
+              locale={locale}
+              dictionary={dictionary}
+              conversations={conversations}
+              activeGroupId={conversationId}
+              currentUser={profileEditor.currentUser}
+              onEditProfile={() => {
+                setLeftSidebarOpen(false);
+                profileEditor.openProfileEditor();
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
+
+      {mobileGroupInfoOpen ? (
+        <div
+          className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileGroupInfoOpen(false)}
+        >
+          <div
+            className="h-[min(88dvh,46rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <GroupSidebar
+              key={`mobile-group-${conversationId}`}
+              dictionary={dictionary}
+              groupId={conversationId}
+              locale={locale}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <ProfileEditorModal
         dictionary={dictionary}
