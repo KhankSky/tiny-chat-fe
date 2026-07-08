@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import { createFeedback } from "@/features/feedback/api/feedback-api";
 import type { FeedbackSeverity, FeedbackType } from "@/features/feedback/types";
@@ -20,6 +20,7 @@ const feedbackTypes: FeedbackType[] = [
 ];
 
 const severities: FeedbackSeverity[] = ["LOW", "MEDIUM", "BLOCKING"];
+const SUCCESS_CLOSE_DELAY_MS = 3000;
 
 function parseContextId(pathname: string, segment: "conversations" | "groups") {
   const match = pathname.match(new RegExp(`/${segment}/(\\d+)`));
@@ -57,6 +58,22 @@ export function FeedbackModal({
     [pathname],
   );
 
+  const handleClose = useCallback(() => {
+    setError(null);
+    setSent(false);
+    onClose();
+  }, [onClose]);
+
+  useEffect(() => {
+    if (!open || !sent) return;
+
+    const timeoutId = window.setTimeout(() => {
+      handleClose();
+    }, SUCCESS_CLOSE_DELAY_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [handleClose, open, sent]);
+
   if (!open) return null;
 
   async function handleSubmit() {
@@ -93,12 +110,6 @@ export function FeedbackModal({
     }
   }
 
-  function handleClose() {
-    setError(null);
-    setSent(false);
-    onClose();
-  }
-
   return (
     <Modal ariaLabel={t.ariaLabel} onClose={handleClose} className="max-w-lg">
       <div className="flex items-start justify-between border-b border-white/10 px-5 py-4 sm:px-6 sm:py-5">
@@ -131,6 +142,7 @@ export function FeedbackModal({
                 key={item}
                 type="button"
                 onClick={() => setType(item)}
+                disabled={sent}
                 className={`min-h-10 rounded-full border px-3 py-2 text-xs font-semibold transition ${
                   type === item
                     ? "border-cyan-400 bg-cyan-400 text-slate-950"
@@ -151,6 +163,7 @@ export function FeedbackModal({
                 key={item}
                 type="button"
                 onClick={() => setSeverity(item)}
+                disabled={sent}
                 className={`min-h-11 rounded-2xl border px-3 py-2 text-sm font-semibold transition ${
                   severity === item
                     ? "border-cyan-400 bg-cyan-400 text-slate-950"
@@ -169,6 +182,7 @@ export function FeedbackModal({
             value={message}
             onChange={(event) => setMessage(event.target.value)}
             className="min-h-32 w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50"
+            disabled={sent}
             maxLength={3000}
             placeholder={t.messagePlaceholder}
           />
@@ -189,7 +203,7 @@ export function FeedbackModal({
         <Button type="button" onClick={handleClose} variant="ghost">
           {dictionary.common.cancel}
         </Button>
-        <Button type="button" onClick={() => void handleSubmit()} disabled={submitting}>
+        <Button type="button" onClick={() => void handleSubmit()} disabled={submitting || sent}>
           {submitting ? t.submitting : t.submit}
         </Button>
       </div>
