@@ -11,7 +11,6 @@ import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { Input } from "@/shared/ui/input";
 import { LoadingState } from "@/shared/ui/loading-state";
-import { StatusBadge } from "@/shared/ui/status-badge";
 
 export function ChatRoom({
   locale,
@@ -110,19 +109,6 @@ export function ChatRoom({
               </span>
             </button>
           ) : null}
-          <StatusBadge
-            tone={
-              socketStatus === "connected"
-                ? "success"
-                : socketStatus === "connecting"
-                  ? "info"
-                  : socketStatus === "error"
-                    ? "danger"
-                    : "neutral"
-            }
-          >
-            {t.socketStatus[socketStatus]}
-          </StatusBadge>
         </div>
       </header>
 
