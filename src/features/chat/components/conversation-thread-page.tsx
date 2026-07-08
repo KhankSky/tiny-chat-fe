@@ -30,7 +30,7 @@ export function ConversationThreadPage({
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-[#070d18] text-white">
+    <div className="tc-app-shell h-screen w-full overflow-hidden bg-[#070d18] text-white">
       <div
         className={
           rightSidebarOpen

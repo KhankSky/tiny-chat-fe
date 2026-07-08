@@ -110,7 +110,7 @@ function GroupStreakCard({
   const countedToday = Boolean(streak?.todayStreakCounted);
 
   return (
-    <div className="mx-5 mb-5 overflow-hidden rounded-2xl border border-amber-300/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,0.22),transparent_34%),linear-gradient(145deg,rgba(34,211,238,0.12),rgba(15,23,42,0.95))] p-4 shadow-[0_18px_45px_rgba(0,0,0,0.25)]">
+    <div className="tc-streak-card mx-5 mb-5 overflow-hidden rounded-2xl border border-amber-300/20 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,0.22),transparent_34%),linear-gradient(145deg,rgba(34,211,238,0.12),rgba(15,23,42,0.95))] p-4 shadow-[0_18px_45px_rgba(0,0,0,0.25)]">
       <div className="flex items-center gap-3">
         <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-amber-300/10">
           <span className="absolute inset-1 animate-streak-glow rounded-2xl bg-amber-300/20 blur-md" />
@@ -285,7 +285,7 @@ export function GroupSidebar({
   }
 
   return (
-    <aside className="flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
+    <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
       <div className="border-b border-white/10 px-5 py-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 gap-3">

@@ -88,7 +88,7 @@ export function ChatRoom({
   }, [currentUser?.userId, groupId, t.roomEyebrow]);
 
   return (
-    <section className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
+    <section className="tc-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
       <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
         <div className="min-w-0">
           <h2 className="truncate text-xl font-semibold text-white">{conversationTitle}</h2>
@@ -112,7 +112,7 @@ export function ChatRoom({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-4 py-5 sm:px-6">
+      <div className="tc-chat-canvas min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-4 py-5 sm:px-6">
         {loading ? (
           <LoadingState label={dictionary.common.loading} />
         ) : null}
@@ -213,7 +213,7 @@ export function ChatRoom({
         <div ref={bottomRef} />
       </div>
 
-      <div className="shrink-0 border-t border-white/10 bg-[#0b111c] p-4">
+      <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-4">
         <div className="flex gap-3">
           <Input
             value={content}

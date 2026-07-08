@@ -3,6 +3,23 @@
 :root {
   --background: #020617;
   --foreground: #f8fafc;
+  --tc-app-bg: #070d18;
+  --tc-sidebar-bg: #0b111c;
+  --tc-panel-bg: #0d1322;
+  --tc-chat-bg:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.08), transparent 32%),
+    linear-gradient(180deg, rgba(2, 6, 23, 0.16), rgba(2, 6, 23, 0.35));
+  --tc-card-bg: rgba(255, 255, 255, 0.05);
+  --tc-border: rgba(255, 255, 255, 0.1);
+  --tc-text: #f8fafc;
+  --tc-muted: #94a3b8;
+  --tc-soft: rgba(255, 255, 255, 0.05);
+  --tc-streak-card:
+    radial-gradient(circle at 20% 0%, rgba(251, 191, 36, 0.22), transparent 34%),
+    linear-gradient(145deg, rgba(34, 211, 238, 0.12), rgba(15, 23, 42, 0.95));
+  --tc-match-bg:
+    radial-gradient(circle at 50% 0%, rgba(34, 211, 238, 0.18), transparent 34%),
+    linear-gradient(180deg, #020617 0%, #050816 58%, #020617 100%);
   --font-ui-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-ui-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
@@ -23,6 +40,23 @@ body {
 [data-theme="light"] {
   --background: #f4f7fb;
   --foreground: #0f172a;
+  --tc-app-bg: #eef4fb;
+  --tc-sidebar-bg: #ffffff;
+  --tc-panel-bg: #f8fbff;
+  --tc-chat-bg:
+    radial-gradient(circle at top, rgba(34, 211, 238, 0.14), transparent 30%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+  --tc-card-bg: rgba(255, 255, 255, 0.78);
+  --tc-border: rgba(15, 23, 42, 0.1);
+  --tc-text: #0f172a;
+  --tc-muted: #64748b;
+  --tc-soft: rgba(15, 23, 42, 0.04);
+  --tc-streak-card:
+    radial-gradient(circle at 16% 0%, rgba(251, 191, 36, 0.28), transparent 36%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(226, 246, 255, 0.92));
+  --tc-match-bg:
+    radial-gradient(circle at 48% 0%, rgba(34, 211, 238, 0.16), transparent 32%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 58%, #f8fbff 100%);
 }
 
 [data-theme="light"] body {
@@ -62,6 +96,7 @@ body {
 [data-theme="light"] .bg-slate-950\/55,
 [data-theme="light"] .bg-slate-950\/60,
 [data-theme="light"] .bg-slate-950\/70,
+[data-theme="light"] .bg-slate-950\/75,
 [data-theme="light"] .bg-slate-950\/80,
 [data-theme="light"] .bg-slate-950\/85,
 [data-theme="light"] .bg-slate-950\/90,
@@ -97,6 +132,65 @@ body {
 [data-theme="light"] .shadow-black\/30,
 [data-theme="light"] .shadow-black\/40 {
   --tw-shadow-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+.tc-app-shell {
+  background: var(--tc-app-bg) !important;
+  color: var(--tc-text) !important;
+}
+
+.tc-sidebar {
+  background: var(--tc-sidebar-bg) !important;
+  color: var(--tc-text) !important;
+}
+
+.tc-panel {
+  background: var(--tc-panel-bg) !important;
+  color: var(--tc-text) !important;
+}
+
+.tc-chat-canvas {
+  background: var(--tc-chat-bg) !important;
+}
+
+.tc-card {
+  background: var(--tc-card-bg) !important;
+  border-color: var(--tc-border) !important;
+}
+
+.tc-border {
+  border-color: var(--tc-border) !important;
+}
+
+.tc-streak-card {
+  background: var(--tc-streak-card) !important;
+}
+
+.tc-match-page {
+  background: var(--tc-match-bg) !important;
+  color: var(--tc-text) !important;
+}
+
+[data-theme="light"] .tc-chat-canvas {
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .tc-sidebar {
+  box-shadow: inset -1px 0 0 rgba(15, 23, 42, 0.06);
+}
+
+[data-theme="light"] .tc-panel {
+  box-shadow: inset 0 1px 0 rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .tc-card {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.08) !important;
+}
+
+[data-theme="light"] .tc-streak-card {
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08) !important;
 }
 
 * {

@@ -136,7 +136,7 @@ export function GroupMatchingPage({
   const profileReady = Boolean(currentUser?.profileCompleted);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(180deg,#020617_0%,#050816_58%,#020617_100%)] text-white">
+    <main className="tc-match-page min-h-screen bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(180deg,#020617_0%,#050816_58%,#020617_100%)] text-white">
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 lg:px-6 lg:py-7">
         <header className="mb-5 flex items-center justify-between gap-3">
           <div>
@@ -155,7 +155,7 @@ export function GroupMatchingPage({
 
         <section className="grid flex-1 gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(26rem,0.72fr)]">
           <div className="flex min-h-0 flex-col gap-5">
-            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20 sm:p-7">
+            <div className="tc-card relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-cyan-950/20 sm:p-7">
               <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-cyan-300/10 blur-3xl" />
               <div className="relative max-w-3xl">
                 <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">
@@ -190,7 +190,7 @@ export function GroupMatchingPage({
             </div>
 
             <div className="grid gap-5 xl:grid-cols-[0.9fr_1.1fr]">
-              <aside className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
+              <aside className="tc-card rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
@@ -224,7 +224,7 @@ export function GroupMatchingPage({
                 </div>
               </aside>
 
-              <section className="rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
+              <section className="tc-card rounded-[1.75rem] border border-white/10 bg-slate-950/70 p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
@@ -264,7 +264,7 @@ export function GroupMatchingPage({
           </div>
 
           <section
-            className="flex min-h-[38rem] flex-col rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-2xl shadow-black/30 sm:p-6"
+            className="tc-card flex min-h-[38rem] flex-col rounded-[2rem] border border-white/10 bg-slate-950/80 p-5 shadow-2xl shadow-black/30 sm:p-6"
             aria-live="polite"
           >
             <div className="flex items-start justify-between gap-3">

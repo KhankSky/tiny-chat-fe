@@ -28,7 +28,7 @@ export function ConversationListPage({
   const profileEditor = useProfileEditor(dictionary);
 
   return (
-    <div className="h-screen w-full overflow-hidden bg-[#070d18] text-white">
+    <div className="tc-app-shell h-screen w-full overflow-hidden bg-[#070d18] text-white">
       <div className="grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]">
         <ConversationSidebar
           locale={locale}
@@ -39,7 +39,7 @@ export function ConversationListPage({
           onEditProfile={profileEditor.openProfileEditor}
         />
 
-        <main className="flex min-h-0 min-w-0 flex-col overflow-hidden border-r border-white/10 bg-[#0d1322]">
+        <main className="tc-panel flex min-h-0 min-w-0 flex-col overflow-hidden border-r border-white/10 bg-[#0d1322]">
           <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4 sm:px-6">
             <h2 className="truncate text-xl font-semibold text-white">
               {t.selectConversationTitle}
@@ -52,7 +52,7 @@ export function ConversationListPage({
             </Link>
           </header>
 
-          <div className="flex min-h-0 flex-1 items-center justify-center bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-6">
+          <div className="tc-chat-canvas flex min-h-0 flex-1 items-center justify-center bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-6">
             <div className="max-w-md text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-400/20 bg-cyan-400/10 text-2xl font-semibold text-cyan-200">
                 TC
@@ -70,7 +70,7 @@ export function ConversationListPage({
           </div>
         </main>
 
-        <aside className="hidden h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c] lg:flex">
+        <aside className="tc-sidebar hidden h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c] lg:flex">
           <div className="border-b border-white/10 px-5 py-4">
             <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
               {t.workspaceTitle}
