@@ -10,6 +10,11 @@ import type { Dictionary, Locale } from "@/i18n/types";
 let cachedConversations: ConversationResponse[] | null = null;
 let conversationsRequest: Promise<ConversationResponse[]> | null = null;
 
+export function clearConversationCache() {
+  cachedConversations = null;
+  conversationsRequest = null;
+}
+
 function toConversationItem(
   conversation: ConversationResponse,
   locale: Locale,

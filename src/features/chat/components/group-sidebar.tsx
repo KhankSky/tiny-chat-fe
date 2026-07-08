@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { getGroupStreak } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { GroupStreakResponse } from "@/features/chat/types";
+import { MemberProfileModal } from "@/features/friends/components/member-profile-modal";
 import { getGroupDetail, updateGroupDetail, uploadGroupAvatar } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
-import type { Dictionary } from "@/i18n/types";
+import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -50,17 +51,21 @@ function MemberRow({
   member,
   index,
   offline = false,
+  onOpenProfile,
 }: {
   member: GroupMemberResponse;
   index: number;
   offline?: boolean;
+  onOpenProfile: (memberUserId: number) => void;
 }) {
   const displayName = member.displayName || `User ${member.userId}`;
   const active = !offline && index === 1;
 
   return (
-    <div
-      className={`flex h-13 items-center gap-3 px-5 transition ${active ? "bg-[#111a35]" : "hover:bg-white/[0.04]"
+    <button
+      type="button"
+      onClick={() => onOpenProfile(member.userId)}
+      className={`flex h-13 w-full items-center gap-3 px-5 text-left transition ${active ? "bg-[#111a35]" : "hover:bg-white/[0.04]"
         } ${offline ? "opacity-45" : ""}`}
     >
       <div className="relative h-11 w-11 shrink-0 overflow-visible">
@@ -86,16 +91,18 @@ function MemberRow({
           <p className="mt-0.5 truncate text-xs italic text-slate-300">hello world~</p>
         ) : null}
       </div>
-    </div>
+    </button>
   );
 }
 
 export function GroupSidebar({
   dictionary,
   groupId,
+  locale,
 }: {
   dictionary: Dictionary;
   groupId: number;
+  locale: Locale;
 }) {
   const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
@@ -109,6 +116,7 @@ export function GroupSidebar({
   const [groupAvatarPreviewUrl, setGroupAvatarPreviewUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -308,38 +316,45 @@ export function GroupSidebar({
           <ErrorMessage className="mx-5">{error}</ErrorMessage>
         ) : null}
 
-        <div className="mx-5 mb-5 rounded-lg border border-cyan-400/20 bg-cyan-400/[0.06] p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300">
-            {t.groupStreakTitle}
-          </p>
-          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
-            <div>
-              <p className="text-lg font-semibold text-white">{groupStreak?.currentStreak ?? 0}</p>
-              <p className="mt-0.5 text-[11px] text-slate-400">{t.currentStreak}</p>
+        {group && !group.directChat ? (
+          <div className="mx-5 mb-5 rounded-lg border border-cyan-400/20 bg-cyan-400/[0.06] p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-cyan-300">
+              {t.groupStreakTitle}
+            </p>
+            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+              <div>
+                <p className="text-lg font-semibold text-white">{groupStreak?.currentStreak ?? 0}</p>
+                <p className="mt-0.5 text-[11px] text-slate-400">{t.currentStreak}</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-white">{groupStreak?.todayActiveMemberCount ?? 0}/2</p>
+                <p className="mt-0.5 text-[11px] text-slate-400">{t.activeToday}</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-white">{groupStreak?.todayMessageCount ?? 0}</p>
+                <p className="mt-0.5 text-[11px] text-slate-400">{t.messagesToday}</p>
+              </div>
             </div>
-            <div>
-              <p className="text-lg font-semibold text-white">{groupStreak?.todayActiveMemberCount ?? 0}/2</p>
-              <p className="mt-0.5 text-[11px] text-slate-400">{t.activeToday}</p>
-            </div>
-            <div>
-              <p className="text-lg font-semibold text-white">{groupStreak?.todayMessageCount ?? 0}</p>
-              <p className="mt-0.5 text-[11px] text-slate-400">{t.messagesToday}</p>
-            </div>
+            <p className="mt-3 text-xs text-slate-300">
+              {groupStreak?.todayStreakCounted ? t.groupStreakCounted : t.groupStreakNeedsMembers}
+            </p>
+            {streakError ? (
+              <p className="mt-2 text-xs text-amber-200">{t.streakUnavailable}</p>
+            ) : null}
           </div>
-          <p className="mt-3 text-xs text-slate-300">
-            {groupStreak?.todayStreakCounted ? t.groupStreakCounted : t.groupStreakNeedsMembers}
-          </p>
-          {streakError ? (
-            <p className="mt-2 text-xs text-amber-200">{t.streakUnavailable}</p>
-          ) : null}
-        </div>
+        ) : null}
 
         <div className="mb-3 px-5 text-sm font-medium tracking-wide text-slate-400">
           {t.online} - {onlineMembers.length}
         </div>
         <div>
           {onlineMembers.map((member, index) => (
-            <MemberRow key={member.userId} member={member} index={index} />
+            <MemberRow
+              key={member.userId}
+              member={member}
+              index={index}
+              onOpenProfile={setSelectedProfileUserId}
+            />
           ))}
         </div>
 
@@ -355,12 +370,23 @@ export function GroupSidebar({
                   member={member}
                   index={index + onlineMembers.length}
                   offline
+                  onOpenProfile={setSelectedProfileUserId}
                 />
               ))}
             </div>
           </>
         ) : null}
       </div>
+
+      {selectedProfileUserId ? (
+        <MemberProfileModal
+          dictionary={dictionary}
+          groupId={groupId}
+          locale={locale}
+          memberUserId={selectedProfileUserId}
+          onClose={() => setSelectedProfileUserId(null)}
+        />
+      ) : null}
     </aside>
   );
 }

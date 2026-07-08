@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ConversationListItem } from "@/features/chat/components/conversation-list-item";
 import { useConversationList } from "@/features/chat/hooks/use-conversation-list";
+import { FriendsPanel } from "@/features/friends/components/friends-panel";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { LoadingState } from "@/shared/ui/loading-state";
@@ -71,6 +72,8 @@ export function ConversationListPage({
                 />
               ))}
             </div>
+
+            <FriendsPanel dictionary={dictionary} locale={locale} />
           </div>
         </aside>
 

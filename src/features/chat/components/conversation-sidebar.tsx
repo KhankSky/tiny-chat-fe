@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
+import { FriendsPanel } from "@/features/friends/components/friends-panel";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 
@@ -93,6 +94,7 @@ export function ConversationSidebar({
             );
           })}
         </div>
+        <FriendsPanel dictionary={dictionary} locale={locale} />
       </div>
 
       <div className="flex h-[81px] shrink-0 items-center border-t border-white/10 px-3">

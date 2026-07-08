@@ -44,6 +44,7 @@ export function ConversationThreadPage({
           key={`group-${conversationId}`}
           dictionary={dictionary}
           groupId={conversationId}
+          locale={locale}
         />
       </div>
 

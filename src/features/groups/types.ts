@@ -25,6 +25,7 @@ export type GroupDetailResponse = {
   groupName: string | null;
   groupDescription: string | null;
   groupAvatarUrl: string | null;
+  directChat: boolean;
   memberCount: number;
   members: GroupMemberResponse[];
 };
