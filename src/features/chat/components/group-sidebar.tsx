@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getGroupStreak } from "@/features/chat/api/chat-api";
+import { getGroupStreakCached } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { GroupStreakResponse } from "@/features/chat/types";
 import { MemberProfileModal } from "@/features/friends/components/member-profile-modal";
@@ -202,9 +202,9 @@ export function GroupSidebar({
   useEffect(() => {
     let active = true;
 
-    async function loadGroupStreak() {
+    async function loadGroupStreak({ force = false }: { force?: boolean } = {}) {
       try {
-        const data = await getGroupStreak(groupId);
+        const data = await getGroupStreakCached(groupId, { force });
         if (active) {
           setGroupStreak(data);
           setStreakError(null);
@@ -219,7 +219,7 @@ export function GroupSidebar({
     function handleGroupStreakChanged(event: Event) {
       const detail = (event as CustomEvent<{ groupId?: number }>).detail;
       if (detail?.groupId === groupId) {
-        void loadGroupStreak();
+        void loadGroupStreak({ force: true });
       }
     }
 

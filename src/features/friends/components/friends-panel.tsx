@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { clearConversationCache } from "@/features/chat/hooks/use-conversations";
 import {
   acceptFriendRequest,
-  getFriends,
-  getIncomingFriendRequests,
+  getFriendsCached,
+  getIncomingFriendRequestsCached,
   openDirectConversation,
   rejectFriendRequest,
 } from "@/features/friends/api/friends-api";
@@ -32,8 +32,8 @@ export function FriendsPanel({
     try {
       setError(null);
       const [nextFriends, nextIncomingRequests] = await Promise.all([
-        getFriends(),
-        getIncomingFriendRequests(),
+        getFriendsCached({ force: true }),
+        getIncomingFriendRequestsCached({ force: true }),
       ]);
       setFriends(nextFriends);
       setIncomingRequests(nextIncomingRequests);
@@ -48,8 +48,8 @@ export function FriendsPanel({
     async function loadInitialFriendsData() {
       try {
         const [nextFriends, nextIncomingRequests] = await Promise.all([
-          getFriends(),
-          getIncomingFriendRequests(),
+          getFriendsCached(),
+          getIncomingFriendRequestsCached(),
         ]);
         if (active) {
           setError(null);

@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
-import { getGroupMessages, getMyStreak, sendGroupMessage } from "@/features/chat/api/chat-api";
+import { getGroupMessages, getMyStreakCached, sendGroupMessage } from "@/features/chat/api/chat-api";
 import { subscribeToGroupMessages } from "@/features/chat/realtime/group-message-subscription";
-import type { UserStreakResponse } from "@/features/chat/types";
 import {
   createOptimisticMessage,
   type LocalChatMessage,
@@ -38,8 +37,6 @@ export function useChatRoom({
   const [error, setError] = useState<string | null>(null);
   const [socketStatus, setSocketStatus] = useState<SocketStatus>("idle");
   const [socketError, setSocketError] = useState<string | null>(null);
-  const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
-  const [streakError, setStreakError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const stompClientRef = useRef<StompClient | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
@@ -50,22 +47,17 @@ export function useChatRoom({
   }, [groupId]);
 
   const refreshPersonalStreak = useCallback(async () => {
-    if (!accessToken) {
-      setUserStreak(null);
-      return;
-    }
+    if (!accessToken) return;
 
     try {
-      setStreakError(null);
-      const nextStreak = await getMyStreak();
-      setUserStreak(nextStreak);
+      const nextStreak = await getMyStreakCached({ force: true });
       window.dispatchEvent(
         new CustomEvent(PERSONAL_STREAK_CHANGED_EVENT, { detail: nextStreak }),
       );
-    } catch (err) {
-      setStreakError(err instanceof Error ? err.message : copy.loadStreakError);
+    } catch {
+      // Streak refresh is secondary metadata; message delivery should stay quiet.
     }
-  }, [accessToken, copy.loadStreakError]);
+  }, [accessToken]);
 
   useEffect(() => {
     let active = true;
@@ -88,7 +80,6 @@ export function useChatRoom({
         if (active) {
           setMessages(historyMessages);
         }
-        void refreshPersonalStreak();
 
         if (!client) {
           if (active) {
@@ -226,7 +217,5 @@ export function useChatRoom({
     setContent,
     socketError,
     socketStatus,
-    streakError,
-    userStreak,
   };
 }

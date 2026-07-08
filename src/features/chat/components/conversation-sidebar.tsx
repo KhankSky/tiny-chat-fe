@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
-import { getMyStreak } from "@/features/chat/api/chat-api";
+import { getMyStreakCached } from "@/features/chat/api/chat-api";
 import { PERSONAL_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { UserStreakResponse } from "@/features/chat/types";
 import { FriendsPanel } from "@/features/friends/components/friends-panel";
@@ -59,13 +59,14 @@ export function ConversationSidebar({
 }) {
   const t = dictionary.chat;
   const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
+  const currentUserId = currentUser?.userId;
 
   useEffect(() => {
     let active = true;
 
     async function loadUserStreak() {
       try {
-        const streak = await getMyStreak();
+        const streak = await getMyStreakCached();
         if (active) {
           setUserStreak(streak);
         }
@@ -76,13 +77,13 @@ export function ConversationSidebar({
       }
     }
 
-    if (currentUser) {
+    if (currentUserId) {
       void loadUserStreak();
     }
 
     function handlePersonalStreakChanged(event: Event) {
       const nextStreak = (event as CustomEvent<UserStreakResponse>).detail;
-      if (nextStreak?.userId === currentUser?.userId) {
+      if (nextStreak?.userId === currentUserId) {
         setUserStreak(nextStreak);
       }
     }
@@ -93,7 +94,7 @@ export function ConversationSidebar({
       active = false;
       window.removeEventListener(PERSONAL_STREAK_CHANGED_EVENT, handlePersonalStreakChanged);
     };
-  }, [currentUser]);
+  }, [currentUserId]);
 
   return (
     <aside className="flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
