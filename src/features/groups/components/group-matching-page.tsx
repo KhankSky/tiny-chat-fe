@@ -294,7 +294,7 @@ export function GroupMatchingPage({
                 </p>
                 {error ? (
                   <div
-                    className="mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100"
+                    className="tc-alert-danger mt-4 rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-100"
                     role="alert"
                   >
                     <p className="font-semibold">{t.matchErrorTitle}</p>

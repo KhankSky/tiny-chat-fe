@@ -113,7 +113,11 @@ export function FriendsPanel({
         ) : null}
       </div>
 
-      {error ? <p className="px-3 py-2 text-xs leading-5 text-amber-200">{error}</p> : null}
+      {error ? (
+        <p className="tc-alert-warning mx-3 rounded-xl border px-3 py-2 text-xs leading-5">
+          {error}
+        </p>
+      ) : null}
 
       {incomingRequests.length > 0 ? (
         <div className="mb-3 space-y-2">
