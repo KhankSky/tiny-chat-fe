@@ -85,3 +85,9 @@ a {
   box-shadow: 0 0 18px rgba(251, 146, 60, 0.45);
   animation: streak-flicker 1.15s ease-in-out infinite;
 }
+
+.streak-flame-sm {
+  height: 15px;
+  width: 12px;
+  box-shadow: 0 0 10px rgba(251, 146, 60, 0.45);
+}

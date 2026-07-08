@@ -20,6 +20,28 @@ export type ConversationItem = {
   unreadCount?: number;
 };
 
+function PersonalStreakBadge({
+  days,
+  label,
+}: {
+  days: number;
+  label: string;
+}) {
+  return (
+    <span
+      className="relative flex shrink-0 items-center gap-1.5 overflow-hidden rounded-full bg-[radial-gradient(circle_at_25%_0%,rgba(251,191,36,0.25),transparent_42%),rgba(251,191,36,0.08)] px-2 py-1 text-xs font-bold text-amber-50 shadow-[0_0_22px_rgba(251,146,60,0.18)]"
+      title={label}
+    >
+      <span className="absolute inset-0 animate-streak-shimmer bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent)]" />
+      <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-amber-300/10">
+        <span className="absolute inset-0 animate-streak-glow rounded-full bg-amber-300/20 blur-sm" />
+        <span className="streak-flame streak-flame-sm relative" aria-hidden="true" />
+      </span>
+      <span className="relative leading-none">{days}</span>
+    </span>
+  );
+}
+
 export function ConversationSidebar({
   locale,
   dictionary,
@@ -156,13 +178,10 @@ export function ConversationSidebar({
             </span>
           </span>
           {userStreak ? (
-            <span
-              className="relative shrink-0 overflow-hidden rounded-full border border-amber-300/30 bg-amber-300/10 px-2.5 py-1 text-xs font-semibold text-amber-100 shadow-[0_0_18px_rgba(251,191,36,0.12)]"
-              title={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`}
-            >
-              <span className="absolute inset-0 animate-streak-shimmer bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent)]" />
-              <span className="relative">{userStreak.currentStreak}d</span>
-            </span>
+            <PersonalStreakBadge
+              days={userStreak.currentStreak}
+              label={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`}
+            />
           ) : null}
         </button>
       </div>
