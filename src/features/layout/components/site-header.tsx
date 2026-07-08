@@ -9,16 +9,16 @@ export function SiteHeader({
 }) {
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 lg:px-8">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-400/15 text-sm font-semibold text-cyan-300 ring-1 ring-inset ring-cyan-400/30">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/15 text-sm font-semibold text-cyan-300 ring-1 ring-inset ring-cyan-400/30">
             TC
           </span>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold tracking-wide text-white">
               {dictionary.appName}
             </p>
-            <p className="text-xs text-slate-400">{dictionary.appTagline}</p>
+            <p className="hidden text-xs text-slate-400 sm:block">{dictionary.appTagline}</p>
           </div>
         </Link>
 
@@ -30,16 +30,16 @@ export function SiteHeader({
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <Link
             href="/auth/login"
-            className="rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5"
+            className="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5 sm:inline-flex"
           >
             {dictionary.header.login}
           </Link>
           <Link
             href="/auth/register"
-            className="rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="inline-flex min-h-10 items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
             {dictionary.header.register}
           </Link>

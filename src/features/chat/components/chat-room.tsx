@@ -121,8 +121,11 @@ export function ChatRoom({
               title={rightSidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open}
               className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322]"
             >
-              <span className="text-base leading-none" aria-hidden="true">
-                {rightSidebarOpen ? ">" : "i"}
+              <span className="text-base leading-none lg:hidden" aria-hidden="true">
+                i
+              </span>
+              <span className="hidden text-base leading-none lg:inline" aria-hidden="true">
+                {rightSidebarOpen ? ">" : "<"}
               </span>
             </button>
           ) : null}

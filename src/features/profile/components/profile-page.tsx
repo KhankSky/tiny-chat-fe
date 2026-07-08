@@ -95,26 +95,26 @@ export function ProfilePage({
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-3xl px-4 py-8 text-white lg:px-6">
-      <div className="rounded-[2rem] border border-white/10 bg-slate-950/85 p-6">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300">
+    <main className="mx-auto min-h-dvh max-w-3xl px-4 py-5 text-white sm:py-8 lg:px-6">
+      <div className="rounded-2xl border border-white/10 bg-slate-950/85 p-5 sm:rounded-[2rem] sm:p-6">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-cyan-300 sm:text-xs sm:tracking-[0.35em]">
           {dictionary.appName}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold">{t.title}</h1>
+        <h1 className="mt-3 text-2xl font-semibold sm:text-3xl">{t.title}</h1>
         <p className="mt-2 text-sm leading-7 text-slate-400">{t.description}</p>
       </div>
 
-      <div className="mt-6 rounded-[2rem] border border-white/10 bg-slate-950/80 p-6">
+      <div className="mt-4 rounded-2xl border border-white/10 bg-slate-950/80 p-4 sm:mt-6 sm:rounded-[2rem] sm:p-6">
         {loading ? (
           <p className="text-sm text-slate-400">{dictionary.common.loading}</p>
         ) : null}
 
         {profile ? (
           <div className="grid gap-5">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-4">
+            <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:rounded-3xl">
               <div className="flex items-center gap-3">
                 <Avatar
-                  className="h-14 w-14 ring-1 ring-white/10"
+                  className="h-12 w-12 ring-1 ring-white/10 sm:h-14 sm:w-14"
                   src={avatarPreviewUrl || profile.avatarUrl}
                   alt={profile.displayName || profile.email}
                 />
@@ -137,7 +137,7 @@ export function ProfilePage({
               <input
                 value={displayName}
                 onChange={(event) => setDisplayName(event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
+                className="min-h-12 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
                 placeholder={t.displayNamePlaceholder}
               />
             </label>
@@ -150,7 +150,7 @@ export function ProfilePage({
                 <select
                   value={locale}
                   onChange={(event) => onLocaleChange(event.target.value as Locale)}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
+                  className="min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
                 >
                   <option value="en">{dictionary.chat.profileModal.languageEnglish}</option>
                   <option value="vi">{dictionary.chat.profileModal.languageVietnamese}</option>
@@ -166,7 +166,7 @@ export function ProfilePage({
                 <select
                   value={theme}
                   onChange={(event) => onThemeChange(event.target.value as ThemeMode)}
-                  className="w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
+                  className="min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-white outline-none focus:border-cyan-400/50"
                 >
                   <option value="dark">{dictionary.chat.profileModal.themeDark}</option>
                   <option value="light">{dictionary.chat.profileModal.themeLight}</option>
@@ -174,9 +174,9 @@ export function ProfilePage({
               </label>
             ) : null}
 
-            <label className="flex cursor-pointer items-center gap-3 rounded-3xl border border-white/10 bg-white/5 p-4">
+            <label className="flex min-h-20 cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 sm:rounded-3xl">
               <Avatar
-                className="h-16 w-16 ring-1 ring-cyan-400/30"
+                className="h-14 w-14 shrink-0 ring-1 ring-cyan-400/30 sm:h-16 sm:w-16"
                 src={avatarPreviewUrl || profile.avatarUrl}
                 alt={profile.displayName || profile.email}
               />
@@ -204,7 +204,7 @@ export function ProfilePage({
               type="button"
               onClick={() => void handleSave()}
               disabled={saving}
-              className="rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
+              className="min-h-12 w-full rounded-full bg-cyan-400 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {saving ? dictionary.common.saving : t.saveButton}
             </button>
