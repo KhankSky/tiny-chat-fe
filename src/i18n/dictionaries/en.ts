@@ -124,6 +124,7 @@ export const en = {
     messagesToday: "Messages today",
     dailyTopicTitle: "Today's topic",
     dailyTopicAction: "Answer",
+    dailyTopicReplying: "Replying to topic",
     dailyTopicQuotePrefix: "Today's topic:",
     loadDailyTopicError: "Could not load today's topic",
     loadStreakError: "Could not load streak",

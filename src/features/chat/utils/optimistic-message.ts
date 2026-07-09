@@ -10,11 +10,15 @@ export function createOptimisticMessage({
   currentUser,
   fallbackSenderName,
   groupId,
+  replyTopicContent = null,
+  replyTopicId = null,
 }: {
   content: string;
   currentUser: AuthUserResponse | null;
   fallbackSenderName: string;
   groupId: number;
+  replyTopicContent?: string | null;
+  replyTopicId?: number | null;
 }) {
   return {
     messageId: -Date.now(),
@@ -24,6 +28,8 @@ export function createOptimisticMessage({
     senderName: currentUser?.displayName ?? currentUser?.email ?? fallbackSenderName,
     senderAvatarUrl: currentUser?.avatarUrl ?? null,
     content,
+    replyTopicId,
+    replyTopicContent,
     sentAt: new Date().toISOString(),
   } satisfies LocalChatMessage;
 }

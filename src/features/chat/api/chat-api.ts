@@ -92,8 +92,13 @@ export function getGroupStreakCached(
   return request;
 }
 
-export function sendGroupMessage(groupId: number, content: string) {
-  return apiPost<ChatMessage, { content: string }>(`/api/groups/${groupId}/messages`, {
-    content,
-  });
+export function sendGroupMessage(
+  groupId: number,
+  body: {
+    content: string;
+    replyTopicId?: number;
+    replyTopicContent?: string;
+  },
+) {
+  return apiPost<ChatMessage, typeof body>(`/api/groups/${groupId}/messages`, body);
 }

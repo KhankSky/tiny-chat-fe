@@ -160,7 +160,7 @@ export function useChatRoom({
     bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages]);
 
-  async function sendMessage() {
+  async function sendMessage(replyTopic?: { id: number; content: string } | null) {
     const trimmed = content.trim();
     if (!trimmed) return;
 
@@ -169,6 +169,8 @@ export function useChatRoom({
       currentUser,
       fallbackSenderName: dictionary.common.you,
       groupId,
+      replyTopicContent: replyTopic?.content ?? null,
+      replyTopicId: replyTopic?.id ?? null,
     });
     setMessages((previousMessages) => {
       const nextMessages = [...previousMessages, optimisticMessage];
@@ -181,9 +183,15 @@ export function useChatRoom({
       if (stompClientRef.current && socketStatus === "connected") {
         stompClientRef.current.send(`/app/groups/${groupId}/messages`, {
           content: trimmed,
+          replyTopicContent: replyTopic?.content,
+          replyTopicId: replyTopic?.id,
         });
       } else {
-        const newMessage = await sendGroupMessage(groupId, trimmed);
+        const newMessage = await sendGroupMessage(groupId, {
+          content: trimmed,
+          replyTopicContent: replyTopic?.content,
+          replyTopicId: replyTopic?.id,
+        });
         setMessages((previousMessages) => {
           const nextMessages = previousMessages.map((message) =>
             message.messageId === optimisticMessage.messageId ? newMessage : message,

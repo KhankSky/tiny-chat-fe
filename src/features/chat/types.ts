@@ -16,6 +16,8 @@ export type ChatMessage = {
   senderName: string;
   senderAvatarUrl: string | null;
   content: string;
+  replyTopicId: number | null;
+  replyTopicContent: string | null;
   sentAt: string;
 };
 

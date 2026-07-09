@@ -124,6 +124,7 @@ export const vi = {
     messagesToday: "Tin nhắn hôm nay",
     dailyTopicTitle: "Topic hôm nay",
     dailyTopicAction: "Trả lời",
+    dailyTopicReplying: "Đang trả lời topic",
     dailyTopicQuotePrefix: "Topic hôm nay:",
     loadDailyTopicError: "Không thể tải topic hôm nay",
     loadStreakError: "Không thể tải streak",

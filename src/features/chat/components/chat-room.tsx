@@ -36,6 +36,7 @@ export function ChatRoom({
   const [conversationTitle, setConversationTitle] = useState(t.roomEyebrow);
   const [dailyTopic, setDailyTopic] = useState<DailyTopicResponse | null>(null);
   const [dailyTopicError, setDailyTopicError] = useState<string | null>(null);
+  const [replyingDailyTopic, setReplyingDailyTopic] = useState<DailyTopicResponse | null>(null);
   const {
     bottomRef,
     content,
@@ -60,6 +61,16 @@ export function ChatRoom({
     [currentUser, memberAvatars, messages],
   );
   const [conversationAvatarUrl, setConversationAvatarUrl] = useState<string | null>(null);
+
+  async function handleSendMessage() {
+    if (!content.trim()) return;
+    await sendMessage(
+      replyingDailyTopic
+        ? { id: replyingDailyTopic.topicId, content: replyingDailyTopic.content }
+        : null,
+    );
+    setReplyingDailyTopic(null);
+  }
 
   useEffect(() => {
     let active = true;
@@ -183,11 +194,7 @@ export function ChatRoom({
               type="button"
               className="min-h-10 shrink-0 px-4"
               onClick={() => {
-                setContent((previousContent) =>
-                  previousContent.trim()
-                    ? previousContent
-                    : `${t.dailyTopicQuotePrefix} ${dailyTopic.content}\n\n`,
-                );
+                setReplyingDailyTopic(dailyTopic);
               }}
             >
               {t.dailyTopicAction}
@@ -279,6 +286,26 @@ export function ChatRoom({
                           }`}
                           title={sentAt}
                         >
+                          {senderMessage.replyTopicContent ? (
+                            <div
+                              className={`mb-2 rounded-2xl border px-3 py-2 text-left ${
+                                isMine
+                                  ? "border-slate-950/10 bg-slate-950/10 text-slate-800"
+                                  : "border-cyan-300/20 bg-cyan-300/[0.07] text-cyan-100"
+                              }`}
+                            >
+                              <p
+                                className={`text-[10px] font-bold uppercase tracking-[0.18em] ${
+                                  isMine ? "text-slate-700" : "text-cyan-200/80"
+                                }`}
+                              >
+                                {t.dailyTopicReplying}
+                              </p>
+                              <p className="mt-1 line-clamp-2 text-xs font-medium leading-5">
+                                {senderMessage.replyTopicContent}
+                              </p>
+                            </div>
+                          ) : null}
                           <p className="whitespace-pre-wrap break-words">{senderMessage.content}</p>
                         </div>
                         <span
@@ -300,11 +327,32 @@ export function ChatRoom({
       </div>
 
       <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
+        {replyingDailyTopic ? (
+          <div className="mb-3 flex items-start gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-3">
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-200/80">
+                {t.dailyTopicReplying}
+              </p>
+              <p className="mt-1 truncate text-sm font-medium text-white">
+                {replyingDailyTopic.content}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReplyingDailyTopic(null)}
+              aria-label={dictionary.common.close}
+              title={dictionary.common.close}
+              className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-sm text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
+            >
+              ×
+            </button>
+          </div>
+        ) : null}
         <form
           className="flex gap-2 sm:gap-3"
           onSubmit={(event) => {
             event.preventDefault();
-            void sendMessage();
+            void handleSendMessage();
           }}
         >
           <Input
@@ -313,7 +361,7 @@ export function ChatRoom({
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
-                void sendMessage();
+                void handleSendMessage();
               }
             }}
             className="min-h-12 flex-1 rounded-full px-5 text-sm"
