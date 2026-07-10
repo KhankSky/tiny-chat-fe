@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import {
   getGroupMessages,
@@ -19,6 +19,10 @@ import { getAccessToken } from "@/shared/auth/session";
 import { StompClient } from "@/shared/realtime/stomp";
 
 export type SocketStatus = "idle" | "connecting" | "connected" | "error";
+export type TypingUser = {
+  userId: number;
+  displayName: string;
+};
 
 const messageHistoryCache = new Map<number, LocalChatMessage[]>();
 const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
@@ -43,7 +47,7 @@ export function useChatRoom({
   const [error, setError] = useState<string | null>(null);
   const [socketStatus, setSocketStatus] = useState<SocketStatus>("idle");
   const [socketError, setSocketError] = useState<string | null>(null);
-  const [typingUsers, setTypingUsers] = useState<Record<number, string>>({});
+  const [typingUsers, setTypingUsers] = useState<Record<number, TypingUser>>({});
   const [presenceByUser, setPresenceByUser] = useState<Record<number, boolean>>(() =>
     currentUser?.userId ? { [currentUser.userId]: true } : {},
   );
@@ -144,7 +148,13 @@ export function useChatRoom({
                 delete next[payload.userId];
                 return next;
               }
-              return { ...previous, [payload.userId]: payload.displayName };
+              return {
+                ...previous,
+                [payload.userId]: {
+                  userId: payload.userId,
+                  displayName: payload.displayName,
+                },
+              };
             });
           }),
           client.subscribe(`/topic/groups/${groupId}/presence`, (body) => {
@@ -232,9 +242,18 @@ export function useChatRoom({
     refreshPersonalStreak,
   ]);
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages]);
+  useLayoutEffect(() => {
+    const bottomElement = bottomRef.current;
+    if (!bottomElement) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      bottomElement.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [messages, typingUsers]);
 
   const publishTyping = useCallback(
     (typing: boolean) => {

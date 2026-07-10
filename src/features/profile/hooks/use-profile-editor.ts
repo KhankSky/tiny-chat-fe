@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import {
   getMeProfile,
@@ -10,15 +10,19 @@ import {
 import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profile/types";
 import type { Dictionary } from "@/i18n/types";
 import { apiAssetUrl } from "@/shared/api/client";
-import { getStoredAuthUser, updateStoredAuthUser } from "@/shared/auth/session";
-
-function readStoredUser() {
-  return (getStoredAuthUser() as AuthUserResponse | null) ?? null;
-}
+import {
+  getStoredAuthUser,
+  subscribeAuthSession,
+  updateStoredAuthUser,
+} from "@/shared/auth/session";
 
 export function useProfileEditor(dictionary: Dictionary) {
   const profileCopy = dictionary.chat.profileModal;
-  const [currentUser, setCurrentUser] = useState<AuthUserResponse | null>(() => readStoredUser());
+  const currentUser = useSyncExternalStore(
+    subscribeAuthSession,
+    () => (getStoredAuthUser() as AuthUserResponse | null) ?? null,
+    () => null,
+  );
   const [profileOpen, setProfileOpen] = useState(false);
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSaving, setProfileSaving] = useState(false);
@@ -69,16 +73,14 @@ export function useProfileEditor(dictionary: Dictionary) {
   }, [profileOpen]);
 
   function syncCurrentUser(updated: MeProfileResponse) {
-    setCurrentUser(
-      updateStoredAuthUser((stored) => {
-        if (!stored) return stored;
-        return {
-          ...stored,
-          displayName: updated.displayName,
-          avatarUrl: updated.avatarUrl,
-        };
-      }),
-    );
+    updateStoredAuthUser((stored) => {
+      if (!stored) return stored;
+      return {
+        ...stored,
+        displayName: updated.displayName,
+        avatarUrl: updated.avatarUrl,
+      };
+    });
   }
 
   async function saveProfile() {

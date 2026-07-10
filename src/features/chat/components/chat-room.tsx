@@ -74,18 +74,22 @@ export function ChatRoom({
     () => Object.values(presenceByUser).filter(Boolean).length,
     [presenceByUser],
   );
+  const primaryTypingUser = typingUsers[0] ?? null;
   const typingLabel = useMemo(() => {
     if (typingUsers.length === 0) return null;
     if (typingUsers.length === 1) {
-      return t.typingSingle.replace("{name}", typingUsers[0]);
+      return t.typingSingle.replace("{name}", typingUsers[0].displayName);
     }
     if (typingUsers.length === 2) {
       return t.typingDouble
-        .replace("{first}", typingUsers[0])
-        .replace("{second}", typingUsers[1]);
+        .replace("{first}", typingUsers[0].displayName)
+        .replace("{second}", typingUsers[1].displayName);
     }
-    return t.typingMany.replace("{name}", typingUsers[0]);
+    return t.typingMany.replace("{name}", typingUsers[0].displayName);
   }, [t.typingDouble, t.typingMany, t.typingSingle, typingUsers]);
+  const typingAvatarUrl = primaryTypingUser
+    ? memberAvatars[primaryTypingUser.userId] ?? null
+    : null;
   const headerStatus = useMemo(() => {
     if (typingLabel) return typingLabel;
     if (socketStatus !== "connected") return t.socketStatus[socketStatus];
@@ -188,6 +192,7 @@ export function ChatRoom({
             <h2 className="truncate text-lg font-semibold text-white sm:text-xl">
               {conversationTitle}
             </h2>
+            <p className="truncate text-xs text-slate-400">{headerStatus}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -368,13 +373,36 @@ export function ChatRoom({
             </div>
           );
         })}
+        {typingLabel && primaryTypingUser ? (
+          <div className="mt-4 flex items-end gap-2 justify-start">
+            <Avatar
+              className="mb-0.5 h-8 w-8 self-end ring-1 ring-white/10"
+              src={typingAvatarUrl}
+              alt={primaryTypingUser.displayName}
+            />
+            <div className="flex max-w-[82%] flex-col items-start sm:max-w-[72%]">
+              <p className="mb-1 max-w-full truncate px-2 text-xs font-medium text-slate-300">
+                {primaryTypingUser.displayName}
+              </p>
+              <div className="rounded-3xl rounded-bl-lg border border-white/10 bg-white/[0.07] px-3 py-2.5 text-white shadow-sm">
+                <div className="flex items-center gap-1.5">
+                  <span className="tc-typing-dot h-2.5 w-2.5 rounded-full bg-cyan-300/90" />
+                  <span className="tc-typing-dot h-2.5 w-2.5 rounded-full bg-cyan-300/75 [animation-delay:120ms]" />
+                  <span className="tc-typing-dot h-2.5 w-2.5 rounded-full bg-cyan-300/55 [animation-delay:240ms]" />
+                </div>
+              </div>
+              {typingUsers.length > 1 ? (
+                <p className="mt-1 px-2 text-[11px] text-slate-400">
+                  +{typingUsers.length - 1} {typingUsers.length - 1 === 1 ? "other person" : "others"}
+                </p>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
         <div ref={bottomRef} />
       </div>
 
       <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
-        {typingLabel ? (
-          <p className="mb-2 px-2 text-xs text-slate-400">{typingLabel}</p>
-        ) : null}
         {replyingDailyTopic ? (
           <div className="mb-3 flex items-start gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-3">
             <div className="min-w-0 flex-1">
