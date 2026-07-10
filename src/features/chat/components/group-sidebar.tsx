@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupStreakCached } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { PresenceEvent } from "@/features/chat/types";
@@ -159,10 +160,12 @@ export function GroupSidebar({
   dictionary,
   groupId,
   locale,
+  currentUser,
 }: {
   dictionary: Dictionary;
   groupId: number;
   locale: Locale;
+  currentUser?: AuthUserResponse | null;
 }) {
   const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
@@ -177,7 +180,9 @@ export function GroupSidebar({
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
-  const [presenceByUser, setPresenceByUser] = useState<Record<number, boolean>>({});
+  const [presenceByUser, setPresenceByUser] = useState<Record<number, boolean>>(() =>
+    currentUser?.userId ? { [currentUser.userId]: true } : {},
+  );
 
   useEffect(() => {
     let active = true;
@@ -276,8 +281,14 @@ export function GroupSidebar({
   }, [groupId]);
 
   const members = group?.members ?? [];
-  const onlineMembers = members.filter((member) => presenceByUser[member.userId]);
-  const offlineMembers = members.filter((member) => !presenceByUser[member.userId]);
+  const effectivePresenceByUser = currentUser?.userId
+    ? {
+        ...presenceByUser,
+        [currentUser.userId]: true,
+      }
+    : presenceByUser;
+  const onlineMembers = members.filter((member) => effectivePresenceByUser[member.userId]);
+  const offlineMembers = members.filter((member) => !effectivePresenceByUser[member.userId]);
 
   function handleGroupAvatarChange(file: File | null) {
     if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);

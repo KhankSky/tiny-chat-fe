@@ -73,6 +73,7 @@ export function ConversationThreadPage({
               dictionary={dictionary}
               groupId={conversationId}
               locale={locale}
+              currentUser={profileEditor.currentUser}
             />
           </div>
         ) : null}
@@ -116,6 +117,7 @@ export function ConversationThreadPage({
               dictionary={dictionary}
               groupId={conversationId}
               locale={locale}
+              currentUser={profileEditor.currentUser}
             />
           </div>
         </div>

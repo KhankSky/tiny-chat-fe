@@ -1,13 +1,12 @@
 import type { ApiResponse } from "./types";
+import { getApiBaseUrl } from "./base-url";
 import { getAccessToken } from "@/shared/auth/session";
 import { createRequestId, logClientError } from "@/shared/lib/logger";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
 type HttpMethod = "GET" | "POST" | "PUT";
 
 export function apiAssetUrl(path: string | null | undefined, fallback = "/image/logo-default.jpg") {
+  const apiBaseUrl = getApiBaseUrl();
   const assetPath = path || fallback;
   if (
     assetPath.startsWith("http://") ||
@@ -17,7 +16,7 @@ export function apiAssetUrl(path: string | null | undefined, fallback = "/image/
   ) {
     return assetPath;
   }
-  return `${API_BASE_URL}${assetPath.startsWith("/") ? assetPath : `/${assetPath}`}`;
+  return `${apiBaseUrl}${assetPath.startsWith("/") ? assetPath : `/${assetPath}`}`;
 }
 
 async function readJsonResponse<TResponse>(
@@ -54,7 +53,7 @@ export async function apiPost<TResponse, TBody>(
 ): Promise<TResponse> {
   const requestId = createRequestId();
   const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: "POST",
     headers: buildHeaders(token, requestId),
     body: body === undefined ? undefined : JSON.stringify(body),
@@ -94,7 +93,7 @@ export async function apiUpload<TResponse>(
 ): Promise<TResponse> {
   const requestId = createRequestId();
   const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: "POST",
     headers: {
       "X-Request-Id": requestId,
@@ -137,7 +136,7 @@ export async function apiPut<TResponse, TBody>(
 ): Promise<TResponse> {
   const requestId = createRequestId();
   const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: "PUT",
     headers: buildHeaders(token, requestId),
     body: JSON.stringify(body),
@@ -174,7 +173,7 @@ export async function apiPut<TResponse, TBody>(
 export async function apiGet<TResponse>(path: string): Promise<TResponse> {
   const requestId = createRequestId();
   const token = getAccessToken();
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const response = await fetch(`${getApiBaseUrl()}${path}`, {
     headers: {
       "X-Request-Id": requestId,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),

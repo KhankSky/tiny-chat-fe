@@ -1,4 +1,5 @@
-import { createRequestId, logClientError } from "@/shared/lib/logger";
+import { createRequestId, logClientError, logClientWarning } from "@/shared/lib/logger";
+import { getApiBaseUrl } from "@/shared/api/base-url";
 
 type Headers = Record<string, string>;
 
@@ -55,7 +56,7 @@ function parseFrame(rawFrame: string): Frame | null {
 }
 
 function getWebSocketBaseUrl() {
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+  const apiBaseUrl = getApiBaseUrl();
   const url = new URL(apiBaseUrl);
   url.protocol = url.protocol === "https:" ? "wss:" : "ws:";
   url.pathname = "/ws";
@@ -112,7 +113,7 @@ export class StompClient {
       };
 
       socket.onerror = () => {
-        logClientError("WebSocket connection failed", {
+        logClientWarning("WebSocket connection failed", {
           connectionId: this.connectionId,
           url: getWebSocketBaseUrl(),
         });
@@ -122,7 +123,7 @@ export class StompClient {
       socket.onclose = () => {
         this.connected = false;
         if (!this.disconnectRequested) {
-          logClientError("WebSocket disconnected unexpectedly", {
+          logClientWarning("WebSocket disconnected unexpectedly", {
             connectionId: this.connectionId,
             url: getWebSocketBaseUrl(),
           });
@@ -182,7 +183,7 @@ export class StompClient {
 
   private sendRaw(frame: string) {
     if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      logClientError("WebSocket send attempted while disconnected", {
+      logClientWarning("WebSocket send attempted while disconnected", {
         connectionId: this.connectionId,
       });
       throw new Error("WebSocket is not connected");

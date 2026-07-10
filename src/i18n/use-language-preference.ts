@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { dictionaries } from "./dictionaries";
 import type { Dictionary, Locale } from "./types";
 
@@ -29,25 +29,30 @@ export function useLanguagePreference(): {
   locale: Locale;
   setLocale: (locale: Locale) => void;
 } {
-  const [locale, setLocaleState] = useState<Locale>(() => getStoredLocale());
-
-  useEffect(() => {
-    function handleLanguageChanged(event: Event) {
-      const nextLocale = (event as CustomEvent<Locale>).detail;
-      if (isLocale(nextLocale)) {
-        setLocaleState(nextLocale);
+  const locale = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === "undefined") {
+        return () => {};
       }
-    }
 
-    window.addEventListener(LANGUAGE_CHANGED_EVENT, handleLanguageChanged);
-    return () => {
-      window.removeEventListener(LANGUAGE_CHANGED_EVENT, handleLanguageChanged);
-    };
-  }, []);
+      function handleLanguageChanged(event: Event) {
+        const nextLocale = (event as CustomEvent<Locale>).detail;
+        if (isLocale(nextLocale)) {
+          onStoreChange();
+        }
+      }
+
+      window.addEventListener(LANGUAGE_CHANGED_EVENT, handleLanguageChanged);
+      return () => {
+        window.removeEventListener(LANGUAGE_CHANGED_EVENT, handleLanguageChanged);
+      };
+    },
+    getStoredLocale,
+    () => "en",
+  );
 
   function setLocale(nextLocale: Locale) {
     persistLocale(nextLocale);
-    setLocaleState(nextLocale);
   }
 
   return {
