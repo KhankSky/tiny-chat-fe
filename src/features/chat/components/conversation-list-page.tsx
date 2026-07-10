@@ -31,7 +31,6 @@ export function ConversationListPage({
     <div className="tc-app-shell h-dvh w-full overflow-hidden bg-[#070d18] text-white">
       <div className="grid h-full min-h-0 w-full lg:grid-cols-[340px_minmax(0,1fr)_360px]">
         <ConversationSidebar
-          locale={locale}
           dictionary={dictionary}
           conversations={conversations}
           activeGroupId={-1}

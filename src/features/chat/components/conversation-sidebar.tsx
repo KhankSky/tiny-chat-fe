@@ -7,7 +7,7 @@ import { getMyStreakCached } from "@/features/chat/api/chat-api";
 import { PERSONAL_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { UserStreakResponse } from "@/features/chat/types";
 import { FriendsPanel } from "@/features/friends/components/friends-panel";
-import type { Dictionary, Locale } from "@/i18n/types";
+import type { Dictionary } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 
 export type ConversationItem = {
@@ -43,14 +43,12 @@ function PersonalStreakBadge({
 }
 
 export function ConversationSidebar({
-  locale,
   dictionary,
   conversations,
   activeGroupId,
   currentUser,
   onEditProfile,
 }: {
-  locale: Locale;
   dictionary: Dictionary;
   conversations: ConversationItem[];
   activeGroupId: number;
@@ -157,7 +155,7 @@ export function ConversationSidebar({
             );
           })}
         </div>
-        <FriendsPanel dictionary={dictionary} locale={locale} />
+        <FriendsPanel dictionary={dictionary} />
       </div>
 
       <div className="shrink-0 border-t border-white/10 px-3 py-3">

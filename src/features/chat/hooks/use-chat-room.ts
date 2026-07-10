@@ -26,6 +26,7 @@ export type TypingUser = {
 
 const messageHistoryCache = new Map<number, LocalChatMessage[]>();
 const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
+const lastSyncedReadMessageIds = new Map<number, number>();
 export const GROUP_STREAK_CHANGED_EVENT = "tiny-chat:group-streak-changed";
 export const PERSONAL_STREAK_CHANGED_EVENT = "tiny-chat:personal-streak-changed";
 
@@ -289,7 +290,13 @@ export function useChatRoom({
     const lastMessage = messages[messages.length - 1];
     if (!lastMessage?.messageId || lastMessage.messageId < 0 || !currentUser?.userId) return;
     if (lastReadMessageIdRef.current === lastMessage.messageId) return;
+    const lastSyncedMessageId = lastSyncedReadMessageIds.get(groupId) ?? 0;
+    if (lastMessage.messageId <= lastSyncedMessageId) {
+      lastReadMessageIdRef.current = lastMessage.messageId;
+      return;
+    }
     lastReadMessageIdRef.current = lastMessage.messageId;
+    lastSyncedReadMessageIds.set(groupId, lastMessage.messageId);
 
     const isConnected = stompClientRef.current && socketStatus === "connected";
     if (isConnected) {
@@ -300,6 +307,10 @@ export function useChatRoom({
     }
 
     void markConversationRead(groupId, lastMessage.messageId).catch(() => {
+      const syncedMessageId = lastSyncedReadMessageIds.get(groupId);
+      if (syncedMessageId === lastMessage.messageId) {
+        lastSyncedReadMessageIds.delete(groupId);
+      }
       // Read sync should not interrupt chat usage.
     });
   }, [currentUser?.userId, groupId, messages, socketStatus]);

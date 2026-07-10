@@ -42,7 +42,6 @@ export function ConversationThreadPage({
       >
         <div className="hidden min-h-0 lg:block">
           <ConversationSidebar
-            locale={locale}
             dictionary={dictionary}
             conversations={conversations}
             activeGroupId={conversationId}
@@ -89,7 +88,6 @@ export function ConversationThreadPage({
             onClick={(event) => event.stopPropagation()}
           >
             <ConversationSidebar
-              locale={locale}
               dictionary={dictionary}
               conversations={conversations}
               activeGroupId={conversationId}

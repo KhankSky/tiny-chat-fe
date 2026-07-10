@@ -48,7 +48,6 @@ export function ChatShell({
   return (
     <div className="mx-auto grid min-h-screen max-w-7xl gap-6 px-4 py-4 lg:grid-cols-[340px_1fr] lg:px-6">
       <ConversationSidebar
-        locale={locale}
         dictionary={dictionary}
         conversations={conversations}
         activeGroupId={groupId}
