@@ -18,6 +18,7 @@ export type GroupMemberResponse = {
   displayName: string | null;
   avatarUrl: string | null;
   role: "OWNER" | "MEMBER";
+  online: boolean;
 };
 
 export type GroupDetailResponse = {

@@ -188,7 +188,6 @@ export function ChatRoom({
             <h2 className="truncate text-lg font-semibold text-white sm:text-xl">
               {conversationTitle}
             </h2>
-            <p className="truncate text-xs text-slate-400">{headerStatus}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">

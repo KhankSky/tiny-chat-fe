@@ -194,6 +194,9 @@ export function GroupSidebar({
           setGroup(data);
           setGroupName(data.groupName ?? "");
           setGroupDescription(data.groupDescription ?? "");
+          setPresenceByUser(
+            Object.fromEntries(data.members.map((member) => [member.userId, member.online])),
+          );
         }
       } catch (err) {
         if (active) {
