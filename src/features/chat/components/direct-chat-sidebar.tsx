@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { X } from "lucide-react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
 import { getFriendProfile } from "@/features/friends/api/friends-api";
 import type { FriendProfileResponse } from "@/features/friends/types";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { LoadingState } from "@/shared/ui/loading-state";
 
@@ -20,11 +22,13 @@ export function DirectChatSidebar({
   groupId,
   locale,
   currentUser,
+  onClose,
 }: {
   dictionary: Dictionary;
   groupId: number;
-  locale: Locale;
+  locale?: Locale;
   currentUser?: AuthUserResponse | null;
+  onClose?: () => void;
 }) {
   const t = dictionary.chat.groupSidebar;
   const [profile, setProfile] = useState<FriendProfileResponse | null>(null);
@@ -82,36 +86,56 @@ export function DirectChatSidebar({
 
   return (
     <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
-      <div className="border-b border-white/10 px-5 py-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
-          Direct chat
-        </p>
-        <h2 className="mt-2 truncate text-xl font-semibold text-white">
-          {profile ? displayName : t.loadingGroup}
-        </h2>
+      <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-5">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-cyan-300/90">
+            Direct chat
+          </p>
+          <h2 className="mt-2 truncate text-lg font-semibold text-white sm:text-xl">
+            {profile ? displayName : t.loadingGroup}
+          </h2>
+        </div>
+        {onClose ? (
+          <Button
+            type="button"
+            variant="icon"
+            className="h-9 w-9 shrink-0 rounded-full"
+            onClick={onClose}
+            aria-label={dictionary.common.close}
+            title={dictionary.common.close}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        ) : null}
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto p-5">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4 sm:p-5">
         {loading ? (
           <LoadingState label={dictionary.common.loading} />
         ) : error ? (
           <ErrorMessage>{error}</ErrorMessage>
         ) : profile ? (
-          <div className="space-y-5">
+          <div className="space-y-4 sm:space-y-5">
             <div className="rounded-3xl border border-white/10 bg-white/[0.03] p-4">
-              <div className="flex items-start gap-4">
-                <Avatar className="h-18 w-18 ring-1 ring-cyan-400/30" src={profile.avatarUrl} alt={displayName} />
+              <div className="flex items-start gap-3 sm:gap-4">
+                <Avatar
+                  className="h-16 w-16 shrink-0 ring-1 ring-cyan-400/30 sm:h-[4.5rem] sm:w-[4.5rem]"
+                  src={profile.avatarUrl}
+                  alt={displayName}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
                     Partner
                   </p>
-                  <h3 className="mt-2 truncate text-2xl font-semibold text-white">{displayName}</h3>
+                  <h3 className="mt-2 truncate text-xl font-semibold text-white sm:text-2xl">
+                    {displayName}
+                  </h3>
                   <p className="mt-1 truncate text-sm text-slate-400">{profile.email}</p>
                 </div>
               </div>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
+              <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                Online status shown in chat
+                <span className="truncate">Online status shown in chat</span>
               </div>
             </div>
 
@@ -135,7 +159,7 @@ export function DirectChatSidebar({
                   interests.map((interest) => (
                     <span
                       key={interest}
-                      className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100"
+                      className="max-w-full rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-100"
                     >
                       {interest}
                     </span>

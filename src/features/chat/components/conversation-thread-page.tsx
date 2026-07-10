@@ -30,6 +30,7 @@ export function ConversationThreadPage({
   const profileEditor = useProfileEditor(dictionary);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [mobileGroupInfoOpen, setMobileGroupInfoOpen] = useState(false);
+  const [mobileDirectInfoOpen, setMobileDirectInfoOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
   const activeConversation = conversations.find(
     (conversation) => conversation.conversationId === conversationId,
@@ -61,10 +62,15 @@ export function ConversationThreadPage({
           groupId={conversationId}
           directChat={directChat}
           currentUser={profileEditor.currentUser}
-          rightSidebarOpen={directChat ? false : rightSidebarOpen || mobileGroupInfoOpen}
+          rightSidebarOpen={
+            directChat === true
+              ? mobileDirectInfoOpen
+              : rightSidebarOpen || mobileGroupInfoOpen
+          }
           onOpenConversationList={() => setLeftSidebarOpen(true)}
           onToggleRightSidebar={() => {
-            if (directChat) {
+            if (directChat === true) {
+              setMobileDirectInfoOpen(true);
               return;
             }
             if (window.matchMedia("(min-width: 1024px)").matches) {
@@ -126,7 +132,7 @@ export function ConversationThreadPage({
           onClick={() => setMobileGroupInfoOpen(false)}
         >
           <div
-            className="h-[min(88dvh,46rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            className="h-[min(80dvh,40rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
             onClick={(event) => event.stopPropagation()}
           >
             <GroupSidebar
@@ -138,15 +144,22 @@ export function ConversationThreadPage({
             />
           </div>
         </div>
-      ) : directChat ? (
-        <div className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden">
-          <div className="h-[min(88dvh,46rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40">
+      ) : directChat === true && mobileDirectInfoOpen ? (
+        <div
+          className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileDirectInfoOpen(false)}
+        >
+          <div
+            className="h-[min(76dvh,38rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            onClick={(event) => event.stopPropagation()}
+          >
             <DirectChatSidebar
               key={`mobile-direct-${conversationId}`}
               dictionary={dictionary}
               groupId={conversationId}
               locale={locale}
               currentUser={profileEditor.currentUser}
+              onClose={() => setMobileDirectInfoOpen(false)}
             />
           </div>
         </div>
