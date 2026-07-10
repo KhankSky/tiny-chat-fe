@@ -31,6 +31,8 @@ export function createOptimisticMessage({
     replyTopicId,
     replyTopicContent,
     sentAt: new Date().toISOString(),
+    readCount: 1,
+    readByCurrentUser: true,
   } satisfies LocalChatMessage;
 }
 

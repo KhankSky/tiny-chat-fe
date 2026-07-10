@@ -137,6 +137,13 @@ export const en = {
       error: "Offline",
       idle: "Idle",
     },
+    typingSingle: "{name} is typing...",
+    typingDouble: "{first} and {second} are typing...",
+    typingMany: "{name} and others are typing...",
+    onlineNow: "Online",
+    offlineNow: "Offline",
+    onlineCount: "{count} online",
+    seenByCount: "Seen by {count}",
     toggleSidebar: {
       collapse: "Collapse info sidebar",
       open: "Open info sidebar",

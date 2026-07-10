@@ -137,6 +137,13 @@ export const vi = {
       error: "Mất kết nối",
       idle: "Chưa sẵn sàng",
     },
+    typingSingle: "{name} Ä‘ang nháº­p...",
+    typingDouble: "{first} vÃ  {second} Ä‘ang nháº­p...",
+    typingMany: "{name} vÃ  nhá»¯ng ngÆ°á»i khÃ¡c Ä‘ang nháº­p...",
+    onlineNow: "Trá»±c tuyáº¿n",
+    offlineNow: "Ngoáº¡i tuyáº¿n",
+    onlineCount: "{count} ngÆ°á»i online",
+    seenByCount: "ÄÃ£ xem bá»Ÿi {count}",
     toggleSidebar: {
       collapse: "Thu gọn thông tin",
       open: "Mở thông tin",

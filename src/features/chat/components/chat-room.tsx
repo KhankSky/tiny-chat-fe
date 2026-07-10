@@ -43,10 +43,12 @@ export function ChatRoom({
     error,
     loading,
     messages,
+    presenceByUser,
     sendMessage,
     setContent,
     socketError,
     socketStatus,
+    typingUsers,
   } = useChatRoom({ currentUser, dictionary, groupId });
   const messagesWithAvatars = useMemo(
     () =>
@@ -61,6 +63,37 @@ export function ChatRoom({
     [currentUser, memberAvatars, messages],
   );
   const [conversationAvatarUrl, setConversationAvatarUrl] = useState<string | null>(null);
+  const directChatMember = useMemo(
+    () =>
+      currentUser
+        ? messagesWithAvatars.find((message) => message.senderId !== currentUser.userId)
+        : null,
+    [currentUser, messagesWithAvatars],
+  );
+  const onlineCount = useMemo(
+    () => Object.values(presenceByUser).filter(Boolean).length,
+    [presenceByUser],
+  );
+  const typingLabel = useMemo(() => {
+    if (typingUsers.length === 0) return null;
+    if (typingUsers.length === 1) {
+      return t.typingSingle.replace("{name}", typingUsers[0]);
+    }
+    if (typingUsers.length === 2) {
+      return t.typingDouble
+        .replace("{first}", typingUsers[0])
+        .replace("{second}", typingUsers[1]);
+    }
+    return t.typingMany.replace("{name}", typingUsers[0]);
+  }, [t.typingDouble, t.typingMany, t.typingSingle, typingUsers]);
+  const headerStatus = useMemo(() => {
+    if (typingLabel) return typingLabel;
+    if (socketStatus !== "connected") return t.socketStatus[socketStatus];
+    if (directChatMember) {
+      return presenceByUser[directChatMember.senderId] ? t.onlineNow : t.offlineNow;
+    }
+    return t.onlineCount.replace("{count}", String(onlineCount));
+  }, [directChatMember, onlineCount, presenceByUser, socketStatus, t, typingLabel]);
 
   async function handleSendMessage() {
     if (!content.trim()) return;
@@ -155,6 +188,7 @@ export function ChatRoom({
             <h2 className="truncate text-lg font-semibold text-white sm:text-xl">
               {conversationTitle}
             </h2>
+            <p className="truncate text-xs text-slate-400">{headerStatus}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -257,6 +291,10 @@ export function ChatRoom({
                     const isFirstInGroup = senderMessageIndex === 0;
                     const isLastInGroup = senderMessageIndex === senderMessages.length - 1;
                     const sentAt = formatDateTime(senderMessage.sentAt, locale);
+                    const showReadReceipt =
+                      isMine &&
+                      isLastInGroup &&
+                      senderMessage.readCount > 1;
 
                     return (
                       <div
@@ -315,6 +353,14 @@ export function ChatRoom({
                         >
                           {sentAt}
                         </span>
+                        {showReadReceipt ? (
+                          <p className="mt-1 px-2 text-[11px] text-slate-400">
+                            {t.seenByCount.replace(
+                              "{count}",
+                              String(senderMessage.readCount - 1),
+                            )}
+                          </p>
+                        ) : null}
                       </div>
                     );
                   })}
@@ -327,6 +373,9 @@ export function ChatRoom({
       </div>
 
       <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
+        {typingLabel ? (
+          <p className="mb-2 px-2 text-xs text-slate-400">{typingLabel}</p>
+        ) : null}
         {replyingDailyTopic ? (
           <div className="mb-3 flex items-start gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-3">
             <div className="min-w-0 flex-1">

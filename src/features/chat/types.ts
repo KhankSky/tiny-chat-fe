@@ -7,6 +7,7 @@ export type ConversationResponse = {
   lastMessage: string | null;
   lastMessageAt: string | null;
   memberCount: number;
+  unreadCount: number;
 };
 
 export type ChatMessage = {
@@ -19,11 +20,40 @@ export type ChatMessage = {
   replyTopicId: number | null;
   replyTopicContent: string | null;
   sentAt: string;
+  readCount: number;
+  readByCurrentUser: boolean;
 };
 
 export type HistoryResponse = {
+  items: ChatMessage[];
+};
+
+export type TypingEvent = {
   groupId: number;
-  messages: ChatMessage[];
+  userId: number;
+  displayName: string;
+  typing: boolean;
+  occurredAt: string;
+};
+
+export type PresenceEvent = {
+  groupId: number;
+  userId: number;
+  displayName: string;
+  online: boolean;
+  occurredAt: string;
+};
+
+export type ReadReceiptResponse = {
+  groupId: number;
+  userId: number;
+  messageId: number;
+  readAt: string;
+};
+
+export type ConversationUpdateResponse = {
+  event: "UPSERT";
+  conversation: ConversationResponse;
 };
 
 export type DailyTopicResponse = {

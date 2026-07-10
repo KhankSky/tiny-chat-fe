@@ -3,11 +3,14 @@
 import { useEffect, useState } from "react";
 import { getGroupStreakCached } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
+import type { PresenceEvent } from "@/features/chat/types";
 import type { GroupStreakResponse } from "@/features/chat/types";
 import { MemberProfileModal } from "@/features/friends/components/member-profile-modal";
 import { getGroupDetail, updateGroupDetail, uploadGroupAvatar } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
 import type { Dictionary, Locale } from "@/i18n/types";
+import { getAccessToken } from "@/shared/auth/session";
+import { StompClient } from "@/shared/realtime/stomp";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -174,6 +177,7 @@ export function GroupSidebar({
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
+  const [presenceByUser, setPresenceByUser] = useState<Record<number, boolean>>({});
 
   useEffect(() => {
     let active = true;
@@ -238,10 +242,42 @@ export function GroupSidebar({
     };
   }, [groupAvatarPreviewUrl]);
 
+  useEffect(() => {
+    let active = true;
+    const accessToken = getAccessToken();
+    const client = accessToken ? new StompClient(accessToken) : null;
+    let unsubscribe: (() => void) | null = null;
+
+    async function connectPresence() {
+      if (!client) return;
+
+      try {
+        await client.connect();
+        if (!active) return;
+        unsubscribe = client.subscribe(`/topic/groups/${groupId}/presence`, (body) => {
+          const payload = JSON.parse(body) as PresenceEvent;
+          setPresenceByUser((previous) => ({
+            ...previous,
+            [payload.userId]: payload.online,
+          }));
+        });
+      } catch {
+        // Presence is decorative metadata; sidebar can still render without it.
+      }
+    }
+
+    void connectPresence();
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+      client?.disconnect();
+    };
+  }, [groupId]);
+
   const members = group?.members ?? [];
-  const onlineCount = members.length <= 2 ? members.length : Math.ceil(members.length * 0.65);
-  const onlineMembers = members.slice(0, onlineCount);
-  const offlineMembers = members.slice(onlineCount);
+  const onlineMembers = members.filter((member) => presenceByUser[member.userId]);
+  const offlineMembers = members.filter((member) => !presenceByUser[member.userId]);
 
   function handleGroupAvatarChange(file: File | null) {
     if (groupAvatarPreviewUrl) URL.revokeObjectURL(groupAvatarPreviewUrl);

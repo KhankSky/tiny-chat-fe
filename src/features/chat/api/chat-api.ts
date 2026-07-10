@@ -2,6 +2,7 @@ import { apiGet, apiPost } from "@/shared/api/client";
 import type {
   ChatMessage,
   ConversationResponse,
+  ReadReceiptResponse,
   DailyTopicResponse,
   GroupStreakResponse,
   HistoryResponse,
@@ -101,4 +102,10 @@ export function sendGroupMessage(
   },
 ) {
   return apiPost<ChatMessage, typeof body>(`/api/groups/${groupId}/messages`, body);
+}
+
+export function markConversationRead(groupId: number, messageId: number) {
+  return apiPost<ReadReceiptResponse, { messageId: number }>(`/api/groups/${groupId}/read`, {
+    messageId,
+  });
 }
