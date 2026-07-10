@@ -26,6 +26,8 @@ function toConversationItem(
   return {
     conversationId: conversation.conversationId,
     groupId: conversation.groupId,
+    directChat: conversation.directChat,
+    conversationType: conversation.conversationType,
     title: conversation.title,
     avatarUrl: conversation.avatarUrl,
     preview: conversation.lastMessage || conversation.description || fallbackPreview,

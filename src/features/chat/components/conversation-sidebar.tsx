@@ -13,6 +13,8 @@ import { Avatar } from "@/shared/ui/avatar";
 export type ConversationItem = {
   conversationId?: number;
   groupId: number;
+  directChat: boolean;
+  conversationType: "DIRECT" | "GROUP";
   title: string;
   avatarUrl?: string | null;
   preview: string;

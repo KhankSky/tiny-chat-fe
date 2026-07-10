@@ -8,6 +8,8 @@ import { ConversationSidebar, type ConversationItem } from "./conversation-sideb
 const defaultConversations: ConversationItem[] = [
   {
     groupId: 1,
+    directChat: false,
+    conversationType: "GROUP",
     title: "English practice",
     preview: "Let's continue with daily conversation and travel topics.",
     updatedAt: "2m",
@@ -15,18 +17,24 @@ const defaultConversations: ConversationItem[] = [
   },
   {
     groupId: 2,
+    directChat: false,
+    conversationType: "GROUP",
     title: "Study group",
     preview: "We need to finish the vocab list before tomorrow.",
     updatedAt: "10m",
   },
   {
     groupId: 3,
+    directChat: true,
+    conversationType: "DIRECT",
     title: "Friends room",
     preview: "Anyone free to chat tonight?",
     updatedAt: "1h",
   },
   {
     groupId: 4,
+    directChat: false,
+    conversationType: "GROUP",
     title: "Work updates",
     preview: "The sprint review is moving to Friday.",
     updatedAt: "3h",
@@ -51,8 +59,9 @@ export function ChatShell({
         dictionary={dictionary}
         conversations={conversations}
         activeGroupId={groupId}
+        currentUser={null}
       />
-      <ChatRoom locale={locale} dictionary={dictionary} groupId={groupId} />
+      <ChatRoom locale={locale} dictionary={dictionary} groupId={groupId} directChat={false} />
     </div>
   );
 }

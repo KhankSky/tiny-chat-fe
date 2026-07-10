@@ -1,6 +1,8 @@
 export type ConversationResponse = {
   conversationId: number;
   groupId: number;
+  directChat: boolean;
+  conversationType: "DIRECT" | "GROUP";
   title: string;
   description: string | null;
   avatarUrl: string | null;

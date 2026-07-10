@@ -298,9 +298,9 @@ export function useChatRoom({
     lastReadMessageIdRef.current = lastMessage.messageId;
     lastSyncedReadMessageIds.set(groupId, lastMessage.messageId);
 
-    const isConnected = stompClientRef.current && socketStatus === "connected";
-    if (isConnected) {
-      stompClientRef.current.send(`/app/groups/${groupId}/read`, {
+    const client = stompClientRef.current;
+    if (client && socketStatus === "connected") {
+      client.send(`/app/groups/${groupId}/read`, {
         messageId: lastMessage.messageId,
       });
       return;

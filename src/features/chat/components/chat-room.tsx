@@ -18,6 +18,7 @@ export function ChatRoom({
   locale,
   dictionary,
   groupId,
+  directChat = null,
   currentUser = null,
   onOpenConversationList,
   onToggleRightSidebar,
@@ -26,6 +27,7 @@ export function ChatRoom({
   locale: Locale;
   dictionary: Dictionary;
   groupId: number;
+  directChat?: boolean | null;
   currentUser?: AuthUserResponse | null;
   onOpenConversationList?: () => void;
   onToggleRightSidebar?: () => void;
@@ -110,6 +112,20 @@ export function ChatRoom({
   }
 
   useEffect(() => {
+    if (directChat === null) {
+      setDailyTopic(null);
+      setDailyTopicError(null);
+      setReplyingDailyTopic(null);
+      return;
+    }
+
+    if (directChat) {
+      setDailyTopic(null);
+      setDailyTopicError(null);
+      setReplyingDailyTopic(null);
+      return;
+    }
+
     let active = true;
 
     async function loadDailyTopic() {
@@ -131,7 +147,7 @@ export function ChatRoom({
     return () => {
       active = false;
     };
-  }, [groupId, t.loadDailyTopicError]);
+  }, [directChat, groupId, t.loadDailyTopicError]);
 
   useEffect(() => {
     let active = true;
@@ -216,7 +232,7 @@ export function ChatRoom({
         </div>
       </header>
 
-      {dailyTopic ? (
+      {directChat === false && dailyTopic ? (
         <div className="shrink-0 border-b border-white/10 bg-[#0b111c] px-3 py-3 sm:px-6">
           <div className="flex flex-col gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="min-w-0">
@@ -238,7 +254,7 @@ export function ChatRoom({
             </Button>
           </div>
         </div>
-      ) : dailyTopicError ? (
+      ) : directChat === false && dailyTopicError ? (
         <ErrorMessage className="mx-3 mt-3 sm:mx-6">{dailyTopicError}</ErrorMessage>
       ) : null}
 

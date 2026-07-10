@@ -8,6 +8,7 @@ import type { Dictionary, Locale } from "@/i18n/types";
 import type { ThemeMode } from "@/theme/use-theme-preference";
 import { ChatRoom } from "./chat-room";
 import { ConversationSidebar } from "./conversation-sidebar";
+import { DirectChatSidebar } from "./direct-chat-sidebar";
 import { GroupSidebar } from "./group-sidebar";
 
 export function ConversationThreadPage({
@@ -30,6 +31,10 @@ export function ConversationThreadPage({
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
   const [mobileGroupInfoOpen, setMobileGroupInfoOpen] = useState(false);
   const [rightSidebarOpen, setRightSidebarOpen] = useState(true);
+  const activeConversation = conversations.find(
+    (conversation) => conversation.conversationId === conversationId,
+  );
+  const directChat = activeConversation ? activeConversation.directChat : null;
 
   return (
     <div className="tc-app-shell h-dvh w-full overflow-hidden bg-[#070d18] text-white">
@@ -54,10 +59,14 @@ export function ConversationThreadPage({
           locale={locale}
           dictionary={dictionary}
           groupId={conversationId}
+          directChat={directChat}
           currentUser={profileEditor.currentUser}
-          rightSidebarOpen={rightSidebarOpen || mobileGroupInfoOpen}
+          rightSidebarOpen={directChat ? false : rightSidebarOpen || mobileGroupInfoOpen}
           onOpenConversationList={() => setLeftSidebarOpen(true)}
           onToggleRightSidebar={() => {
+            if (directChat) {
+              return;
+            }
             if (window.matchMedia("(min-width: 1024px)").matches) {
               setRightSidebarOpen((open) => !open);
             } else {
@@ -65,10 +74,20 @@ export function ConversationThreadPage({
             }
           }}
         />
-        {rightSidebarOpen ? (
+        {directChat === false && rightSidebarOpen ? (
           <div className="hidden min-h-0 lg:block">
             <GroupSidebar
               key={`group-${conversationId}`}
+              dictionary={dictionary}
+              groupId={conversationId}
+              locale={locale}
+              currentUser={profileEditor.currentUser}
+            />
+          </div>
+        ) : directChat ? (
+          <div className="hidden min-h-0 lg:block">
+            <DirectChatSidebar
+              key={`direct-${conversationId}`}
               dictionary={dictionary}
               groupId={conversationId}
               locale={locale}
@@ -101,7 +120,7 @@ export function ConversationThreadPage({
         </div>
       ) : null}
 
-      {mobileGroupInfoOpen ? (
+      {directChat === false && mobileGroupInfoOpen ? (
         <div
           className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileGroupInfoOpen(false)}
@@ -112,6 +131,18 @@ export function ConversationThreadPage({
           >
             <GroupSidebar
               key={`mobile-group-${conversationId}`}
+              dictionary={dictionary}
+              groupId={conversationId}
+              locale={locale}
+              currentUser={profileEditor.currentUser}
+            />
+          </div>
+        </div>
+      ) : directChat ? (
+        <div className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden">
+          <div className="h-[min(88dvh,46rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40">
+            <DirectChatSidebar
+              key={`mobile-direct-${conversationId}`}
               dictionary={dictionary}
               groupId={conversationId}
               locale={locale}

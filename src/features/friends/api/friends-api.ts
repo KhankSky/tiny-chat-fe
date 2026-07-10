@@ -10,16 +10,40 @@ let incomingRequestsCache: FriendRequestResponse[] | null = null;
 let incomingRequestsRequest: Promise<FriendRequestResponse[]> | null = null;
 let friendsCache: FriendUserSummary[] | null = null;
 let friendsRequest: Promise<FriendUserSummary[]> | null = null;
+const friendProfileCache = new Map<number, FriendProfileResponse>();
+const friendProfileRequests = new Map<number, Promise<FriendProfileResponse>>();
 
 export function clearFriendsCache() {
   incomingRequestsCache = null;
   incomingRequestsRequest = null;
   friendsCache = null;
   friendsRequest = null;
+  friendProfileCache.clear();
+  friendProfileRequests.clear();
 }
 
 export function getGroupMemberProfile(groupId: number, memberUserId: number) {
   return apiGet<FriendProfileResponse>(`/api/groups/${groupId}/members/${memberUserId}/profile`);
+}
+
+export function getFriendProfile(friendId: number) {
+  const cached = friendProfileCache.get(friendId);
+  if (cached) return Promise.resolve(cached);
+
+  const activeRequest = friendProfileRequests.get(friendId);
+  if (activeRequest) return activeRequest;
+
+  const request = apiGet<FriendProfileResponse>(`/api/friends/${friendId}/profile`)
+    .then((profile) => {
+      friendProfileCache.set(friendId, profile);
+      return profile;
+    })
+    .finally(() => {
+      friendProfileRequests.delete(friendId);
+    });
+
+  friendProfileRequests.set(friendId, request);
+  return request;
 }
 
 export function sendFriendRequest(receiverId: number) {
