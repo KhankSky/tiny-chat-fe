@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { clearConversationCache } from "@/features/chat/hooks/use-conversations";
 import {
   acceptFriendRequest,
   getFriendsCached,
@@ -65,7 +64,6 @@ export function FriendsPanel({
       setError(null);
       await action(requestId);
       await loadFriendsData({ force: true });
-      clearConversationCache();
     } catch (err) {
       setError(err instanceof Error ? err.message : t.actionError);
     } finally {
@@ -73,12 +71,16 @@ export function FriendsPanel({
     }
   }
 
-  async function handleOpenChat(friendId: number) {
+  async function handleOpenChat(friend: FriendUserSummary) {
     try {
-      setBusyFriendId(friendId);
+      setBusyFriendId(friend.userId);
       setError(null);
-      const conversation = await openDirectConversation(friendId);
-      clearConversationCache();
+      if (friend.directConversationId) {
+        router.push(`/conversations/${friend.directConversationId}`);
+        return;
+      }
+
+      const conversation = await openDirectConversation(friend.userId);
       router.push(`/conversations/${conversation.conversationId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : t.actionError);
@@ -185,7 +187,7 @@ export function FriendsPanel({
                         key={friend.userId}
                         type="button"
                         disabled={busyFriendId === friend.userId}
-                        onClick={() => handleOpenChat(friend.userId)}
+                        onClick={() => handleOpenChat(friend)}
                         className="flex w-full items-center gap-3 rounded-2xl border border-transparent px-3 py-2 text-left transition hover:border-white/10 hover:bg-white/5 disabled:opacity-60"
                       >
                         <Avatar

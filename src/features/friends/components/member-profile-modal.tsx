@@ -10,7 +10,6 @@ import {
   sendFriendRequest,
 } from "@/features/friends/api/friends-api";
 import type { FriendProfileResponse } from "@/features/friends/types";
-import { clearConversationCache } from "@/features/chat/hooks/use-conversations";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -100,8 +99,12 @@ export function MemberProfileModal({
     try {
       setBusy(true);
       setActionError(null);
+      if (profile.directConversationId) {
+        router.push(`/conversations/${profile.directConversationId}`);
+        return;
+      }
+
       const conversation = await openDirectConversation(profile.userId);
-      clearConversationCache();
       router.push(`/conversations/${conversation.conversationId}`);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : t.actionError);
