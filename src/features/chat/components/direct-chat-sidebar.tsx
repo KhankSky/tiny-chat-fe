@@ -20,13 +20,11 @@ function enumLabel(labels: Record<string, string>, value: string | null) {
 export function DirectChatSidebar({
   dictionary,
   groupId,
-  locale,
   currentUser,
   onClose,
 }: {
   dictionary: Dictionary;
   groupId: number;
-  locale?: Locale;
   currentUser?: AuthUserResponse | null;
   onClose?: () => void;
 }) {
@@ -142,11 +140,15 @@ export function DirectChatSidebar({
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
                 <p className="text-xs text-slate-500">Level</p>
-                <p className="mt-1 text-sm font-semibold text-white">{level || t.unknownValue}</p>
+                <p className="mt-1 text-sm font-semibold text-white">
+                  {level || dictionary.chat.friends.unknownValue}
+                </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
                 <p className="text-xs text-slate-500">Goal</p>
-                <p className="mt-1 text-sm font-semibold text-white">{goal || t.unknownValue}</p>
+                <p className="mt-1 text-sm font-semibold text-white">
+                  {goal || dictionary.chat.friends.unknownValue}
+                </p>
               </div>
             </div>
 
@@ -165,7 +167,7 @@ export function DirectChatSidebar({
                     </span>
                   ))
                 ) : (
-                  <span className="text-sm text-slate-400">{t.noInterests}</span>
+                  <span className="text-sm text-slate-400">{dictionary.chat.friends.noInterests}</span>
                 )}
               </div>
             </div>
@@ -174,7 +176,9 @@ export function DirectChatSidebar({
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
                 Bio
               </p>
-              <p className="mt-2 text-sm leading-6 text-slate-300">{profile.bio || t.noBio}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">
+                {profile.bio || dictionary.chat.friends.noBio}
+              </p>
             </div>
           </div>
         ) : null}

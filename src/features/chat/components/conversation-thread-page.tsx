@@ -96,7 +96,6 @@ export function ConversationThreadPage({
               key={`direct-${conversationId}`}
               dictionary={dictionary}
               groupId={conversationId}
-              locale={locale}
               currentUser={profileEditor.currentUser}
             />
           </div>
@@ -157,7 +156,6 @@ export function ConversationThreadPage({
               key={`mobile-direct-${conversationId}`}
               dictionary={dictionary}
               groupId={conversationId}
-              locale={locale}
               currentUser={profileEditor.currentUser}
               onClose={() => setMobileDirectInfoOpen(false)}
             />
