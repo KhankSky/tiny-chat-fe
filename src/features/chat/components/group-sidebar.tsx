@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { LogOut } from "lucide-react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupStreakCached } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
@@ -183,6 +184,7 @@ export function GroupSidebar({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isLeaving, setIsLeaving] = useState(false);
   const [leaveError, setLeaveError] = useState<string | null>(null);
+  const [leaveConfirmOpen, setLeaveConfirmOpen] = useState(false);
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
   const [presenceByUser, setPresenceByUser] = useState<Record<number, boolean>>(() =>
     currentUser?.userId ? { [currentUser.userId]: true } : {},
@@ -312,11 +314,11 @@ export function GroupSidebar({
   }
 
   async function handleLeaveGroup() {
-    if (!window.confirm(t.leaveConfirm)) return;
     setIsLeaving(true);
     setLeaveError(null);
     try {
       await leaveGroup(groupId);
+      setLeaveConfirmOpen(false);
       router.push(`/${locale}/groups/match`);
       router.refresh();
     } catch (err) {
@@ -438,12 +440,6 @@ export function GroupSidebar({
       ) : null}
 
       <div className="min-h-0 flex-1 overflow-y-auto py-4">
-        <div className="mb-5 px-5">
-          {leaveError ? <ErrorMessage>{leaveError}</ErrorMessage> : null}
-          <Button type="button" variant="secondary" onClick={handleLeaveGroup} disabled={isLeaving} className="w-full border-red-300/20 text-red-200 hover:border-red-300/50 hover:bg-red-400/10">
-            {isLeaving ? dictionary.common.loading : t.leaveGroup}
-          </Button>
-        </div>
         {error ? (
           <ErrorMessage className="mx-5">{error}</ErrorMessage>
         ) : null}
@@ -485,6 +481,31 @@ export function GroupSidebar({
           </>
         ) : null}
       </div>
+
+      <div className="shrink-0 border-t border-white/10 p-4">
+        {leaveError ? <ErrorMessage className="mb-3">{leaveError}</ErrorMessage> : null}
+        <button type="button" onClick={() => setLeaveConfirmOpen(true)} disabled={isLeaving} className="mx-auto flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium text-slate-500 transition hover:bg-red-400/10 hover:text-red-200 disabled:opacity-60">
+          <LogOut aria-hidden="true" size={15} />
+          {t.leaveGroup}
+        </button>
+      </div>
+
+      {leaveConfirmOpen ? (
+        <Modal ariaLabel={t.leaveConfirmTitle} onClose={() => { if (!isLeaving) setLeaveConfirmOpen(false); }} className="max-w-md rounded-[1.75rem] p-6">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-400/10 text-red-200">
+            <LogOut aria-hidden="true" size={23} />
+          </div>
+          <h3 className="mt-5 text-xl font-semibold text-white">{t.leaveConfirmTitle}</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-400">{t.leaveConfirm}</p>
+          <div className="mt-6 flex justify-end gap-3">
+            <Button type="button" variant="secondary" onClick={() => setLeaveConfirmOpen(false)} disabled={isLeaving}>{dictionary.common.cancel}</Button>
+            <Button type="button" onClick={() => void handleLeaveGroup()} disabled={isLeaving} className="bg-red-400 text-slate-950 hover:bg-red-300">
+              <LogOut aria-hidden="true" size={16} className="mr-2" />
+              {isLeaving ? dictionary.common.loading : t.leaveGroup}
+            </Button>
+          </div>
+        </Modal>
+      ) : null}
 
       {selectedProfileUserId ? (
         <MemberProfileModal

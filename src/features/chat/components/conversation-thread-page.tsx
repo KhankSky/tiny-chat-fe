@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { logout } from "@/shared/api/client";
 import { useConversations } from "@/features/chat/hooks/use-conversations";
 import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
 import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
@@ -26,6 +28,7 @@ export function ConversationThreadPage({
   theme?: ThemeMode;
   onThemeChange?: (theme: ThemeMode) => void;
 }) {
+  const router = useRouter();
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
   const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
@@ -36,6 +39,9 @@ export function ConversationThreadPage({
     (conversation) => conversation.conversationId === conversationId,
   );
   const directChat = activeConversation ? activeConversation.directChat : null;
+  async function handleLogout() {
+    try { await logout(); } finally { router.push(`/${locale}/auth/login`); }
+  }
 
   return (
     <div className="tc-app-shell h-dvh w-full overflow-hidden bg-[#070d18] text-white">
@@ -53,6 +59,7 @@ export function ConversationThreadPage({
             activeGroupId={conversationId}
             currentUser={profileEditor.currentUser}
             onEditProfile={profileEditor.openProfileEditor}
+            onLogout={() => void handleLogout()}
           />
         </div>
         <ChatRoom
@@ -120,6 +127,7 @@ export function ConversationThreadPage({
                 setLeftSidebarOpen(false);
                 profileEditor.openProfileEditor();
               }}
+              onLogout={() => { setLeftSidebarOpen(false); void handleLogout(); }}
             />
           </div>
         </div>

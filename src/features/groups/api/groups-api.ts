@@ -9,7 +9,7 @@ export function matchGroup() {
 }
 
 export function leaveGroup(groupId: number) {
-  return apiPost<void, Record<string, never>>(`/api/groups/${groupId}/leave`);
+  return apiPost<boolean, Record<string, never>>(`/api/groups/${groupId}/leave`);
 }
 
 export function getGroupDetail(groupId: number) {

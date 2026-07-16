@@ -50,12 +50,14 @@ export function ConversationSidebar({
   activeGroupId,
   currentUser,
   onEditProfile,
+  onLogout,
 }: {
   dictionary: Dictionary;
   conversations: ConversationItem[];
   activeGroupId: number;
   currentUser?: AuthUserResponse | null;
   onEditProfile?: () => void;
+  onLogout?: () => void;
 }) {
   const t = dictionary.chat;
   const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
@@ -184,6 +186,9 @@ export function ConversationSidebar({
               label={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`}
             />
           ) : null}
+        </button>
+        <button type="button" onClick={onLogout} className="mt-2 w-full rounded-xl px-3 py-2 text-left text-sm text-slate-400 transition hover:bg-red-400/10 hover:text-red-200">
+          {dictionary.common.logout}
         </button>
       </div>
     </aside>
