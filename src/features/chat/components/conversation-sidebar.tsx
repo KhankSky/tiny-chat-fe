@@ -144,20 +144,20 @@ export function ConversationSidebar({
       <div className="shrink-0 border-t border-white/10 px-3 py-3">
         <div className="flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 p-2 transition hover:border-cyan-400/30 hover:bg-cyan-400/10">
           <button type="button" onClick={onEditProfile} className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-1 py-1 text-left">
-            <span className="relative shrink-0">
-              <Avatar
-                src={currentUser?.avatarUrl}
-                alt={currentUser?.displayName || currentUser?.email || "User avatar"}
-              />
-              {userStreak ? (
-                <span title={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`} className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-amber-200/30 bg-amber-300 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-950 shadow-lg shadow-amber-950/30">
-                  <span aria-hidden="true">🔥</span>{userStreak.currentStreak}
-                </span>
-              ) : null}
-            </span>
+            <Avatar
+              src={currentUser?.avatarUrl}
+              alt={currentUser?.displayName || currentUser?.email || "User avatar"}
+            />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold text-white">
+              <span className="flex min-w-0 items-center gap-2">
+                <span className="truncate text-sm font-semibold text-white">
                 {currentUser?.displayName || currentUser?.email || dictionary.common.you}
+                </span>
+                {userStreak ? (
+                  <span title={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`} className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200/20 bg-amber-300/10 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-200">
+                    <span aria-hidden="true">🔥</span>{userStreak.currentStreak}
+                  </span>
+                ) : null}
               </span>
               <span className="mt-1 block truncate text-xs text-slate-400">
                 {currentUser?.email || t.personalInfo}
