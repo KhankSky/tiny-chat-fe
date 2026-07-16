@@ -36,6 +36,8 @@ export function ChatRoom({
   const [memberAvatars, setMemberAvatars] = useState<Record<number, string | null>>({});
   const [replyingDailyTopic] = useState<DailyTopicResponse | null>(null);
   const [conversationTitle, setConversationTitle] = useState(t.roomEyebrow);
+  const [emojiOpen, setEmojiOpen] = useState(false);
+  const emojis = ["😀", "😂", "😊", "😍", "👍", "👏", "🙏", "🔥", "🎉", "💪", "❤️", "🤔"];
   const {
     bottomRef,
     content,
@@ -354,6 +356,7 @@ export function ChatRoom({
             void handleSendMessage();
           }}
         >
+          <div className="relative flex min-w-0 flex-1">
           <Input
             value={content}
             onChange={(event) => setContent(event.target.value)}
@@ -363,10 +366,13 @@ export function ChatRoom({
                 void handleSendMessage();
               }
             }}
-            className="min-h-12 flex-1 rounded-full px-5 text-sm"
+            className="min-h-12 flex-1 rounded-full px-5 pr-12 text-sm"
             placeholder={socketStatus === "connected" ? t.writeMessage : t.waitingForConnection}
             disabled={false}
           />
+          <button type="button" aria-label={t.emoji} title={t.emoji} onClick={() => setEmojiOpen((open) => !open)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xl">😊</button>
+          {emojiOpen ? <div className="absolute bottom-14 right-0 z-10 grid grid-cols-6 gap-1 rounded-2xl border border-white/10 bg-[#111a2b] p-2 shadow-2xl">{emojis.map((emoji) => <button key={emoji} type="button" className="rounded-lg p-1.5 text-xl hover:bg-white/10" onClick={() => { setContent((value) => `${value}${emoji}`); setEmojiOpen(false); }}>{emoji}</button>)}</div> : null}
+          </div>
           <Button
             type="submit"
             className="min-h-12 shrink-0 px-4 sm:px-6"

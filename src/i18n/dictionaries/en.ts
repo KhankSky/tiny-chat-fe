@@ -153,6 +153,7 @@ export const en = {
     send: "Send",
     loadMessagesError: "Failed to load messages",
     sendMessageError: "Failed to send message",
+    emoji: "Choose an emoji",
     unknownSocketError: "Unknown error",
     friends: {
       friendsTitle: "Friends",
@@ -193,6 +194,9 @@ export const en = {
       groupNamePlaceholder: "Group name",
       groupDescriptionPlaceholder: "Group description",
       saveGroupError: "Could not save group",
+      leaveGroup: "Leave group",
+      leaveConfirm: "Leave this group and find another one?",
+      leaveError: "Could not leave group",
       groupStreakTitle: "Group streak",
       currentStreak: "Streak",
       activeToday: "Practiced today",

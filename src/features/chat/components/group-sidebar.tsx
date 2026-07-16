@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupStreakCached } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { PresenceEvent } from "@/features/chat/types";
 import type { GroupStreakResponse } from "@/features/chat/types";
 import { MemberProfileModal } from "@/features/friends/components/member-profile-modal";
-import { getGroupDetail, updateGroupDetail, uploadGroupAvatar } from "@/features/groups/api/groups-api";
+import { getGroupDetail, leaveGroup, updateGroupDetail, uploadGroupAvatar } from "@/features/groups/api/groups-api";
 import type { GroupDetailResponse, GroupMemberResponse } from "@/features/groups/types";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { getAccessToken } from "@/shared/auth/session";
@@ -167,6 +168,7 @@ export function GroupSidebar({
   locale: Locale;
   currentUser?: AuthUserResponse | null;
 }) {
+  const router = useRouter();
   const t = dictionary.chat.groupSidebar;
   const [group, setGroup] = useState<GroupDetailResponse | null>(null);
   const [groupStreak, setGroupStreak] = useState<GroupStreakResponse | null>(null);
@@ -179,6 +181,8 @@ export function GroupSidebar({
   const [groupAvatarPreviewUrl, setGroupAvatarPreviewUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [isLeaving, setIsLeaving] = useState(false);
+  const [leaveError, setLeaveError] = useState<string | null>(null);
   const [selectedProfileUserId, setSelectedProfileUserId] = useState<number | null>(null);
   const [presenceByUser, setPresenceByUser] = useState<Record<number, boolean>>(() =>
     currentUser?.userId ? { [currentUser.userId]: true } : {},
@@ -307,6 +311,21 @@ export function GroupSidebar({
     handleGroupAvatarChange(null);
   }
 
+  async function handleLeaveGroup() {
+    if (!window.confirm(t.leaveConfirm)) return;
+    setIsLeaving(true);
+    setLeaveError(null);
+    try {
+      await leaveGroup(groupId);
+      router.push(`/${locale}/groups/match`);
+      router.refresh();
+    } catch (err) {
+      setLeaveError(err instanceof Error ? err.message : t.leaveError);
+    } finally {
+      setIsLeaving(false);
+    }
+  }
+
   async function saveGroupDetail() {
     setIsSaving(true);
     setSaveError(null);
@@ -419,6 +438,12 @@ export function GroupSidebar({
       ) : null}
 
       <div className="min-h-0 flex-1 overflow-y-auto py-4">
+        <div className="mb-5 px-5">
+          {leaveError ? <ErrorMessage>{leaveError}</ErrorMessage> : null}
+          <Button type="button" variant="secondary" onClick={handleLeaveGroup} disabled={isLeaving} className="w-full border-red-300/20 text-red-200 hover:border-red-300/50 hover:bg-red-400/10">
+            {isLeaving ? dictionary.common.loading : t.leaveGroup}
+          </Button>
+        </div>
         {error ? (
           <ErrorMessage className="mx-5">{error}</ErrorMessage>
         ) : null}

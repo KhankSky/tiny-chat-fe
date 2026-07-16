@@ -153,6 +153,7 @@ export const vi = {
     send: "Gửi",
     loadMessagesError: "Không thể tải tin nhắn",
     sendMessageError: "Không thể gửi tin nhắn",
+    emoji: "Chọn emoji",
     unknownSocketError: "Lỗi không xác định",
     friends: {
       friendsTitle: "Bạn bè",
@@ -193,6 +194,9 @@ export const vi = {
       groupNamePlaceholder: "Tên nhóm",
       groupDescriptionPlaceholder: "Mô tả nhóm",
       saveGroupError: "Không thể lưu nhóm",
+      leaveGroup: "Rời nhóm",
+      leaveConfirm: "Bạn có chắc muốn rời nhóm và tìm nhóm khác không?",
+      leaveError: "Không thể rời nhóm",
       groupStreakTitle: "Streak nhóm",
       currentStreak: "Streak",
       activeToday: "Đã luyện hôm nay",

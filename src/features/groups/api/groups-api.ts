@@ -8,6 +8,10 @@ export function matchGroup() {
   return apiPost<MatchGroupResponse, Record<string, never>>("/api/groups/match");
 }
 
+export function leaveGroup(groupId: number) {
+  return apiPost<void, Record<string, never>>(`/api/groups/${groupId}/leave`);
+}
+
 export function getGroupDetail(groupId: number) {
   const cached = groupDetailCache.get(groupId);
   if (cached) return Promise.resolve(cached);
