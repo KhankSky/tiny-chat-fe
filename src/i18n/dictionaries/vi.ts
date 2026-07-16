@@ -155,6 +155,8 @@ export const vi = {
     loadMessagesError: "Không thể tải tin nhắn",
     sendMessageError: "Không thể gửi tin nhắn",
     emoji: "Chọn emoji",
+    conversationUnavailable: "Không thể mở cuộc trò chuyện",
+    backToConversations: "Quay lại danh sách trò chuyện",
     unknownSocketError: "Lỗi không xác định",
     friends: {
       friendsTitle: "Bạn bè",

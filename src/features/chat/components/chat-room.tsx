@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { useChatRoom } from "@/features/chat/hooks/use-chat-room";
 import type { DailyTopicResponse } from "@/features/chat/types";
@@ -33,7 +33,6 @@ export function ChatRoom({
   onToggleRightSidebar?: () => void;
   rightSidebarOpen?: boolean;
 }) {
-  const router = useRouter();
   const t = dictionary.chat;
   const [memberAvatars, setMemberAvatars] = useState<Record<number, string | null>>({});
   const [replyingDailyTopic] = useState<DailyTopicResponse | null>(null);
@@ -132,9 +131,8 @@ export function ChatRoom({
         if (active) {
           setConversationAvatarUrl(null);
           setMemberAvatars({});
-          if (!directChat) {
-            router.replace(`/${locale}/groups/match`);
-          }
+          setConversationTitle(t.conversationUnavailable);
+          setError(t.conversationUnavailable);
         }
       }
     }
@@ -143,7 +141,7 @@ export function ChatRoom({
     return () => {
       active = false;
     };
-  }, [currentUser?.userId, directChat, groupId, locale, router, t.roomEyebrow]);
+  }, [currentUser?.userId, directChat, groupId, t.conversationUnavailable, t.roomEyebrow]);
 
   return (
     <section className="tc-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
@@ -199,7 +197,12 @@ export function ChatRoom({
         ) : null}
 
         {error ? (
-          <ErrorMessage>{error}</ErrorMessage>
+          <div className="space-y-3">
+            <ErrorMessage>{error}</ErrorMessage>
+            <Link href={`/${locale}/conversations`} className="inline-flex rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/10">
+              {t.backToConversations}
+            </Link>
+          </div>
         ) : null}
 
         {socketError ? (

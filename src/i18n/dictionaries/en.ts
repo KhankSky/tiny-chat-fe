@@ -155,6 +155,8 @@ export const en = {
     loadMessagesError: "Failed to load messages",
     sendMessageError: "Failed to send message",
     emoji: "Choose an emoji",
+    conversationUnavailable: "Conversation unavailable",
+    backToConversations: "Back to conversations",
     unknownSocketError: "Unknown error",
     friends: {
       friendsTitle: "Friends",

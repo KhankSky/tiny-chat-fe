@@ -319,7 +319,7 @@ export function GroupSidebar({
     try {
       await leaveGroup(groupId);
       setLeaveConfirmOpen(false);
-      router.push(`/${locale}/groups/match`);
+      router.push(`/${locale}/conversations`);
       router.refresh();
     } catch (err) {
       setLeaveError(err instanceof Error ? err.message : t.leaveError);
