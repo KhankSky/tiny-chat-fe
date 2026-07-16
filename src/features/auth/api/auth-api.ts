@@ -2,11 +2,11 @@ import { apiGet, apiPost } from "@/shared/api/client";
 import type { AuthCredentials, AuthUserResponse, CompleteProfileRequest } from "../types";
 
 export function login(payload: AuthCredentials) {
-  return apiPost<AuthUserResponse, AuthCredentials>("/api/auth/login", payload);
+  return apiPost<AuthUserResponse, AuthCredentials>("/api/auth/p/login", payload);
 }
 
 export function register(payload: AuthCredentials) {
-  return apiPost<AuthUserResponse, AuthCredentials>("/api/auth/register", payload);
+  return apiPost<AuthUserResponse, AuthCredentials>("/api/auth/p/register", payload);
 }
 
 export function getCurrentUser() {

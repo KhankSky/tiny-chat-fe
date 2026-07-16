@@ -8,7 +8,7 @@ type HttpMethod = "GET" | "POST" | "PUT";
 async function restoreAccessToken() {
   if (getAccessToken()) return;
   try {
-    const response = await fetch(`${getApiBaseUrl()}/api/auth/refresh`, {
+    const response = await fetch(`${getApiBaseUrl()}/api/auth/p/refresh`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -22,7 +22,7 @@ async function restoreAccessToken() {
 }
 
 export async function logout(allSessions = false) {
-  const response = await fetch(`${getApiBaseUrl()}/api/auth/${allSessions ? "logout-all" : "logout"}`, {
+  const response = await fetch(`${getApiBaseUrl()}/api/auth/${allSessions ? "logout-all" : "p/logout"}`, {
     method: "POST",
     credentials: "include",
   });
