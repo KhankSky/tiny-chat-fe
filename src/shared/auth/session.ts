@@ -1,11 +1,11 @@
 import type { AuthUserResponse } from "@/features/auth/types";
 
-const ACCESS_TOKEN_KEY = "tiny-chat.access-token";
 const AUTH_USER_KEY = "tiny-chat.auth-user";
 export const AUTH_SESSION_CHANGED_EVENT = "tiny-chat:auth-session-changed";
 
 let cachedAuthUserRaw: string | null | undefined;
 let cachedAuthUser: AuthUserResponse | null = null;
+let accessToken: string | null = null;
 
 function readStoredAuthUser(): AuthUserResponse | null {
   const raw = localStorage.getItem(AUTH_USER_KEY);
@@ -31,14 +31,14 @@ function readStoredAuthUser(): AuthUserResponse | null {
 export function persistAuthSession(user: AuthUserResponse) {
   if (typeof window === "undefined") return;
 
-  localStorage.setItem(ACCESS_TOKEN_KEY, user.accessToken);
+  accessToken = user.accessToken;
   localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
   cachedAuthUserRaw = null;
 }
 
 export function getAccessToken() {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(ACCESS_TOKEN_KEY);
+  return accessToken;
 }
 
 export function getStoredAuthUser() {
@@ -66,7 +66,7 @@ export function updateStoredAuthUser(
 
 export function clearAuthSession() {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  accessToken = null;
   localStorage.removeItem(AUTH_USER_KEY);
   cachedAuthUserRaw = null;
   window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
@@ -82,7 +82,7 @@ export function subscribeAuthSession(onStoreChange: () => void) {
   }
 
   function handleStorage(event: StorageEvent) {
-    if (!event.key || event.key === ACCESS_TOKEN_KEY || event.key === AUTH_USER_KEY) {
+    if (!event.key || event.key === AUTH_USER_KEY) {
       onStoreChange();
     }
   }

@@ -55,6 +55,7 @@ export async function apiPost<TResponse, TBody>(
   const token = getAccessToken();
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: "POST",
+    credentials: "include",
     headers: buildHeaders(token, requestId),
     body: body === undefined ? undefined : JSON.stringify(body),
   });
@@ -95,6 +96,7 @@ export async function apiUpload<TResponse>(
   const token = getAccessToken();
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: "POST",
+    credentials: "include",
     headers: {
       "X-Request-Id": requestId,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
@@ -138,6 +140,7 @@ export async function apiPut<TResponse, TBody>(
   const token = getAccessToken();
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     method: "PUT",
+    credentials: "include",
     headers: buildHeaders(token, requestId),
     body: JSON.stringify(body),
   });
@@ -174,6 +177,7 @@ export async function apiGet<TResponse>(path: string): Promise<TResponse> {
   const requestId = createRequestId();
   const token = getAccessToken();
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
+    credentials: "include",
     headers: {
       "X-Request-Id": requestId,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
