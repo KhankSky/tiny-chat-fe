@@ -41,6 +41,10 @@ export function getAccessToken() {
   return accessToken;
 }
 
+export function setAccessToken(token: string) {
+  accessToken = token;
+}
+
 export function getStoredAuthUser() {
   if (typeof window === "undefined") return null;
   return readStoredAuthUser();

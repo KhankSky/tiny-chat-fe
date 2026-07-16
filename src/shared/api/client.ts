@@ -1,9 +1,34 @@
 import type { ApiResponse } from "./types";
 import { getApiBaseUrl } from "./base-url";
-import { getAccessToken } from "@/shared/auth/session";
+import { clearAuthSession, getAccessToken, setAccessToken } from "@/shared/auth/session";
 import { createRequestId, logClientError } from "@/shared/lib/logger";
 
 type HttpMethod = "GET" | "POST" | "PUT";
+
+async function restoreAccessToken() {
+  if (getAccessToken()) return;
+  try {
+    const response = await fetch(`${getApiBaseUrl()}/api/auth/refresh`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (!response.ok) return;
+    const payload = await response.json() as ApiResponse<{ accessToken: string }>;
+    if (payload.data?.accessToken) setAccessToken(payload.data.accessToken);
+  } catch {
+    // Anonymous requests continue without an access token.
+  }
+}
+
+export async function logout(allSessions = false) {
+  const response = await fetch(`${getApiBaseUrl()}/api/auth/${allSessions ? "logout-all" : "logout"}`, {
+    method: "POST",
+    credentials: "include",
+  });
+  if (!response.ok && response.status !== 204) throw new Error(`Logout failed (${response.status})`);
+  clearAuthSession();
+}
 
 export function apiAssetUrl(path: string | null | undefined, fallback = "/image/logo-default.jpg") {
   const apiBaseUrl = getApiBaseUrl();
@@ -26,7 +51,11 @@ async function readJsonResponse<TResponse>(
   requestId: string,
 ) {
   try {
-    return (await response.json()) as ApiResponse<TResponse>;
+    const text = await response.text();
+    if (!text.trim()) {
+      return { message: `Request failed with HTTP ${response.status}` } as ApiResponse<TResponse>;
+    }
+    return JSON.parse(text) as ApiResponse<TResponse>;
   } catch (error) {
     logClientError("Failed to parse API response", {
       method,
@@ -174,6 +203,7 @@ export async function apiPut<TResponse, TBody>(
 }
 
 export async function apiGet<TResponse>(path: string): Promise<TResponse> {
+  await restoreAccessToken();
   const requestId = createRequestId();
   const token = getAccessToken();
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
