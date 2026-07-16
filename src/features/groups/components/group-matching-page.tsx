@@ -270,15 +270,15 @@ export function GroupMatchingPage({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
-                  {matchResult ? t.successTitle : t.actionPanelTitle}
+                  {matchResult?.action === "already_in_group" ? t.currentGroupTitle : matchResult ? t.successTitle : t.actionPanelTitle}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold">
-                  {matchResult ? t.joinedGroup : t.actionPanelHeading}
+                  {matchResult?.action === "already_in_group" ? t.alreadyInGroup : matchResult ? t.joinedGroup : t.actionPanelHeading}
                 </h2>
               </div>
               {matchResult ? (
                 <StatusBadge tone={matchResult.createdNewGroup ? "info" : "success"}>
-                  {matchResult.createdNewGroup ? t.newGroup : t.joinedGroup}
+                  {matchResult.action === "already_in_group" ? t.currentGroupBadge : matchResult.createdNewGroup ? t.newGroup : t.joinedGroup}
                 </StatusBadge>
               ) : null}
             </div>
