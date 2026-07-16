@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { getGroupMatchingCopy } from "@/features/groups/group-matching-copy";
 import { useGroupMatching } from "@/features/groups/hooks/use-group-matching";
@@ -127,6 +128,11 @@ export function GroupMatchingPage({
   dictionary: Dictionary;
 }) {
   const router = useRouter();
+  const hydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const t = getGroupMatchingCopy(dictionary);
   const { currentUser, error, findGroup, loading, matchResult, profileSignals } =
     useGroupMatching(dictionary);
@@ -159,7 +165,7 @@ export function GroupMatchingPage({
               <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-cyan-300/10 blur-3xl" />
               <div className="relative max-w-3xl">
                 <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-100">
-                  {profileReady ? t.profileReady : t.profileMissing}
+                  {hydrated && profileReady ? t.profileReady : hydrated ? t.profileMissing : ""}
                 </span>
                 <h2 className="mt-5 max-w-2xl text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
                   {t.title}
@@ -270,15 +276,15 @@ export function GroupMatchingPage({
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">
-                  {matchResult?.action === "already_in_group" ? t.currentGroupTitle : matchResult ? t.successTitle : t.actionPanelTitle}
+                  {matchResult?.action === "no_new_group_available" ? t.noNewGroupTitle : matchResult?.action === "already_in_group" ? t.currentGroupTitle : matchResult ? t.successTitle : t.actionPanelTitle}
                 </p>
                 <h2 className="mt-2 text-2xl font-bold">
-                  {matchResult?.action === "already_in_group" ? t.alreadyInGroup : matchResult ? t.joinedGroup : t.actionPanelHeading}
+                  {matchResult?.action === "no_new_group_available" ? t.noNewGroup : matchResult?.action === "already_in_group" ? t.alreadyInGroup : matchResult ? t.joinedGroup : t.actionPanelHeading}
                 </h2>
               </div>
               {matchResult ? (
                 <StatusBadge tone={matchResult.createdNewGroup ? "info" : "success"}>
-                  {matchResult.action === "already_in_group" ? t.currentGroupBadge : matchResult.createdNewGroup ? t.newGroup : t.joinedGroup}
+                  {matchResult.action === "no_new_group_available" ? t.noNewGroupBadge : matchResult.action === "already_in_group" ? t.currentGroupBadge : matchResult.createdNewGroup ? t.newGroup : t.joinedGroup}
                 </StatusBadge>
               ) : null}
             </div>
@@ -304,7 +310,7 @@ export function GroupMatchingPage({
               </div>
             ) : (
               <div className="mt-5 flex flex-1 flex-col gap-4">
-                <div className="rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.18),transparent_34%),rgba(255,255,255,0.05)] p-4 sm:rounded-[1.75rem] sm:p-5">
+                <div className={matchResult.action === "no_new_group_available" ? "hidden" : "rounded-2xl border border-cyan-300/25 bg-[radial-gradient(circle_at_20%_0%,rgba(34,211,238,0.18),transparent_34%),rgba(255,255,255,0.05)] p-4 sm:rounded-[1.75rem] sm:p-5"}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <p className="text-sm text-slate-400">
@@ -373,13 +379,15 @@ export function GroupMatchingPage({
                 ) : null}
 
                 <div className="mt-auto grid gap-3 sm:grid-cols-2">
-                  <Button
-                    type="button"
-                    onClick={() => router.push(`/conversations/${matchResult.groupId}`)}
-                    className="h-12"
-                  >
-                    {t.openChat}
-                  </Button>
+                  {matchResult.action !== "no_new_group_available" ? (
+                    <Button
+                      type="button"
+                      onClick={() => router.push(`/conversations/${matchResult.groupId}`)}
+                      className="h-12"
+                    >
+                      {t.openChat}
+                    </Button>
+                  ) : null}
                   <Button
                     type="button"
                     onClick={() => void findGroup()}
