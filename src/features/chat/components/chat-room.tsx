@@ -35,6 +35,7 @@ export function ChatRoom({
 }) {
   const t = dictionary.chat;
   const [memberAvatars, setMemberAvatars] = useState<Record<number, string | null>>({});
+  const [detailError, setDetailError] = useState<string | null>(null);
   const [replyingDailyTopic] = useState<DailyTopicResponse | null>(null);
   const [conversationTitle, setConversationTitle] = useState(t.roomEyebrow);
   const [emojiOpen, setEmojiOpen] = useState(false);
@@ -132,7 +133,7 @@ export function ChatRoom({
           setConversationAvatarUrl(null);
           setMemberAvatars({});
           setConversationTitle(t.conversationUnavailable);
-          setError(t.conversationUnavailable);
+          setDetailError(t.conversationUnavailable);
         }
       }
     }
@@ -196,9 +197,9 @@ export function ChatRoom({
           <LoadingState label={dictionary.common.loading} />
         ) : null}
 
-        {error ? (
+        {(error || detailError) ? (
           <div className="space-y-3">
-            <ErrorMessage>{error}</ErrorMessage>
+            <ErrorMessage>{error || detailError}</ErrorMessage>
             <Link href={`/${locale}/conversations`} className="inline-flex rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/10">
               {t.backToConversations}
             </Link>

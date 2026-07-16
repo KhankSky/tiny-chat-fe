@@ -7,6 +7,7 @@ export const en = {
     close: "Close",
     completeProfile: "Complete profile",
     loading: "Loading...",
+    logout: "Log out",
     loggedIn: "Logged in",
     saveChanges: "Save changes",
     saving: "Saving...",

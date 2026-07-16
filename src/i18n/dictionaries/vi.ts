@@ -2,6 +2,7 @@ export const vi = {
   appName: "Tiny Chat",
   appTagline: "Nói chuyện, học tập, kết nối",
   common: {
+    logout: "Đăng xuất",
     anonymous: "Ẩn danh",
     cancel: "Hủy",
     close: "Đóng",
@@ -81,8 +82,8 @@ export const vi = {
     passwordPlaceholder: "••••••••",
     displayNamePlaceholder: "Nguyễn An",
     bioPlaceholder: "Mình muốn luyện nói tiếng Anh mỗi ngày.",
-      loading: "Vui lòng chờ...",
-      logout: "Đăng xuất",
+    loading: "Vui lòng chờ...",
+    logout: "Đăng xuất",
     loginButton: "Đăng nhập",
     registerButton: "Tạo tài khoản",
     completeProfileButton: "Hoàn tất hồ sơ",

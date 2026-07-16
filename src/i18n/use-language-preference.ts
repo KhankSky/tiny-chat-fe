@@ -48,7 +48,7 @@ export function useLanguagePreference(): {
       };
     },
     getStoredLocale,
-    () => "en",
+    (): Locale => "en",
   );
 
   function setLocale(nextLocale: Locale) {
