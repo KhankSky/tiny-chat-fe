@@ -5,20 +5,42 @@ import { createRequestId, logClientError } from "@/shared/lib/logger";
 
 type HttpMethod = "GET" | "POST" | "PUT";
 
-async function restoreAccessToken() {
-  if (getAccessToken()) return;
+let refreshRequest: Promise<string | null> | null = null;
+
+async function requestRefresh(): Promise<string | null> {
   try {
     const response = await fetch(`${getApiBaseUrl()}/api/auth/p/refresh`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
     });
-    if (!response.ok) return;
+    if (!response.ok) return null;
+
     const payload = await response.json() as ApiResponse<{ accessToken: string }>;
-    if (payload.data?.accessToken) setAccessToken(payload.data.accessToken);
+    const nextToken = payload.data?.accessToken ?? null;
+    if (nextToken) setAccessToken(nextToken);
+    return nextToken;
   } catch {
-    // Anonymous requests continue without an access token.
+    return null;
   }
+}
+
+function refreshAccessToken(): Promise<string | null> {
+  if (!refreshRequest) {
+    refreshRequest = requestRefresh().finally(() => {
+      refreshRequest = null;
+    });
+  }
+  return refreshRequest;
+}
+
+async function restoreAccessToken(): Promise<string | null> {
+  const currentToken = getAccessToken();
+  if (currentToken) return currentToken;
+
+  // All concurrent requests share one refresh call. This is important because
+  // the backend rotates refresh tokens and rejects reuse of the old token.
+  return refreshAccessToken();
 }
 
 export async function logout(allSessions = false) {
@@ -76,16 +98,50 @@ function buildHeaders(token: string | null, requestId: string) {
   };
 }
 
+async function executeRequest(
+  path: string,
+  requestId: string,
+  init: RequestInit,
+): Promise<Response> {
+  await restoreAccessToken();
+  let token = getAccessToken();
+  let response = await fetch(`${getApiBaseUrl()}${path}`, {
+    ...init,
+    headers: {
+      ...init.headers,
+      ...buildHeaders(token, requestId),
+    },
+  });
+
+  if (response.status !== 401 || path === "/api/auth/p/refresh") {
+    return response;
+  }
+
+  const refreshedToken = await refreshAccessToken();
+  if (!refreshedToken) {
+    clearAuthSession();
+    return response;
+  }
+
+  token = refreshedToken;
+  response = await fetch(`${getApiBaseUrl()}${path}`, {
+    ...init,
+    headers: {
+      ...init.headers,
+      ...buildHeaders(token, requestId),
+    },
+  });
+  return response;
+}
+
 export async function apiPost<TResponse, TBody>(
   path: string,
   body?: TBody,
 ): Promise<TResponse> {
   const requestId = createRequestId();
-  const token = getAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  const response = await executeRequest(path, requestId, {
     method: "POST",
     credentials: "include",
-    headers: buildHeaders(token, requestId),
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
@@ -122,14 +178,9 @@ export async function apiUpload<TResponse>(
   formData: FormData,
 ): Promise<TResponse> {
   const requestId = createRequestId();
-  const token = getAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  const response = await executeRequest(path, requestId, {
     method: "POST",
     credentials: "include",
-    headers: {
-      "X-Request-Id": requestId,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
     body: formData,
   });
 
@@ -166,11 +217,9 @@ export async function apiPut<TResponse, TBody>(
   body: TBody,
 ): Promise<TResponse> {
   const requestId = createRequestId();
-  const token = getAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  const response = await executeRequest(path, requestId, {
     method: "PUT",
     credentials: "include",
-    headers: buildHeaders(token, requestId),
     body: JSON.stringify(body),
   });
 
@@ -203,15 +252,10 @@ export async function apiPut<TResponse, TBody>(
 }
 
 export async function apiGet<TResponse>(path: string): Promise<TResponse> {
-  await restoreAccessToken();
   const requestId = createRequestId();
-  const token = getAccessToken();
-  const response = await fetch(`${getApiBaseUrl()}${path}`, {
+  const response = await executeRequest(path, requestId, {
+    method: "GET",
     credentials: "include",
-    headers: {
-      "X-Request-Id": requestId,
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
   });
 
   const payload = await readJsonResponse<TResponse>(response, "GET", path, requestId);
