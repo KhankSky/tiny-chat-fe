@@ -80,8 +80,8 @@ export function useChatRoom({
 
   useEffect(() => {
     let active = true;
-    const client = accessToken ? new StompClient(accessToken) : null;
-    stompClientRef.current = client;
+    let client: StompClient | null = null;
+    stompClientRef.current = null;
     lastTypingSentRef.current = false;
     lastReadMessageIdRef.current = null;
     lastReadByUserRef.current = {};
@@ -102,6 +102,12 @@ export function useChatRoom({
         if (active) {
           setMessages(historyMessages);
         }
+
+        // REST requests may restore the access token from the refresh cookie.
+        // Read it again here before deciding whether realtime is available.
+        const restoredToken = getAccessToken();
+        client = restoredToken ? new StompClient(restoredToken) : null;
+        stompClientRef.current = client;
 
         if (!client) {
           if (active) {
