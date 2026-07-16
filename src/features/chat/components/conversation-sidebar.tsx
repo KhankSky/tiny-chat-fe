@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { LogOut } from "lucide-react";
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getMyStreakCached } from "@/features/chat/api/chat-api";
@@ -21,28 +22,6 @@ export type ConversationItem = {
   updatedAt: string;
   unreadCount?: number;
 };
-
-function PersonalStreakBadge({
-  days,
-  label,
-}: {
-  days: number;
-  label: string;
-}) {
-  return (
-    <span
-      className="relative flex shrink-0 items-center gap-1.5 overflow-hidden rounded-full bg-[radial-gradient(circle_at_25%_0%,rgba(251,191,36,0.25),transparent_42%),rgba(251,191,36,0.08)] px-2 py-1 text-xs font-bold text-amber-50 shadow-[0_0_22px_rgba(251,146,60,0.18)]"
-      title={label}
-    >
-      <span className="absolute inset-0 animate-streak-shimmer bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent)]" />
-      <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-amber-300/10">
-        <span className="absolute inset-0 animate-streak-glow rounded-full bg-amber-300/20 blur-sm" />
-        <span className="streak-flame streak-flame-sm relative" aria-hidden="true" />
-      </span>
-      <span className="relative leading-none">{days}</span>
-    </span>
-  );
-}
 
 export function ConversationSidebar({
   dictionary,
@@ -163,33 +142,32 @@ export function ConversationSidebar({
       </div>
 
       <div className="shrink-0 border-t border-white/10 px-3 py-3">
-        <button
-          type="button"
-          onClick={onEditProfile}
-          className="flex w-full items-center gap-3 rounded-[1.25rem] border border-white/10 bg-white/5 px-3 py-3 text-left transition hover:border-cyan-400/30 hover:bg-cyan-400/10"
-        >
-          <Avatar
-            src={currentUser?.avatarUrl}
-            alt={currentUser?.displayName || currentUser?.email || "User avatar"}
-          />
-          <span className="min-w-0 flex-1">
-            <span className="block truncate text-sm font-semibold text-white">
-              {currentUser?.displayName || currentUser?.email || dictionary.common.you}
+        <div className="flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 p-2 transition hover:border-cyan-400/30 hover:bg-cyan-400/10">
+          <button type="button" onClick={onEditProfile} className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-1 py-1 text-left">
+            <span className="relative shrink-0">
+              <Avatar
+                src={currentUser?.avatarUrl}
+                alt={currentUser?.displayName || currentUser?.email || "User avatar"}
+              />
+              {userStreak ? (
+                <span title={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`} className="absolute -bottom-1 left-1/2 flex -translate-x-1/2 items-center gap-0.5 rounded-full border border-amber-200/30 bg-amber-300 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-950 shadow-lg shadow-amber-950/30">
+                  <span aria-hidden="true">🔥</span>{userStreak.currentStreak}
+                </span>
+              ) : null}
             </span>
-            <span className="mt-1 block truncate text-xs text-slate-400">
-              {currentUser?.email || t.personalInfo}
+            <span className="min-w-0 flex-1">
+              <span className="block truncate text-sm font-semibold text-white">
+                {currentUser?.displayName || currentUser?.email || dictionary.common.you}
+              </span>
+              <span className="mt-1 block truncate text-xs text-slate-400">
+                {currentUser?.email || t.personalInfo}
+              </span>
             </span>
-          </span>
-          {userStreak ? (
-            <PersonalStreakBadge
-              days={userStreak.currentStreak}
-              label={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`}
-            />
-          ) : null}
-        </button>
-        <button type="button" onClick={onLogout} className="mt-2 w-full rounded-xl px-3 py-2 text-left text-sm text-slate-400 transition hover:bg-red-400/10 hover:text-red-200">
-          {dictionary.common.logout}
-        </button>
+          </button>
+          <button type="button" onClick={onLogout} aria-label={dictionary.common.logout} title={dictionary.common.logout} className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-slate-500 transition hover:bg-red-400/10 hover:text-red-200">
+            <LogOut aria-hidden="true" size={15} />
+          </button>
+        </div>
       </div>
     </aside>
   );
