@@ -163,11 +163,13 @@ export function GroupSidebar({
   groupId,
   locale,
   currentUser,
+  onClose,
 }: {
   dictionary: Dictionary;
   groupId: number;
   locale: Locale;
   currentUser?: AuthUserResponse | null;
+  onClose?: () => void;
 }) {
   const router = useRouter();
   const t = dictionary.chat.groupSidebar;
@@ -357,17 +359,27 @@ export function GroupSidebar({
 
   return (
     <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
-      <div className="flex h-20 shrink-0 items-center border-b border-white/10 px-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex min-w-0 gap-3">
+      <div className="flex h-20 shrink-0 items-center border-b border-white/10 px-4 lg:px-5">
+        <div className="flex w-full items-center gap-3">
+          {onClose ? (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label={dictionary.common.close}
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-slate-300 transition hover:bg-white/10 hover:text-white lg:hidden"
+            >
+              ‹
+            </button>
+          ) : null}
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="group/avatar relative h-13 w-13 shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
+              className="group/avatar relative h-12 w-12 shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
               aria-label={t.editGroup}
             >
               <Avatar
-                className="h-13 w-13 shrink-0 ring-1 ring-cyan-400/30 transition-opacity group-hover/avatar:opacity-75"
+                className="h-12 w-12 shrink-0 ring-1 ring-cyan-400/30 transition-opacity group-hover/avatar:opacity-75"
                 src={group?.groupAvatarUrl}
                 alt={group?.groupName || t.loadingGroup}
               />
@@ -376,7 +388,7 @@ export function GroupSidebar({
               </div>
             </button>
             <div className="min-w-0">
-              <h2 className="mt-2 truncate text-xl font-semibold text-white">
+              <h2 className="truncate text-lg font-semibold text-white lg:text-xl">
                 {group?.groupName || t.loadingGroup}
               </h2>
             </div>
@@ -385,7 +397,7 @@ export function GroupSidebar({
             type="button"
             onClick={() => setIsEditing(true)}
             aria-label={t.editGroup}
-            className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/[0.04] text-cyan-100 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
+              className="ml-auto inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-cyan-100 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0b111c]"
           >
             <PencilIcon />
           </button>
@@ -482,7 +494,7 @@ export function GroupSidebar({
         ) : null}
       </div>
 
-      <div className="flex h-20 shrink-0 items-center border-t border-white/10 p-4">
+      <div className="flex h-16 shrink-0 items-center border-t border-white/10 p-3 lg:h-20 lg:p-4">
         {leaveError ? <ErrorMessage className="mb-3">{leaveError}</ErrorMessage> : null}
         <button type="button" onClick={() => setLeaveConfirmOpen(true)} disabled={isLeaving} className="mx-auto flex h-12 items-center gap-2 rounded-full px-3 text-xs font-medium text-slate-500 transition hover:bg-red-400/10 hover:text-red-200 disabled:opacity-60">
           <LogOut aria-hidden="true" size={15} />

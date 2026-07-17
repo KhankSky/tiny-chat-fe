@@ -135,11 +135,11 @@ export function ConversationThreadPage({
 
       {directChat === false && mobileGroupInfoOpen ? (
         <div
-          className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-[#0b111c] lg:hidden"
           onClick={() => setMobileGroupInfoOpen(false)}
         >
           <div
-            className="h-[min(80dvh,40rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            className="h-full w-full overflow-hidden bg-[#0b111c]"
             onClick={(event) => event.stopPropagation()}
           >
             <GroupSidebar
@@ -148,16 +148,17 @@ export function ConversationThreadPage({
               groupId={conversationId}
               locale={locale}
               currentUser={profileEditor.currentUser}
+              onClose={() => setMobileGroupInfoOpen(false)}
             />
           </div>
         </div>
       ) : directChat === true && mobileDirectInfoOpen ? (
         <div
-          className="fixed inset-0 z-40 flex items-end bg-slate-950/65 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-[#0b111c] lg:hidden"
           onClick={() => setMobileDirectInfoOpen(false)}
         >
           <div
-            className="h-[min(76dvh,38rem)] w-full overflow-hidden rounded-t-[1.75rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            className="h-full w-full overflow-hidden bg-[#0b111c]"
             onClick={(event) => event.stopPropagation()}
           >
             <DirectChatSidebar

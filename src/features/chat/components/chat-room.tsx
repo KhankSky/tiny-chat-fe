@@ -146,7 +146,7 @@ export function ChatRoom({
 
   return (
     <section className="tc-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
-      <header className="flex h-20 shrink-0 items-center justify-between border-b border-white/10 px-3 sm:px-6">
+      <header className="flex h-20 shrink-0 items-center justify-between border-b border-white/10 px-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           {onOpenConversationList ? (
             <button
@@ -154,13 +154,13 @@ export function ChatRoom({
               onClick={onOpenConversationList}
               aria-label={t.sidebarTitle}
               title={t.sidebarTitle}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-lg leading-none text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322] lg:hidden"
+              className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-slate-200 transition hover:bg-white/10 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322] lg:hidden"
             >
               <span aria-hidden="true">‹</span>
             </button>
           ) : null}
           <Avatar
-            className="h-10 w-10 ring-1 ring-white/10 sm:h-11 sm:w-11"
+            className="h-12 w-12 ring-1 ring-white/10"
             src={conversationAvatarUrl}
             alt={conversationTitle}
           />
