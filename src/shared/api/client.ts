@@ -7,6 +7,13 @@ type HttpMethod = "GET" | "POST" | "PUT";
 
 let refreshRequest: Promise<string | null> | null = null;
 
+const PUBLIC_AUTH_PATHS = new Set([
+  "/api/auth/p/login",
+  "/api/auth/p/register",
+  "/api/auth/p/google",
+  "/api/auth/p/refresh",
+]);
+
 async function requestRefresh(): Promise<string | null> {
   try {
     const response = await fetch(`${getApiBaseUrl()}/api/auth/p/refresh`, {
@@ -103,7 +110,12 @@ async function executeRequest(
   requestId: string,
   init: RequestInit,
 ): Promise<Response> {
-  await restoreAccessToken();
+  // Public auth endpoints must not try to restore a session first. Otherwise
+  // a stale refresh cookie causes login/register to call /refresh before the
+  // actual auth request.
+  if (!PUBLIC_AUTH_PATHS.has(path)) {
+    await restoreAccessToken();
+  }
   let token = getAccessToken();
   let response = await fetch(`${getApiBaseUrl()}${path}`, {
     ...init,
