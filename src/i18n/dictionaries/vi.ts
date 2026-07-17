@@ -182,6 +182,13 @@ export const vi = {
       selfProfile: "Đây là bạn",
     },
     groupSidebar: {
+      directChatTitle: "Trò chuyện riêng",
+      partnerLabel: "Bạn trò chuyện",
+      onlineStatusShown: "Trạng thái trực tuyến hiển thị trong chat",
+      levelLabel: "Trình độ",
+      goalLabel: "Mục tiêu",
+      interestsLabel: "Sở thích",
+      bioLabel: "Giới thiệu",
       collapsedLabel: "Thành viên",
       openRightSidebar: "Mở sidebar phải",
       collapseRightSidebar: "Thu gọn sidebar phải",

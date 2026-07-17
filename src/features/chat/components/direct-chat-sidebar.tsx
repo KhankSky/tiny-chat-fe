@@ -6,7 +6,7 @@ import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
 import { getFriendProfile } from "@/features/friends/api/friends-api";
 import type { FriendProfileResponse } from "@/features/friends/types";
-import type { Dictionary, Locale } from "@/i18n/types";
+import type { Dictionary } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
@@ -87,7 +87,7 @@ export function DirectChatSidebar({
       <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-5">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-cyan-300/90">
-            Direct chat
+            {t.directChatTitle}
           </p>
           <h2 className="mt-2 truncate text-lg font-semibold text-white sm:text-xl">
             {profile ? displayName : t.loadingGroup}
@@ -123,7 +123,7 @@ export function DirectChatSidebar({
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-                    Partner
+                    {t.partnerLabel}
                   </p>
                   <h3 className="mt-2 truncate text-xl font-semibold text-white sm:text-2xl">
                     {displayName}
@@ -133,19 +133,19 @@ export function DirectChatSidebar({
               </div>
               <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="truncate">Online status shown in chat</span>
+                <span className="truncate">{t.onlineStatusShown}</span>
               </div>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-2">
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-                <p className="text-xs text-slate-500">Level</p>
+                <p className="text-xs text-slate-500">{t.levelLabel}</p>
                 <p className="mt-1 text-sm font-semibold text-white">
                   {level || dictionary.chat.friends.unknownValue}
                 </p>
               </div>
               <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-3">
-                <p className="text-xs text-slate-500">Goal</p>
+                <p className="text-xs text-slate-500">{t.goalLabel}</p>
                 <p className="mt-1 text-sm font-semibold text-white">
                   {goal || dictionary.chat.friends.unknownValue}
                 </p>
@@ -154,7 +154,7 @@ export function DirectChatSidebar({
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-                Interests
+                {t.interestsLabel}
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {interests.length > 0 ? (
@@ -174,7 +174,7 @@ export function DirectChatSidebar({
 
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-                Bio
+                {t.bioLabel}
               </p>
               <p className="mt-2 text-sm leading-6 text-slate-300">
                 {profile.bio || dictionary.chat.friends.noBio}

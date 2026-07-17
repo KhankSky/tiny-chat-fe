@@ -182,6 +182,13 @@ export const en = {
       selfProfile: "This is you",
     },
     groupSidebar: {
+      directChatTitle: "Direct chat",
+      partnerLabel: "Partner",
+      onlineStatusShown: "Online status shown in chat",
+      levelLabel: "Level",
+      goalLabel: "Goal",
+      interestsLabel: "Interests",
+      bioLabel: "Bio",
       collapsedLabel: "Members",
       openRightSidebar: "Open right sidebar",
       collapseRightSidebar: "Collapse right sidebar",
