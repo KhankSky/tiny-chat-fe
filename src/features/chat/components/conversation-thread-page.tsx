@@ -111,11 +111,11 @@ export function ConversationThreadPage({
 
       {leftSidebarOpen ? (
         <div
-          className="fixed inset-0 z-40 bg-slate-950/65 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-[#0b111c] md:bg-slate-950/65 md:backdrop-blur-sm lg:hidden"
           onClick={() => setLeftSidebarOpen(false)}
         >
           <div
-            className="h-full w-[min(22rem,88vw)] overflow-hidden border-r border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40"
+            className="h-full w-full overflow-hidden bg-[#0b111c] shadow-2xl shadow-black/40 md:w-[min(26rem,88vw)] md:border-r md:border-white/10"
             onClick={(event) => event.stopPropagation()}
           >
             <ConversationSidebar
@@ -128,6 +128,7 @@ export function ConversationThreadPage({
                 profileEditor.openProfileEditor();
               }}
               onLogout={() => { setLeftSidebarOpen(false); void handleLogout(); }}
+              onClose={() => setLeftSidebarOpen(false)}
             />
           </div>
         </div>

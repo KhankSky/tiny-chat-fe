@@ -30,6 +30,7 @@ export function ConversationSidebar({
   currentUser,
   onEditProfile,
   onLogout,
+  onClose,
 }: {
   dictionary: Dictionary;
   conversations: ConversationItem[];
@@ -37,6 +38,7 @@ export function ConversationSidebar({
   currentUser?: AuthUserResponse | null;
   onEditProfile?: () => void;
   onLogout?: () => void;
+  onClose?: () => void;
 }) {
   const t = dictionary.chat;
   const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
@@ -80,7 +82,12 @@ export function ConversationSidebar({
   return (
     <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
       <div className="flex h-20 shrink-0 items-center border-b border-white/10 px-5">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex w-full items-center gap-3">
+          {onClose ? (
+            <button type="button" onClick={onClose} aria-label={dictionary.common.close} className="inline-flex h-12 w-10 shrink-0 items-center justify-center rounded-full text-3xl leading-none text-slate-300 hover:bg-white/10 hover:text-white md:hidden">
+              ‹
+            </button>
+          ) : null}
           <div className="min-w-0">
             <p className="text-xl font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
               {dictionary.appName}
@@ -89,7 +96,7 @@ export function ConversationSidebar({
           </div>
           <Link
             href="/groups/match"
-            className="inline-flex h-10 shrink-0 items-center rounded-full bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            className="ml-auto inline-flex h-10 shrink-0 items-center rounded-full bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
             {t.findGroup}
           </Link>

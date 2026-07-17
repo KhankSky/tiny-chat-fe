@@ -179,7 +179,7 @@ export function ChatRoom({
                 rightSidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open
               }
               title={rightSidebarOpen ? t.toggleSidebar.collapse : t.toggleSidebar.open}
-              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322]"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-xl leading-none text-slate-200 transition hover:border-cyan-300/60 hover:bg-cyan-400/15 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#0d1322] lg:rounded-none lg:border-0 lg:bg-transparent lg:text-xl lg:hover:bg-transparent lg:hover:text-cyan-200"
             >
               <span className="text-base leading-none lg:hidden" aria-hidden="true">
                 i

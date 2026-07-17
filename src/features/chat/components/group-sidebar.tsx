@@ -33,7 +33,7 @@ function nameColor(index: number, offline: boolean) {
 
 function CameraIcon() {
   return (
-    <svg aria-hidden="true" style={{ display: "block", height: 20, width: 20 }} viewBox="0 0 24 24">
+    <svg aria-hidden="true" style={{ display: "block", height: 16, width: 16 }} viewBox="0 0 24 24">
       <path
         fill="currentColor"
         d="M8.75 4.5a1 1 0 0 0-.8.4L6.38 7H4.5A2.5 2.5 0 0 0 2 9.5v7A2.5 2.5 0 0 0 4.5 19h15a2.5 2.5 0 0 0 2.5-2.5v-7A2.5 2.5 0 0 0 19.5 7h-1.88l-1.57-2.1a1 1 0 0 0-.8-.4h-6.5ZM12 9a4 4 0 1 1 0 8 4 4 0 0 1 0-8Zm0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4Z"
@@ -44,7 +44,7 @@ function CameraIcon() {
 
 function PencilIcon() {
   return (
-    <svg aria-hidden="true" style={{ display: "block", height: 20, width: 20 }} viewBox="0 0 24 24">
+    <svg aria-hidden="true" style={{ display: "block", height: 16, width: 16 }} viewBox="0 0 24 24">
       <path
         fill="currentColor"
         d="M16.86 3.64a2.2 2.2 0 0 1 3.11 3.11L8.87 17.85a1 1 0 0 1-.46.26l-4.13 1.1a1 1 0 0 1-1.22-1.22l1.1-4.13a1 1 0 0 1 .26-.46L16.86 3.64Zm1.7 1.41a.2.2 0 0 0-.29 0L6.03 17.29l-.36 1.34 1.34-.36L19.25 6.03a.2.2 0 0 0 0-.29l-.69-.69ZM12 20a1 1 0 0 1 1-1h7a1 1 0 1 1 0 2h-7a1 1 0 0 1-1-1Z"
