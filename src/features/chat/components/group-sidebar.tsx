@@ -357,7 +357,7 @@ export function GroupSidebar({
 
   return (
     <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
-      <div className="border-b border-white/10 px-5 py-4">
+      <div className="flex h-20 shrink-0 items-center border-b border-white/10 px-5">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 gap-3">
             <button
@@ -482,9 +482,9 @@ export function GroupSidebar({
         ) : null}
       </div>
 
-      <div className="shrink-0 border-t border-white/10 p-4">
+      <div className="flex h-20 shrink-0 items-center border-t border-white/10 p-4">
         {leaveError ? <ErrorMessage className="mb-3">{leaveError}</ErrorMessage> : null}
-        <button type="button" onClick={() => setLeaveConfirmOpen(true)} disabled={isLeaving} className="mx-auto flex items-center gap-2 rounded-full px-3 py-2 text-xs font-medium text-slate-500 transition hover:bg-red-400/10 hover:text-red-200 disabled:opacity-60">
+        <button type="button" onClick={() => setLeaveConfirmOpen(true)} disabled={isLeaving} className="mx-auto flex h-12 items-center gap-2 rounded-full px-3 text-xs font-medium text-slate-500 transition hover:bg-red-400/10 hover:text-red-200 disabled:opacity-60">
           <LogOut aria-hidden="true" size={15} />
           {t.leaveGroup}
         </button>

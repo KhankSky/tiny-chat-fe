@@ -79,7 +79,7 @@ export function ConversationSidebar({
 
   return (
     <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-r border-white/10 bg-[#0b111c]">
-      <div className="border-b border-white/10 px-5 py-4">
+      <div className="flex h-20 shrink-0 items-center border-b border-white/10 px-5">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <p className="text-xl font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
@@ -141,8 +141,8 @@ export function ConversationSidebar({
         <FriendsPanel dictionary={dictionary} />
       </div>
 
-      <div className="shrink-0 border-t border-white/10 px-3 py-3">
-        <div className="flex items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 p-2 transition hover:border-cyan-400/30 hover:bg-cyan-400/10">
+      <div className="flex h-20 shrink-0 items-center border-t border-white/10 px-3">
+        <div className="flex w-full items-center gap-2 rounded-[1.25rem] border border-white/10 bg-white/5 p-2 transition hover:border-cyan-400/30 hover:bg-cyan-400/10">
           <button type="button" onClick={onEditProfile} className="flex min-w-0 flex-1 items-center gap-3 rounded-xl px-1 py-1 text-left">
             <Avatar
               src={currentUser?.avatarUrl}

@@ -146,7 +146,7 @@ export function ChatRoom({
 
   return (
     <section className="tc-panel flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#0d1322]">
-      <header className="flex shrink-0 items-center justify-between border-b border-white/10 px-3 py-3 sm:px-6 sm:py-4">
+      <header className="flex h-20 shrink-0 items-center justify-between border-b border-white/10 px-3 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           {onOpenConversationList ? (
             <button
@@ -336,7 +336,7 @@ export function ChatRoom({
         <div ref={bottomRef} />
       </div>
 
-      <div className="tc-sidebar shrink-0 border-t border-white/10 bg-[#0b111c] p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:p-4">
+      <div className="tc-sidebar flex h-20 shrink-0 items-center border-t border-white/10 bg-[#0b111c] px-3 pb-[env(safe-area-inset-bottom)] sm:px-4">
         {replyingDailyTopic ? (
           <div className="mb-3 flex items-start gap-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-3">
             <div className="min-w-0 flex-1">
@@ -359,7 +359,7 @@ export function ChatRoom({
           </div>
         ) : null}
         <form
-          className="flex gap-2 sm:gap-3"
+          className="flex w-full gap-2 sm:gap-3"
           onSubmit={(event) => {
             event.preventDefault();
             void handleSendMessage();
@@ -375,17 +375,14 @@ export function ChatRoom({
                 void handleSendMessage();
               }
             }}
-            className="min-h-12 flex-1 rounded-full px-5 pr-12 text-sm"
+            className="h-12 flex-1 rounded-full px-5 pr-12 text-sm"
             placeholder={socketStatus === "connected" ? t.writeMessage : t.waitingForConnection}
             disabled={false}
           />
           <button type="button" aria-label={t.emoji} title={t.emoji} onClick={() => setEmojiOpen((open) => !open)} className="absolute right-3 top-1/2 -translate-y-1/2 text-xl">😊</button>
           {emojiOpen ? <div className="absolute bottom-14 right-0 z-10 grid grid-cols-6 gap-1 rounded-2xl border border-white/10 bg-[#111a2b] p-2 shadow-2xl">{emojis.map((emoji) => <button key={emoji} type="button" className="rounded-lg p-1.5 text-xl hover:bg-white/10" onClick={() => { setContent((value) => `${value}${emoji}`); setEmojiOpen(false); }}>{emoji}</button>)}</div> : null}
           </div>
-          <Button
-            type="submit"
-            className="min-h-12 shrink-0 px-4 sm:px-6"
-          >
+          <Button type="submit" className="h-12 shrink-0 px-4 py-0 sm:px-6">
             {t.send}
           </Button>
         </form>

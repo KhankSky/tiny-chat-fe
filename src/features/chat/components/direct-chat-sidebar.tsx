@@ -84,7 +84,7 @@ export function DirectChatSidebar({
 
   return (
     <aside className="tc-sidebar flex h-full min-h-0 flex-col overflow-hidden border-l border-white/10 bg-[#0b111c]">
-      <div className="flex items-start justify-between gap-3 border-b border-white/10 px-4 py-4 sm:px-5">
+      <div className="flex h-20 shrink-0 items-center justify-between gap-3 border-b border-white/10 px-4 sm:px-5">
         <div className="min-w-0">
           <p className="text-[11px] font-semibold uppercase tracking-[0.32em] text-cyan-300/90">
             {t.directChatTitle}
