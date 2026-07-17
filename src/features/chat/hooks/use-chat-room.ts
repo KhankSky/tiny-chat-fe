@@ -123,7 +123,7 @@ export function useChatRoom({
         }
 
         await client.connect();
-        if (!active) return;
+        if (!active || !client.isConnected()) return;
 
         setSocketStatus("connected");
         const unsubscribers = [

@@ -9,7 +9,7 @@ export function createRequestId() {
 }
 
 function formatContext(context?: LogContext) {
-  return context && Object.keys(context).length > 0 ? context : undefined;
+  return context && Object.keys(context).length > 0 ? JSON.stringify(context) : "{}";
 }
 
 export function logClientError(message: string, context?: LogContext) {

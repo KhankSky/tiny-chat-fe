@@ -135,6 +135,10 @@ export class StompClient {
     return this.connectPromise;
   }
 
+  isConnected() {
+    return this.connected && this.socket?.readyState === WebSocket.OPEN;
+  }
+
   subscribe(destination: string, handler: MessageHandler) {
     const subscriptionId = `sub-${crypto.randomUUID()}`;
     this.subscriptions.set(subscriptionId, handler);
@@ -167,6 +171,7 @@ export class StompClient {
 
   disconnect() {
     this.disconnectRequested = true;
+    this.connectReject?.(new Error("WebSocket connection cancelled"));
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(buildFrame("DISCONNECT"));
     }
@@ -186,9 +191,10 @@ export class StompClient {
       logClientWarning("WebSocket send attempted while disconnected", {
         connectionId: this.connectionId,
       });
-      throw new Error("WebSocket is not connected");
+      return false;
     }
     this.socket.send(frame);
+    return true;
   }
 
   private drainBuffer() {
