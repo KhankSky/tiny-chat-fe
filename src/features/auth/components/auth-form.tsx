@@ -2,8 +2,9 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
+import Script from "next/script";
 import { useRouter } from "next/navigation";
-import { login, register } from "@/features/auth/api/auth-api";
+import { googleLogin, login, register } from "@/features/auth/api/auth-api";
 import { persistAuthSession } from "@/shared/auth/session";
 import type { Dictionary, Locale } from "@/i18n/types";
 
@@ -24,6 +25,29 @@ export function AuthForm({
   const [loading, setLoading] = useState(false);
 
   const isLogin = mode === "login";
+
+  async function handleGoogleCredential(response: { credential: string }) {
+    setError(null);
+    setLoading(true);
+    try {
+      const user = await googleLogin({ idToken: response.credential });
+      persistAuthSession(user);
+      router.push(user.profileCompleted ? "/conversations" : "/auth/complete-profile");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function initializeGoogle() {
+    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+    if (!clientId || !window.google?.accounts?.id) return;
+    window.google.accounts.id.initialize({ client_id: clientId, callback: handleGoogleCredential });
+    const button = document.getElementById("google-sign-in-button");
+    if (button) window.google.accounts.id.renderButton(button, { theme: "outline", size: "large", width: 400 });
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -46,7 +70,11 @@ export function AuthForm({
   }
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit}>
+    <>
+      <Script src="https://accounts.google.com/gsi/client" async defer onLoad={initializeGoogle} />
+      <div id="google-sign-in-button" className="flex justify-center" />
+      <div className="my-4 flex items-center gap-3 text-xs text-slate-500"><span className="h-px flex-1 bg-white/10" />OR<span className="h-px flex-1 bg-white/10" /></div>
+      <form className="space-y-5" onSubmit={handleSubmit}>
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-200" htmlFor="email">
           {dictionary.auth.emailLabel}
@@ -96,6 +124,7 @@ export function AuthForm({
             ? dictionary.auth.loginButton
             : dictionary.auth.registerButton}
       </button>
-    </form>
+      </form>
+    </>
   );
 }

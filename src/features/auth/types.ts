@@ -16,6 +16,8 @@ export type AuthCredentials = {
   password: string;
 };
 
+export type GoogleLoginRequest = { idToken: string };
+
 export type CompleteProfileRequest = {
   displayName: string;
   avatarUrl: string | null;
