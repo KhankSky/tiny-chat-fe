@@ -390,8 +390,14 @@ export function GroupMatchingPage({
                   ) : null}
                   <Button
                     type="button"
-                    onClick={() => void findGroup()}
-                    disabled={loading}
+                    onClick={() => {
+                      if (!profileReady) {
+                        router.push("/auth/complete-profile");
+                        return;
+                      }
+                      void findGroup();
+                    }}
+                    disabled={loading || !profileReady}
                     variant="secondary"
                     className="h-12"
                   >

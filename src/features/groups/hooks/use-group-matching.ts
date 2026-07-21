@@ -31,7 +31,13 @@ export function useGroupMatching(dictionary: Dictionary) {
       const result = await matchGroup();
       setMatchResult(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : copy.matchErrorFallback);
+      setMatchResult(null);
+      const message = err instanceof Error ? err.message : "";
+      setError(
+        message.includes("maximum number of active groups")
+          ? copy.maxActiveGroupsError
+          : message || copy.matchErrorFallback,
+      );
     } finally {
       setLoading(false);
     }

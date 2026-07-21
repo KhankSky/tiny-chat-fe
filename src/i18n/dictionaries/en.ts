@@ -308,6 +308,7 @@ export const en = {
     ],
     matchErrorTitle: "Could not match you",
     matchErrorFallback: "Unable to match group",
+    maxActiveGroupsError: "You have reached the maximum number of active groups. Leave a group before finding a new one.",
     yourGroup: "Your group",
   },
   profile: {

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { logout } from "@/shared/api/client";
 import { useConversations } from "@/features/chat/hooks/use-conversations";
 import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
 import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
@@ -23,9 +25,19 @@ export function ConversationListPage({
   theme?: ThemeMode;
   onThemeChange?: (theme: ThemeMode) => void;
 }) {
+  const router = useRouter();
   const t = dictionary.chat;
   const conversations = useConversations({ dictionary, locale });
   const profileEditor = useProfileEditor(dictionary);
+
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      router.push(`/${locale}/auth/login`);
+      router.refresh();
+    }
+  }
 
   return (
     <div className="tc-app-shell h-dvh w-full overflow-hidden bg-[#070d18] text-white">
@@ -36,6 +48,7 @@ export function ConversationListPage({
           activeGroupId={-1}
           currentUser={profileEditor.currentUser}
           onEditProfile={profileEditor.openProfileEditor}
+          onLogout={() => void handleLogout()}
         />
 
         <main className="tc-panel hidden min-h-0 min-w-0 flex-col overflow-hidden border-r border-white/10 bg-[#0d1322] lg:flex">

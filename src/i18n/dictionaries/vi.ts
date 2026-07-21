@@ -308,6 +308,7 @@ export const vi = {
     ],
     matchErrorTitle: "Không thể ghép nhóm",
     matchErrorFallback: "Không thể ghép nhóm",
+    maxActiveGroupsError: "Bạn đã tham gia tối đa số nhóm đang hoạt động. Hãy rời một nhóm trước khi tìm nhóm mới.",
     yourGroup: "Nhóm của bạn",
   },
   profile: {
