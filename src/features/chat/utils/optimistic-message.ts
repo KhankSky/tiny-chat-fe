@@ -3,6 +3,7 @@ import type { ChatMessage } from "@/features/chat/types";
 
 export type LocalChatMessage = ChatMessage & {
   clientTempId?: string;
+  readByUserIds?: number[];
 };
 
 export function createOptimisticMessage({
@@ -33,6 +34,7 @@ export function createOptimisticMessage({
     sentAt: new Date().toISOString(),
     readCount: 1,
     readByCurrentUser: true,
+    readByUserIds: [],
   } satisfies LocalChatMessage;
 }
 
