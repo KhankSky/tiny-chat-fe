@@ -14,9 +14,9 @@ function isLocale(value: string | null): value is Locale {
 }
 
 export function getStoredLocale(): Locale {
-  if (typeof window === "undefined") return "en";
+  if (typeof window === "undefined") return "vi";
   const storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  return isLocale(storedLocale) ? storedLocale : "en";
+  return isLocale(storedLocale) ? storedLocale : "vi";
 }
 
 export function persistLocale(locale: Locale) {
@@ -48,7 +48,7 @@ export function useLanguagePreference(): {
       };
     },
     getStoredLocale,
-    (): Locale => "en",
+    (): Locale => "vi",
   );
 
   function setLocale(nextLocale: Locale) {

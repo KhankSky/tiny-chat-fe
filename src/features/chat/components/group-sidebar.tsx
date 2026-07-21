@@ -6,6 +6,7 @@ import { LogOut } from "lucide-react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupStreakCached } from "@/features/chat/api/chat-api";
 import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
+import { clearConversationCache } from "@/features/chat/hooks/use-conversations";
 import type { PresenceEvent } from "@/features/chat/types";
 import type { GroupStreakResponse } from "@/features/chat/types";
 import { MemberProfileModal } from "@/features/friends/components/member-profile-modal";
@@ -320,6 +321,7 @@ export function GroupSidebar({
     setLeaveError(null);
     try {
       await leaveGroup(groupId);
+      clearConversationCache();
       setLeaveConfirmOpen(false);
       router.push(`/${locale}/conversations`);
       router.refresh();

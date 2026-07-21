@@ -5,6 +5,7 @@ import type { AuthUserResponse } from "@/features/auth/types";
 import { matchGroup } from "@/features/groups/api/groups-api";
 import type { MatchGroupResponse } from "@/features/groups/types";
 import { formatGroupLabel } from "@/features/groups/utils/group-format";
+import { clearConversationCache } from "@/features/chat/hooks/use-conversations";
 import type { Dictionary } from "@/i18n/types";
 import { getStoredAuthUser } from "@/shared/auth/session";
 
@@ -29,6 +30,9 @@ export function useGroupMatching(dictionary: Dictionary) {
 
     try {
       const result = await matchGroup();
+      // The match endpoint creates/joins a conversation. Invalidate the
+      // sidebar snapshot so the conversations page fetches the new group.
+      clearConversationCache();
       setMatchResult(result);
     } catch (err) {
       setMatchResult(null);

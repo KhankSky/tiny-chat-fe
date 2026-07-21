@@ -8,5 +8,5 @@ export function getDictionary(locale: string | undefined): Dictionary {
 }
 
 export function getLocaleFromParams(locale: string | undefined): Locale {
-  return locales.includes(locale as Locale) ? (locale as Locale) : "en";
+  return locales.includes(locale as Locale) ? (locale as Locale) : "vi";
 }
