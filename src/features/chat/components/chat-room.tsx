@@ -220,15 +220,17 @@ export function ChatRoom({
           const nextSenderIndex = groupMessages.findIndex(
             (nextMessage) => nextMessage.senderId !== message.senderId,
           );
-          const senderMessages = groupMessages.slice(
-            0,
-            nextSenderIndex === -1 ? groupMessages.length : nextSenderIndex,
-          );
+           const senderMessages = groupMessages.slice(
+             0,
+             nextSenderIndex === -1 ? groupMessages.length : nextSenderIndex,
+           );
+           const groupHasReadReceipt =
+             isMine && (senderMessages[senderMessages.length - 1]?.readCount ?? 0) > 1;
 
           return (
             <div
               key={message.messageId}
-              className={`mt-4 flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"}`}
+              className={`mt-4 flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"} ${groupHasReadReceipt ? "pb-1" : ""}`}
             >
               {!isMine ? (
                 <Avatar
@@ -346,7 +348,7 @@ export function ChatRoom({
             </div>
           </div>
         ) : null}
-        <div ref={bottomRef} />
+        <div ref={bottomRef} className="h-2 shrink-0" aria-hidden="true" />
       </div>
 
       <div className="tc-sidebar flex h-20 shrink-0 items-center border-t border-white/10 bg-[#0b111c] px-3 pb-[env(safe-area-inset-bottom)] sm:px-4">
