@@ -292,12 +292,26 @@ export function ChatRoom({
                           {sentAt}
                         </span>
                         {showReadReceipt ? (
-                          <p className="mt-1 px-2 text-[11px] text-slate-400">
-                            {t.seenByCount.replace(
+                          <div
+                            className="absolute right-1 top-full z-10 mt-1 flex -space-x-1"
+                            aria-label={t.seenByCount.replace(
                               "{count}",
                               String(senderMessage.readCount - 1),
                             )}
-                          </p>
+                          >
+                            {Object.entries(memberAvatars)
+                              .filter(([userId]) => Number(userId) !== currentUser?.userId)
+                              .slice(0, senderMessage.readCount - 1)
+                              .map(([userId, avatarUrl]) => (
+                                <Avatar
+                                  key={userId}
+                                  className="h-1 w-1 ring-[0.5px] ring-slate-950"
+                                  style={{ width: 20, height: 20 }}
+                                  src={avatarUrl}
+                                  alt="Đã xem"
+                                />
+                              ))}
+                          </div>
                         ) : null}
                       </div>
                     );

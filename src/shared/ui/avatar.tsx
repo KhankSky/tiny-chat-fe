@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { apiAssetUrl } from "@/shared/api/client";
 import { cn } from "@/shared/lib/cn";
 
@@ -9,10 +10,12 @@ export function Avatar({
   alt,
   className,
   src,
+  style,
 }: {
   alt: string;
   className?: string;
   src?: string | null;
+  style?: CSSProperties;
 }) {
   return (
     <span
@@ -20,6 +23,7 @@ export function Avatar({
         "relative inline-flex h-10 w-10 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10",
         className,
       )}
+      style={style}
     >
       {src ? (
         // eslint-disable-next-line @next/next/no-img-element
