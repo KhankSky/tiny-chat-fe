@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupStreakCached } from "@/features/chat/api/chat-api";
-import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import { clearConversationCache } from "@/features/chat/hooks/use-conversations";
+import { GROUP_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { PresenceEvent } from "@/features/chat/types";
 import type { GroupStreakResponse } from "@/features/chat/types";
 import { MemberProfileModal } from "@/features/friends/components/member-profile-modal";
@@ -238,12 +238,9 @@ export function GroupSidebar({
     }
 
     function handleGroupStreakChanged(event: Event) {
-      const detail = (event as CustomEvent<{ groupId?: number }>).detail;
-      if (detail?.groupId === groupId) {
-        void loadGroupStreak({ force: true });
-      }
+      const detail = (event as CustomEvent<GroupStreakResponse>).detail;
+      if (detail?.groupId === groupId) setGroupStreak(detail);
     }
-
     void loadGroupStreak();
     window.addEventListener(GROUP_STREAK_CHANGED_EVENT, handleGroupStreakChanged);
 

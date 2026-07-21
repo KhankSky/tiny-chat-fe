@@ -4,7 +4,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } fr
 import type { AuthUserResponse } from "@/features/auth/types";
 import {
   getGroupMessages,
-  getMyStreakCached,
+  refreshGroupStreakAfterActivityOnce,
+  refreshMyStreakAfterActivityOnce,
   markConversationRead,
   sendGroupMessage,
 } from "@/features/chat/api/chat-api";
@@ -13,7 +14,11 @@ import {
   createOptimisticMessage,
   type LocalChatMessage,
 } from "@/features/chat/utils/optimistic-message";
-import type { PresenceEvent, ReadReceiptResponse, TypingEvent } from "@/features/chat/types";
+import type {
+  PresenceEvent,
+  ReadReceiptResponse,
+  TypingEvent,
+} from "@/features/chat/types";
 import type { Dictionary } from "@/i18n/types";
 import { getAccessToken } from "@/shared/auth/session";
 import { StompClient } from "@/shared/realtime/stomp";
@@ -61,22 +66,19 @@ export function useChatRoom({
   const lastReadByUserRef = useRef<Record<number, number>>({});
   const accessToken = useMemo(() => getAccessToken(), []);
 
-  const notifyGroupStreakChanged = useCallback(() => {
-    window.dispatchEvent(new CustomEvent(GROUP_STREAK_CHANGED_EVENT, { detail: { groupId } }));
-  }, [groupId]);
-
-  const refreshPersonalStreak = useCallback(async () => {
+  const refreshStreaksAfterFirstActivity = useCallback(async () => {
     if (!accessToken) return;
-
     try {
-      const nextStreak = await getMyStreakCached({ force: true });
-      window.dispatchEvent(
-        new CustomEvent(PERSONAL_STREAK_CHANGED_EVENT, { detail: nextStreak }),
-      );
+      const [groupStreak, personalStreak] = await Promise.all([
+        refreshGroupStreakAfterActivityOnce(groupId),
+        refreshMyStreakAfterActivityOnce(),
+      ]);
+      window.dispatchEvent(new CustomEvent(GROUP_STREAK_CHANGED_EVENT, { detail: groupStreak }));
+      window.dispatchEvent(new CustomEvent(PERSONAL_STREAK_CHANGED_EVENT, { detail: personalStreak }));
     } catch {
-      // Streak refresh is secondary metadata; message delivery should stay quiet.
+      // Streak is secondary metadata and should not interrupt chat.
     }
-  }, [accessToken]);
+  }, [accessToken, groupId]);
 
   useEffect(() => {
     let active = true;
@@ -132,9 +134,8 @@ export function useChatRoom({
             groupId,
             invalidDataMessage: copy.invalidChatData,
             onMessage: (message) => {
-              notifyGroupStreakChanged();
               if (message.senderId === currentUser?.userId) {
-                void refreshPersonalStreak();
+                void refreshStreaksAfterFirstActivity();
               }
             },
             onInvalidData: setSocketError,
@@ -245,8 +246,7 @@ export function useChatRoom({
     copy.realtimeSignInRequired,
     copy.unknownSocketError,
     groupId,
-    notifyGroupStreakChanged,
-    refreshPersonalStreak,
+    refreshStreaksAfterFirstActivity,
   ]);
 
   useLayoutEffect(() => {
@@ -348,6 +348,12 @@ export function useChatRoom({
           replyTopicContent: replyTopic?.content,
           replyTopicId: replyTopic?.id,
         });
+        // The server processes the message asynchronously over STOMP. Refresh
+        // the two streak snapshots once after the first activity in this
+        // session, without tying the update to the incoming message payload.
+        window.setTimeout(() => {
+          void refreshStreaksAfterFirstActivity();
+        }, 300);
       } else {
         const newMessage = await sendGroupMessage(groupId, {
           content: trimmed,
@@ -361,8 +367,7 @@ export function useChatRoom({
           messageHistoryCache.set(groupId, nextMessages);
           return nextMessages;
         });
-        await refreshPersonalStreak();
-        notifyGroupStreakChanged();
+        await refreshStreaksAfterFirstActivity();
       }
     } catch (err) {
       setMessages((previousMessages) => {

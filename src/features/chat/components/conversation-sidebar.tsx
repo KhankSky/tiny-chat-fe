@@ -5,8 +5,8 @@ import { LogOut } from "lucide-react";
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { getMyStreakCached } from "@/features/chat/api/chat-api";
-import { PERSONAL_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import type { UserStreakResponse } from "@/features/chat/types";
+import { PERSONAL_STREAK_CHANGED_EVENT } from "@/features/chat/hooks/use-chat-room";
 import { FriendsPanel } from "@/features/friends/components/friends-panel";
 import type { Dictionary } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
@@ -66,13 +66,9 @@ export function ConversationSidebar({
 
     function handlePersonalStreakChanged(event: Event) {
       const nextStreak = (event as CustomEvent<UserStreakResponse>).detail;
-      if (nextStreak?.userId === currentUserId) {
-        setUserStreak(nextStreak);
-      }
+      if (nextStreak?.userId === currentUserId) setUserStreak(nextStreak);
     }
-
     window.addEventListener(PERSONAL_STREAK_CHANGED_EVENT, handlePersonalStreakChanged);
-
     return () => {
       active = false;
       window.removeEventListener(PERSONAL_STREAK_CHANGED_EVENT, handlePersonalStreakChanged);

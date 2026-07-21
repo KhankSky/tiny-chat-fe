@@ -11,8 +11,10 @@ import type {
 
 let myStreakCache: UserStreakResponse | null = null;
 let myStreakRequest: Promise<UserStreakResponse> | null = null;
+let myStreakActivityRefreshUsed = false;
 const groupStreakCache = new Map<number, GroupStreakResponse>();
 const groupStreakRequests = new Map<number, Promise<GroupStreakResponse>>();
+const groupStreakActivityRefreshUsed = new Set<number>();
 const dailyTopicCache = new Map<number, DailyTopicResponse>();
 const dailyTopicRequests = new Map<number, Promise<DailyTopicResponse>>();
 
@@ -51,9 +53,11 @@ export function getMyStreak() {
   return apiGet<UserStreakResponse>("/api/me/streak");
 }
 
-export function getMyStreakCached({ force = false }: { force?: boolean } = {}) {
+export function getMyStreakCached(_options: { force?: boolean } = {}) {
   if (myStreakRequest) return myStreakRequest;
-  if (!force && myStreakCache) return Promise.resolve(myStreakCache);
+  if (myStreakCache) {
+    return Promise.resolve(myStreakCache);
+  }
 
   myStreakRequest = getMyStreak()
     .then((streak) => {
@@ -67,18 +71,27 @@ export function getMyStreakCached({ force = false }: { force?: boolean } = {}) {
   return myStreakRequest;
 }
 
+export function refreshMyStreakAfterActivityOnce() {
+  if (myStreakActivityRefreshUsed) return getMyStreakCached();
+  myStreakActivityRefreshUsed = true;
+  myStreakCache = null;
+  return getMyStreakCached();
+}
+
 export function getGroupStreak(groupId: number) {
   return apiGet<GroupStreakResponse>(`/api/groups/${groupId}/streak`);
 }
 
 export function getGroupStreakCached(
   groupId: number,
-  { force = false }: { force?: boolean } = {},
+  _options: { force?: boolean } = {},
 ) {
   const cached = groupStreakCache.get(groupId);
   const activeRequest = groupStreakRequests.get(groupId);
   if (activeRequest) return activeRequest;
-  if (!force && cached) return Promise.resolve(cached);
+  if (cached) {
+    return Promise.resolve(cached);
+  }
 
   const request = getGroupStreak(groupId)
     .then((streak) => {
@@ -91,6 +104,13 @@ export function getGroupStreakCached(
 
   groupStreakRequests.set(groupId, request);
   return request;
+}
+
+export function refreshGroupStreakAfterActivityOnce(groupId: number) {
+  if (groupStreakActivityRefreshUsed.has(groupId)) return getGroupStreakCached(groupId);
+  groupStreakActivityRefreshUsed.add(groupId);
+  groupStreakCache.delete(groupId);
+  return getGroupStreakCached(groupId);
 }
 
 export function sendGroupMessage(
