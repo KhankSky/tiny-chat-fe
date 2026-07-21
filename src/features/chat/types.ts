@@ -24,6 +24,7 @@ export type ChatMessage = {
   sentAt: string;
   readCount: number;
   readByCurrentUser: boolean;
+  readByUserIds?: number[];
 };
 
 export type HistoryResponse = {

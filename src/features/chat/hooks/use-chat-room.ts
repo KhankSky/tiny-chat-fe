@@ -195,6 +195,10 @@ export function useChatRoom({
                     payload.userId !== message.senderId && !isOwnReceipt && advancedPastMessage
                       ? message.readCount + 1
                       : message.readCount,
+                  readByUserIds:
+                    payload.userId !== message.senderId && advancedPastMessage
+                      ? Array.from(new Set([...(message.readByUserIds ?? []), payload.userId]))
+                      : message.readByUserIds,
                 };
               });
               messageHistoryCache.set(groupId, nextMessages);

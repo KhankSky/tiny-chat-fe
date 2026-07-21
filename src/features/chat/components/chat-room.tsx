@@ -299,15 +299,14 @@ export function ChatRoom({
                               String(senderMessage.readCount - 1),
                             )}
                           >
-                            {Object.entries(memberAvatars)
-                              .filter(([userId]) => Number(userId) !== currentUser?.userId)
-                              .slice(0, senderMessage.readCount - 1)
-                              .map(([userId, avatarUrl]) => (
+                            {(senderMessage.readByUserIds ?? [])
+                              .filter((userId) => userId !== currentUser?.userId)
+                              .map((userId) => (
                                 <Avatar
                                   key={userId}
                                   className="h-1 w-1 ring-[0.5px] ring-slate-950"
                                   style={{ width: 20, height: 20 }}
-                                  src={avatarUrl}
+                                  src={memberAvatars[userId] ?? null}
                                   alt="Đã xem"
                                 />
                               ))}
