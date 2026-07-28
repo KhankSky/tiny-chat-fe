@@ -125,7 +125,9 @@ async function executeRequest(
     },
   });
 
-  if (response.status !== 401 || path === "/api/auth/p/refresh") {
+  // The backend may represent an expired access token as either 401 or 403.
+  // Refresh once and retry the original request for both cases.
+  if (![401, 403].includes(response.status) || path === "/api/auth/p/refresh") {
     return response;
   }
 
