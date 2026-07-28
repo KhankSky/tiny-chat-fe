@@ -11,6 +11,7 @@ import { LoadingState } from "@/shared/ui/loading-state";
 import { Modal } from "@/shared/ui/modal";
 import type { ProfileEditorState } from "@/features/profile/hooks/use-profile-editor";
 import type { ThemeMode } from "@/theme/use-theme-preference";
+import { SHOW_THEME_SELECTOR } from "@/theme/theme-config";
 
 export function ProfileEditorModal({
   dictionary,
@@ -117,7 +118,7 @@ export function ProfileEditorModal({
           </label>
         ) : null}
 
-        {theme && onThemeChange ? (
+        {SHOW_THEME_SELECTOR && theme && onThemeChange ? (
           <label className="block space-y-2">
             <span className="text-sm font-medium text-slate-200">
               {profileCopy.themeLabel}

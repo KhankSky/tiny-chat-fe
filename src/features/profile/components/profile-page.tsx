@@ -7,6 +7,7 @@ import type { MeProfileResponse, UpdateMeProfileRequest } from "@/features/profi
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import type { ThemeMode } from "@/theme/use-theme-preference";
+import { SHOW_THEME_SELECTOR } from "@/theme/theme-config";
 
 export function ProfilePage({
   dictionary,
@@ -158,7 +159,7 @@ export function ProfilePage({
               </label>
             ) : null}
 
-            {theme && onThemeChange ? (
+            {SHOW_THEME_SELECTOR && theme && onThemeChange ? (
               <label className="block space-y-2">
                 <span className="text-sm font-medium text-slate-200">
                   {dictionary.chat.profileModal.themeLabel}
