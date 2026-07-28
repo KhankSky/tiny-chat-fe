@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 import { getGroupMatchingCopy } from "@/features/groups/group-matching-copy";
 import { useGroupMatching } from "@/features/groups/hooks/use-group-matching";
@@ -136,10 +136,31 @@ export function GroupMatchingPage({
   const t = getGroupMatchingCopy(dictionary);
   const { currentUser, error, findGroup, loading, matchResult, profileSignals } =
     useGroupMatching(dictionary);
+  const [redirectSeconds, setRedirectSeconds] = useState<number | null>(null);
   const levelReady = Boolean(currentUser?.englishLevel);
   const goalReady = Boolean(currentUser?.practiceGoal);
   const interestsReady = Boolean(currentUser?.interests?.length);
   const profileReady = Boolean(currentUser?.profileCompleted);
+
+  useEffect(() => {
+    if (!matchResult?.groupId || matchResult.action === "no_new_group_available" || matchResult.action === "already_in_group") {
+      setRedirectSeconds(null);
+      return;
+    }
+
+    setRedirectSeconds(5);
+    const countdown = window.setInterval(() => {
+      setRedirectSeconds((current) => (current && current > 1 ? current - 1 : current));
+    }, 1000);
+    const redirect = window.setTimeout(() => {
+      router.push(`/conversations/${matchResult.groupId}`);
+    }, 5000);
+
+    return () => {
+      window.clearInterval(countdown);
+      window.clearTimeout(redirect);
+    };
+  }, [matchResult, router]);
 
   return (
     <main className="tc-match-page min-h-screen bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.18),transparent_34%),linear-gradient(180deg,#020617_0%,#050816_58%,#020617_100%)] text-white">
@@ -174,15 +195,17 @@ export function GroupMatchingPage({
                   {t.description}
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                  <Button
-                    type="button"
-                    onClick={() => void findGroup()}
-                    disabled={loading}
-                    className="h-12 w-full px-7 text-base sm:w-auto"
-                    aria-busy={loading}
-                  >
-                    {loading ? t.statusLoading : t.primary}
-                  </Button>
+                  {!matchResult ? (
+                    <Button
+                      type="button"
+                      onClick={() => void findGroup()}
+                      disabled={loading}
+                      className="h-12 w-full px-7 text-base sm:w-auto"
+                      aria-busy={loading}
+                    >
+                      {loading ? t.statusLoading : t.primary}
+                    </Button>
+                  ) : null}
                   {!profileReady ? (
                     <Link
                       href="/auth/complete-profile"
@@ -378,31 +401,32 @@ export function GroupMatchingPage({
                   </div>
                 ) : null}
 
-                <div className="mt-auto grid gap-3 sm:grid-cols-2">
+                {redirectSeconds ? (
+                  <p className="mb-3 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm font-medium text-cyan-100">
+                    {t.redirectingToChat.replace("{seconds}", String(redirectSeconds))}
+                  </p>
+                ) : null}
+                <div className="mt-auto flex justify-center pt-5">
                   {matchResult.action !== "no_new_group_available" ? (
                     <Button
                       type="button"
                       onClick={() => router.push(`/conversations/${matchResult.groupId}`)}
-                      className="h-12"
+                      className="h-12 w-full sm:w-72"
                     >
                       {t.openChat}
                     </Button>
                   ) : null}
-                  <Button
-                    type="button"
-                    onClick={() => {
-                      if (!profileReady) {
-                        router.push("/auth/complete-profile");
-                        return;
-                      }
-                      void findGroup();
-                    }}
-                    disabled={loading || !profileReady}
-                    variant="secondary"
-                    className="h-12"
-                  >
-                    {t.searchAgain}
-                  </Button>
+                  {matchResult.action === "no_new_group_available" ? (
+                    <Button
+                      type="button"
+                      onClick={() => void findGroup()}
+                      disabled={loading || !profileReady}
+                      variant="secondary"
+                      className="h-12"
+                    >
+                      {t.searchAgain}
+                    </Button>
+                  ) : null}
                 </div>
 
                 {matchResult.joinedAt ? (

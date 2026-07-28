@@ -284,6 +284,7 @@ export const en = {
     noNewGroupBadge: "No new match",
     openChat: "Open chat",
     searchAgain: "Match again",
+    redirectingToChat: "Group matched successfully. Opening the conversation in {seconds} seconds...",
     newGroup: "New group created",
     joinedGroup: "Joined an existing group",
     sizeLabel: "Group size",

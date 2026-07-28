@@ -284,6 +284,7 @@ export const vi = {
     noNewGroupBadge: "Chưa có match mới",
     openChat: "Mở chat",
     searchAgain: "Tìm lại nhóm",
+    redirectingToChat: "Đã ghép nhóm thành công. Sẽ chuyển vào cuộc trò chuyện sau {seconds} giây...",
     newGroup: "Đã tạo nhóm mới",
     joinedGroup: "Đã vào nhóm hiện có",
     sizeLabel: "Số người trong nhóm",
