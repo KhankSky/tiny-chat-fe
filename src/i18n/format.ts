@@ -55,7 +55,6 @@ export function formatMessageTime(value: string | null | undefined, locale: Loca
     date.getDate() === now.getDate();
 
   return new Intl.DateTimeFormat(dateTimeLocales[locale], {
-    ...(sameDay ? {} : { day: "2-digit", month: "2-digit" }),
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);

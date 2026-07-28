@@ -22,8 +22,8 @@ export function getConversations() {
   return apiGet<ConversationResponse[]>("/api/conversations");
 }
 
-export function getGroupMessages(groupId: number) {
-  return apiGet<HistoryResponse>(`/api/groups/${groupId}/messages`);
+export function getGroupMessages(groupId: number, page = 0, size = 30) {
+  return apiGet<HistoryResponse>(`/api/groups/${groupId}/messages?page=${page}&size=${size}`);
 }
 
 export function getDailyTopic(groupId: number) {

@@ -28,6 +28,8 @@ export type ChatMessage = {
 
 export type HistoryResponse = {
   items: ChatMessage[];
+  page: number;
+  size: number;
 };
 
 export type TypingEvent = {

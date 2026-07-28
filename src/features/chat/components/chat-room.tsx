@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { AuthUserResponse } from "@/features/auth/types";
 import { useChatRoom } from "@/features/chat/hooks/use-chat-room";
@@ -49,6 +49,7 @@ export function ChatRoom({
     content,
     error,
     loading,
+    loadOlderMessages,
     messages,
     presenceByUser,
     sendMessage,
@@ -57,6 +58,17 @@ export function ChatRoom({
     socketStatus,
     typingUsers,
   } = useChatRoom({ currentUser, dictionary, groupId });
+  const chatCanvasRef = useRef<HTMLDivElement | null>(null);
+  async function handleChatScroll() {
+    const canvas = chatCanvasRef.current;
+    if (!canvas || canvas.scrollTop > 80) return;
+    const previousHeight = canvas.scrollHeight;
+    const loaded = await loadOlderMessages();
+    if (!loaded) return;
+    requestAnimationFrame(() => {
+      canvas.scrollTop += canvas.scrollHeight - previousHeight;
+    });
+  }
   const messagesWithAvatars = useMemo(
     () =>
       messages.map((message) => ({
@@ -196,7 +208,7 @@ export function ChatRoom({
         </div>
       </header>
 
-      <div className="tc-chat-canvas min-h-0 flex-1 overscroll-contain overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-3 py-4 sm:px-6 sm:py-5">
+      <div ref={chatCanvasRef} onScroll={() => void handleChatScroll()} className="tc-chat-canvas min-h-0 flex-1 overscroll-contain overflow-y-auto bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-3 py-4 sm:px-6 sm:py-5">
         {loading ? (
           <LoadingState label={dictionary.common.loading} />
         ) : null}
@@ -218,21 +230,23 @@ export function ChatRoom({
           const isMine = currentUser?.userId === message.senderId;
           const previousMessage = messagesWithAvatars[index - 1];
           const startsSenderGroup = previousMessage?.senderId !== message.senderId;
-          if (!startsSenderGroup) return null;
+          const startsNewDay =
+            !previousMessage ||
+            new Date(previousMessage.sentAt).toDateString() !== new Date(message.sentAt).toDateString();
+          if (!startsSenderGroup && !startsNewDay) return null;
 
           const groupMessages = messagesWithAvatars.slice(index);
           const nextSenderIndex = groupMessages.findIndex(
             (nextMessage) => nextMessage.senderId !== message.senderId,
           );
-          const senderMessages = groupMessages.slice(
-             0,
-             nextSenderIndex === -1 ? groupMessages.length : nextSenderIndex,
-           );
-           const groupHasReadReceipt =
-             isMine && (senderMessages[senderMessages.length - 1]?.readCount ?? 0) > 1;
-          const startsNewDay =
-            !previousMessage ||
-            new Date(previousMessage.sentAt).toDateString() !== new Date(message.sentAt).toDateString();
+          const senderMessages = startsSenderGroup
+            ? groupMessages.slice(
+                0,
+                nextSenderIndex === -1 ? groupMessages.length : nextSenderIndex,
+              )
+            : [message];
+          const groupHasReadReceipt =
+            isMine && (senderMessages[senderMessages.length - 1]?.readCount ?? 0) > 1;
 
           return (
             <div key={message.messageId}>

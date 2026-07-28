@@ -64,6 +64,10 @@ export function useChatRoom({
   const lastTypingSentRef = useRef(false);
   const lastReadMessageIdRef = useRef<number | null>(null);
   const lastReadByUserRef = useRef<Record<number, number>>({});
+  const nextHistoryPageRef = useRef(1);
+  const hasOlderMessagesRef = useRef(true);
+  const loadingOlderRef = useRef(false);
+  const loadingOlderMessagesRef = useRef(false);
   const accessToken = useMemo(() => getAccessToken(), []);
 
   const refreshStreaksAfterFirstActivity = useCallback(async () => {
@@ -87,6 +91,10 @@ export function useChatRoom({
     lastTypingSentRef.current = false;
     lastReadMessageIdRef.current = null;
     lastReadByUserRef.current = {};
+    nextHistoryPageRef.current = 1;
+    hasOlderMessagesRef.current = true;
+    loadingOlderRef.current = false;
+    loadingOlderMessagesRef.current = false;
 
     async function loadHistoryAndConnect() {
       try {
@@ -95,7 +103,10 @@ export function useChatRoom({
 
         let historyRequest = messageHistoryRequests.get(groupId);
         if (!historyRequest) {
-          historyRequest = getGroupMessages(groupId).then((history) => history.items);
+          historyRequest = getGroupMessages(groupId).then((history) => {
+            hasOlderMessagesRef.current = history.items.length >= history.size;
+            return history.items;
+          });
           messageHistoryRequests.set(groupId, historyRequest);
         }
 
@@ -254,6 +265,10 @@ export function useChatRoom({
   ]);
 
   useLayoutEffect(() => {
+    if (loadingOlderMessagesRef.current) {
+      loadingOlderMessagesRef.current = false;
+      return;
+    }
     const bottomElement = bottomRef.current;
     if (!bottomElement) return;
 
@@ -265,6 +280,32 @@ export function useChatRoom({
       window.cancelAnimationFrame(frameId);
     };
   }, [messages, typingUsers]);
+
+  const loadOlderMessages = useCallback(async () => {
+    if (loadingOlderRef.current || !hasOlderMessagesRef.current) return false;
+    loadingOlderRef.current = true;
+    try {
+      const history = await getGroupMessages(groupId, nextHistoryPageRef.current);
+      const olderMessages = history.items;
+      hasOlderMessagesRef.current = olderMessages.length >= history.size;
+      nextHistoryPageRef.current += 1;
+      if (olderMessages.length > 0) {
+        setMessages((currentMessages) => {
+          const existingIds = new Set(currentMessages.map((message) => message.messageId));
+          const nextMessages = [
+            ...olderMessages.filter((message) => !existingIds.has(message.messageId)),
+            ...currentMessages,
+          ];
+          messageHistoryCache.set(groupId, nextMessages);
+          loadingOlderMessagesRef.current = true;
+          return nextMessages;
+        });
+      }
+      return olderMessages.length > 0;
+    } finally {
+      loadingOlderRef.current = false;
+    }
+  }, [groupId]);
 
   const publishTyping = useCallback(
     (typing: boolean) => {
@@ -391,6 +432,7 @@ export function useChatRoom({
     content,
     error,
     loading,
+    loadOlderMessages,
     messages,
     presenceByUser,
     sendMessage,
