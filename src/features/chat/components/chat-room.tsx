@@ -6,7 +6,11 @@ import type { AuthUserResponse } from "@/features/auth/types";
 import { useChatRoom } from "@/features/chat/hooks/use-chat-room";
 import type { DailyTopicResponse } from "@/features/chat/types";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
-import { formatDateTime } from "@/i18n/format";
+import {
+  formatDateTime,
+  formatMessageDateSeparator,
+  formatMessageTime,
+} from "@/i18n/format";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -220,18 +224,26 @@ export function ChatRoom({
           const nextSenderIndex = groupMessages.findIndex(
             (nextMessage) => nextMessage.senderId !== message.senderId,
           );
-           const senderMessages = groupMessages.slice(
+          const senderMessages = groupMessages.slice(
              0,
              nextSenderIndex === -1 ? groupMessages.length : nextSenderIndex,
            );
            const groupHasReadReceipt =
              isMine && (senderMessages[senderMessages.length - 1]?.readCount ?? 0) > 1;
+          const startsNewDay =
+            !previousMessage ||
+            new Date(previousMessage.sentAt).toDateString() !== new Date(message.sentAt).toDateString();
 
           return (
-            <div
-              key={message.messageId}
-              className={`mt-4 flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"} ${groupHasReadReceipt ? "pb-1" : ""}`}
-            >
+            <div key={message.messageId}>
+              {startsNewDay ? (
+                <div className="mx-auto my-5 w-fit rounded-full bg-white/[0.06] px-5 py-1 text-center text-xs font-medium text-slate-400">
+                  {formatMessageDateSeparator(message.sentAt, locale)}
+                </div>
+              ) : null}
+              <div
+                className={`mt-4 flex items-end gap-2 ${isMine ? "justify-end" : "justify-start"} ${groupHasReadReceipt ? "pb-1" : ""}`}
+              >
               {!isMine ? (
                 <Avatar
                   className="mb-0.5 h-8 w-8 self-end ring-1 ring-white/10"
@@ -251,6 +263,7 @@ export function ChatRoom({
                     const isFirstInGroup = senderMessageIndex === 0;
                     const isLastInGroup = senderMessageIndex === senderMessages.length - 1;
                     const sentAt = formatDateTime(senderMessage.sentAt, locale);
+                    const messageTime = formatMessageTime(senderMessage.sentAt, locale);
                     const showReadReceipt =
                       isMine &&
                       isLastInGroup &&
@@ -286,6 +299,16 @@ export function ChatRoom({
                         >
                           <p className="whitespace-pre-wrap break-words">{senderMessage.content}</p>
                         </div>
+                        {isLastInGroup ? (
+                          <time
+                            dateTime={senderMessage.sentAt}
+                            className={`mt-1 block px-1 text-[10px] leading-4 text-slate-500 ${
+                              isMine ? "text-right" : "text-left"
+                            }`}
+                          >
+                            {messageTime}
+                          </time>
+                        ) : null}
                         <span
                           className={`pointer-events-none absolute top-1/2 hidden -translate-y-1/2 whitespace-nowrap rounded-full border border-white/10 bg-slate-950/95 px-2.5 py-1 text-[11px] font-medium text-slate-200 opacity-0 shadow-xl transition group-hover/message:block group-hover/message:opacity-100 ${
                             isMine ? "right-full mr-2" : "left-full ml-2"
@@ -318,6 +341,7 @@ export function ChatRoom({
                     );
                   })}
                 </div>
+              </div>
               </div>
             </div>
           );
