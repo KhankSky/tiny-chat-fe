@@ -47,7 +47,12 @@ export function AuthForm({
     window.google.accounts.id.initialize({ client_id: clientId, callback: handleGoogleCredential });
     const button = document.getElementById("google-sign-in-button");
     if (button && !button.dataset.googleRendered) {
-      window.google.accounts.id.renderButton(button, { theme: "outline", size: "large", width: 400 });
+      const availableWidth = button.parentElement?.clientWidth ?? 400;
+      window.google.accounts.id.renderButton(button, {
+        theme: "outline",
+        size: "large",
+        width: Math.min(400, availableWidth),
+      });
       button.dataset.googleRendered = "true";
     }
   }
