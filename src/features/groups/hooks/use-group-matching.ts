@@ -27,14 +27,23 @@ export function useGroupMatching(dictionary: Dictionary) {
   async function findGroup() {
     setError(null);
     setLoading(true);
+    const startedAt = Date.now();
+    const waitForMatchingAnimation = async () => {
+      const remainingDelay = Math.max(0, 1000 - (Date.now() - startedAt));
+      if (remainingDelay > 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, remainingDelay));
+      }
+    };
 
     try {
       const result = await matchGroup();
+      await waitForMatchingAnimation();
       // The match endpoint creates/joins a conversation. Invalidate the
       // sidebar snapshot so the conversations page fetches the new group.
       clearConversationCache();
       setMatchResult(result);
     } catch (err) {
+      await waitForMatchingAnimation();
       setMatchResult(null);
       const message = err instanceof Error ? err.message : "";
       setError(
