@@ -273,7 +273,15 @@ export function useChatRoom({
     if (!bottomElement) return;
 
     const frameId = window.requestAnimationFrame(() => {
-      bottomElement.scrollIntoView({ behavior: "smooth", block: "end" });
+      const scrollContainer = bottomElement.parentElement;
+      if (scrollContainer) {
+        scrollContainer.scrollTo({
+          top: scrollContainer.scrollHeight,
+          behavior: "smooth",
+        });
+      } else {
+        bottomElement.scrollIntoView({ behavior: "smooth", block: "end" });
+      }
     });
 
     return () => {
