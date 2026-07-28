@@ -27,7 +27,8 @@ function activityStatus(profile: FriendProfileResponse, copy: Dictionary["chat"]
   if (minutes < 60) return copy.activeMinutesAgo.replace("{minutes}", String(minutes));
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return copy.activeHoursAgo.replace("{hours}", String(hours));
-  return copy.activeDaysAgo.replace("{days}", String(Math.floor(hours / 24)));
+  const days = Math.floor(hours / 24);
+  return days > 7 ? copy.activeUnknown : copy.activeDaysAgo.replace("{days}", String(days));
 }
 
 export function DirectChatSidebar({
