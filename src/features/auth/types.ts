@@ -16,6 +16,10 @@ export type AuthCredentials = {
   password: string;
 };
 
+export type RegisterCredentials = AuthCredentials & {
+  confirmPassword: string;
+};
+
 export type GoogleLoginRequest = { idToken: string };
 
 export type CompleteProfileRequest = {

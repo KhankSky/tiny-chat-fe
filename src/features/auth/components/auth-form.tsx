@@ -21,6 +21,7 @@ export function AuthForm({
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -28,6 +29,10 @@ export function AuthForm({
 
   async function handleGoogleCredential(response: { credential: string }) {
     setError(null);
+    if (!isLogin && password !== confirmPassword) {
+      setError(dictionary.auth.passwordMismatch);
+      return;
+    }
     setLoading(true);
     try {
       const user = await googleLogin({ idToken: response.credential });
@@ -76,7 +81,9 @@ export function AuthForm({
     setLoading(true);
 
     try {
-      const user = await (isLogin ? login : register)({ email, password });
+      const user = isLogin
+        ? await login({ email, password })
+        : await register({ email, password, confirmPassword });
 
       persistAuthSession(user);
       router.push(
@@ -125,6 +132,24 @@ export function AuthForm({
           required
         />
       </div>
+
+      {!isLogin ? (
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-slate-200" htmlFor="confirm-password">
+            {dictionary.auth.confirmPasswordLabel}
+          </label>
+          <input
+            id="confirm-password"
+            type="password"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            className="min-h-12 w-full rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60 focus:bg-white/[0.08]"
+            placeholder={dictionary.auth.passwordPlaceholder}
+            autoComplete="new-password"
+            required
+          />
+        </div>
+      ) : null}
 
       {error ? (
         <p className="tc-alert-danger rounded-2xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">

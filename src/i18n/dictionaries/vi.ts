@@ -71,6 +71,8 @@ export const vi = {
       "Thông tin này giúp Tiny Chat gợi ý chủ đề và kết nối bạn với những cuộc hội thoại phù hợp hơn.",
     emailLabel: "Email",
     passwordLabel: "Mật khẩu",
+    confirmPasswordLabel: "Nhập lại mật khẩu",
+    passwordMismatch: "Mật khẩu nhập lại không khớp.",
     displayNameLabel: "Tên hiển thị",
     avatarUrlLabel: "Ảnh đại diện",
     avatarUploadHint: "Bấm để tải ảnh lên",

@@ -1,12 +1,12 @@
 import { apiGet, apiPost } from "@/shared/api/client";
-import type { AuthCredentials, AuthUserResponse, CompleteProfileRequest, GoogleLoginRequest } from "../types";
+import type { AuthCredentials, AuthUserResponse, CompleteProfileRequest, GoogleLoginRequest, RegisterCredentials } from "../types";
 
 export function login(payload: AuthCredentials) {
   return apiPost<AuthUserResponse, AuthCredentials>("/api/auth/p/login", payload);
 }
 
-export function register(payload: AuthCredentials) {
-  return apiPost<AuthUserResponse, AuthCredentials>("/api/auth/p/register", payload);
+export function register(payload: RegisterCredentials) {
+  return apiPost<AuthUserResponse, RegisterCredentials>("/api/auth/p/register", payload);
 }
 
 export function googleLogin(payload: GoogleLoginRequest) {

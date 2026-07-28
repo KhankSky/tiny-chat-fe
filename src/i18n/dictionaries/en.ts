@@ -71,6 +71,8 @@ export const en = {
       "This helps Tiny Chat match you with better topics and conversations.",
     emailLabel: "Email",
     passwordLabel: "Password",
+    confirmPasswordLabel: "Confirm password",
+    passwordMismatch: "Passwords do not match.",
     displayNameLabel: "Display name",
     avatarUrlLabel: "Avatar image",
     avatarUploadHint: "Click to upload an image",
