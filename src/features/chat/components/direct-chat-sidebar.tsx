@@ -6,15 +6,28 @@ import type { AuthUserResponse } from "@/features/auth/types";
 import { getGroupDetail } from "@/features/groups/api/groups-api";
 import { getFriendProfile } from "@/features/friends/api/friends-api";
 import type { FriendProfileResponse } from "@/features/friends/types";
+import type { PresenceEvent } from "@/features/chat/types";
 import type { Dictionary } from "@/i18n/types";
 import { Avatar } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import { ErrorMessage } from "@/shared/ui/error-message";
 import { LoadingState } from "@/shared/ui/loading-state";
+import { getAccessToken } from "@/shared/auth/session";
+import { StompClient } from "@/shared/realtime/stomp";
 
 function enumLabel(labels: Record<string, string>, value: string | null) {
   if (!value) return null;
   return labels[value] ?? value;
+}
+
+function activityStatus(profile: FriendProfileResponse, copy: Dictionary["chat"]["friends"]) {
+  if (profile.online) return copy.activeNow;
+  if (!profile.lastSeenAt) return copy.activeUnknown;
+  const minutes = Math.max(1, Math.floor((Date.now() - new Date(profile.lastSeenAt).getTime()) / 60000));
+  if (minutes < 60) return copy.activeMinutesAgo.replace("{minutes}", String(minutes));
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return copy.activeHoursAgo.replace("{hours}", String(hours));
+  return copy.activeDaysAgo.replace("{days}", String(Math.floor(hours / 24)));
 }
 
 export function DirectChatSidebar({
@@ -70,6 +83,35 @@ export function DirectChatSidebar({
       active = false;
     };
   }, [currentUser?.userId, groupId, t.loadGroupError]);
+
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) return;
+
+    const client = new StompClient(token);
+    let active = true;
+    let unsubscribe: (() => void) | null = null;
+
+    void client.connect().then(() => {
+      if (!active || !client.isConnected()) return;
+      unsubscribe = client.subscribe(`/topic/groups/${groupId}/presence`, (body) => {
+        const event = JSON.parse(body) as PresenceEvent;
+        setProfile((currentProfile) =>
+          currentProfile && currentProfile.userId === event.userId
+            ? { ...currentProfile, online: event.online, lastSeenAt: event.online ? currentProfile.lastSeenAt : event.occurredAt }
+            : currentProfile,
+        );
+      });
+    }).catch(() => {
+      // Profile data remains available even when realtime presence is unavailable.
+    });
+
+    return () => {
+      active = false;
+      unsubscribe?.();
+      client.disconnect();
+    };
+  }, [groupId]);
 
   const level = profile
     ? enumLabel(dictionary.enums.englishLevel as Record<string, string>, profile.englishLevel)
@@ -131,9 +173,9 @@ export function DirectChatSidebar({
                   <p className="mt-1 truncate text-sm text-slate-400">{profile.email}</p>
                 </div>
               </div>
-              <div className="mt-4 inline-flex max-w-full items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-medium text-emerald-200">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span className="truncate">{t.onlineStatusShown}</span>
+              <div className={`mt-4 inline-flex max-w-full items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${profile.online ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200" : "border-white/10 bg-white/5 text-slate-400"}`}>
+                <span className={`h-2 w-2 rounded-full ${profile.online ? "bg-emerald-400" : "bg-slate-500"}`} />
+                <span className="truncate">{activityStatus(profile, dictionary.chat.friends)}</span>
               </div>
             </div>
 

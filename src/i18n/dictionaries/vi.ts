@@ -180,6 +180,11 @@ export const vi = {
       addFriend: "Kết bạn",
       requestSent: "Đã gửi lời mời",
       selfProfile: "Đây là bạn",
+      activeNow: "Đang hoạt động",
+      activeMinutesAgo: "Hoạt động {minutes} phút trước",
+      activeHoursAgo: "Hoạt động {hours} giờ trước",
+      activeDaysAgo: "Hoạt động {days} ngày trước",
+      activeUnknown: "Không hoạt động",
     },
     groupSidebar: {
       directChatTitle: "Trò chuyện riêng",

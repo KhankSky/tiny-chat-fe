@@ -180,6 +180,11 @@ export const en = {
       addFriend: "Add friend",
       requestSent: "Request sent",
       selfProfile: "This is you",
+      activeNow: "Active now",
+      activeMinutesAgo: "Active {minutes} minutes ago",
+      activeHoursAgo: "Active {hours} hours ago",
+      activeDaysAgo: "Active {days} days ago",
+      activeUnknown: "Inactive",
     },
     groupSidebar: {
       directChatTitle: "Direct chat",

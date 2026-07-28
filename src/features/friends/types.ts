@@ -24,6 +24,8 @@ export type FriendProfileResponse = {
   practiceGoal: string | null;
   interests: string[] | null;
   bio: string | null;
+  online: boolean;
+  lastSeenAt: string | null;
   friendshipStatus: FriendshipStatus;
   incomingRequestId: number | null;
   outgoingRequestId: number | null;

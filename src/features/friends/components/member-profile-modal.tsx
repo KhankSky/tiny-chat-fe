@@ -22,6 +22,21 @@ function enumLabel(labels: Record<string, string>, value: string | null) {
   return labels[value] ?? value;
 }
 
+function formatActivityStatus(
+  online: boolean,
+  lastSeenAt: string | null,
+  copy: typeof import("@/i18n/dictionaries/vi").vi.chat.friends,
+) {
+  if (online) return copy.activeNow;
+  if (!lastSeenAt) return copy.activeUnknown;
+
+  const minutes = Math.max(1, Math.floor((Date.now() - new Date(lastSeenAt).getTime()) / 60000));
+  if (minutes < 60) return copy.activeMinutesAgo.replace("{minutes}", String(minutes));
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return copy.activeHoursAgo.replace("{hours}", String(hours));
+  return copy.activeDaysAgo.replace("{days}", String(Math.floor(hours / 24)));
+}
+
 export function MemberProfileModal({
   dictionary,
   groupId,
@@ -120,6 +135,9 @@ export function MemberProfileModal({
     profile?.interests?.map((interest) =>
       enumLabel(dictionary.enums.interest as Record<string, string>, interest),
     ) ?? [];
+  const activityStatus = profile
+    ? formatActivityStatus(profile.online, profile.lastSeenAt, t)
+    : null;
 
   return (
     <Modal ariaLabel={t.memberProfileTitle} onClose={onClose} className="max-w-lg p-5">
@@ -137,6 +155,9 @@ export function MemberProfileModal({
               </p>
               <h3 className="mt-2 truncate text-2xl font-semibold text-white">{displayName}</h3>
               <p className="mt-1 truncate text-sm text-slate-400">{profile.email}</p>
+              <p className={`mt-2 text-xs ${profile.online ? "text-emerald-300" : "text-slate-500"}`}>
+                {activityStatus}
+              </p>
             </div>
           </div>
 
