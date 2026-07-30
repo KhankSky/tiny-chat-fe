@@ -4,15 +4,18 @@ import { ThemeInitializer } from "@/theme/theme-initializer";
 
 export const metadata: Metadata = {
   title: {
-    default: "Conyva",
+    default: "Conyva - Luyện ngôn ngữ qua trò chuyện",
     template: "%s | Conyva",
   },
-  description: "Conyva — talk, learn, and connect in one place.",
+  description:
+    "Conyva là nền tảng trò chuyện giúp người dùng luyện ngôn ngữ, kết nối cộng đồng và nhận hỗ trợ trong quá trình học.",
   metadataBase: new URL("https://conyva.app"),
   alternates: { canonical: "https://conyva.app" },
+  robots: { index: true, follow: true },
   openGraph: {
-    title: "Conyva",
-    description: "Talk, learn, and connect with Conyva.",
+    title: "Conyva - Luyện ngôn ngữ qua trò chuyện",
+    description:
+      "Conyva là nền tảng trò chuyện giúp người dùng luyện ngôn ngữ, kết nối cộng đồng và nhận hỗ trợ trong quá trình học.",
     url: "https://conyva.app",
     siteName: "Conyva",
     type: "website",
