@@ -13,9 +13,9 @@ function formatContext(context?: LogContext) {
 }
 
 export function logClientError(message: string, context?: LogContext) {
-  console.error(`[tiny-chat] ${message}`, formatContext(context));
+  console.error(`[conyva] ${message}`, formatContext(context));
 }
 
 export function logClientWarning(message: string, context?: LogContext) {
-  console.warn(`[tiny-chat] ${message}`, formatContext(context));
+  console.warn(`[conyva] ${message}`, formatContext(context));
 }

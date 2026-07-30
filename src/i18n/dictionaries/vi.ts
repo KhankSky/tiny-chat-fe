@@ -1,5 +1,5 @@
 export const vi = {
-  appName: "Tiny Chat",
+  appName: "Conyva",
   appTagline: "Nói chuyện, học tập, kết nối",
   common: {
     logout: "Đăng xuất",
@@ -28,7 +28,7 @@ export const vi = {
     badge: "Xây dựng cuộc trò chuyện ý nghĩa nhanh hơn",
     title: "Trải nghiệm chat gọn gàng cho luyện ngôn ngữ, cộng đồng và hỗ trợ.",
     description:
-      "Tiny Chat được thiết kế như một nền tảng front-end đơn giản nhưng có thể mở rộng. Chúng ta tách riêng landing, auth và luồng sản phẩm để mọi tính năng đều dễ phát triển.",
+      "Conyva là không gian đơn giản, linh hoạt để trò chuyện, luyện ngôn ngữ, kết nối cộng đồng và nhận hỗ trợ.",
     primaryCta: "Bắt đầu ngay",
     secondaryCta: "Xem cách hoạt động",
     previewTitle: "Xem trước",
@@ -65,10 +65,10 @@ export const vi = {
     loginDescription:
       "Đăng nhập để tiếp tục cuộc trò chuyện, lấy lại hồ sơ và đi vào ứng dụng chính.",
     registerDescription:
-      "Tạo tài khoản Tiny Chat trước. Phần hoàn thiện hồ sơ được tách riêng để luồng auth luôn nhanh và gọn.",
+      "Tạo tài khoản Conyva trước. Phần hoàn thiện hồ sơ được tách riêng để luồng auth luôn nhanh và gọn.",
     completeProfileTitle: "Hoàn thiện hồ sơ",
     completeProfileDescription:
-      "Thông tin này giúp Tiny Chat gợi ý chủ đề và kết nối bạn với những cuộc hội thoại phù hợp hơn.",
+      "Thông tin này giúp Conyva gợi ý chủ đề và kết nối bạn với những cuộc hội thoại phù hợp hơn.",
     emailLabel: "Email",
     passwordLabel: "Mật khẩu",
     confirmPasswordLabel: "Nhập lại mật khẩu",
@@ -324,7 +324,7 @@ export const vi = {
   },
   profile: {
     title: "Hồ sơ cá nhân",
-    description: "Cập nhật tên hiển thị và avatar dùng trong Tiny Chat.",
+    description: "Cập nhật tên hiển thị và avatar dùng trong Conyva.",
     loadError: "Không thể tải hồ sơ",
     saveError: "Không thể lưu hồ sơ",
     userIdLabel: "User ID",

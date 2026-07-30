@@ -1,5 +1,5 @@
 export const en = {
-  appName: "Tiny Chat",
+  appName: "Conyva",
   appTagline: "Talk, learn, connect",
   common: {
     anonymous: "Anonymous",
@@ -28,7 +28,7 @@ export const en = {
     badge: "Build meaningful conversations faster",
     title: "A clean chat experience for language practice, communities, and support.",
     description:
-      "Tiny Chat is set up as a simple, scalable front-end foundation. We keep marketing pages separate from auth and product flows so every feature stays easy to grow.",
+      "Conyva is a simple, scalable space for meaningful conversations, language practice, communities, and support.",
     primaryCta: "Get started",
     secondaryCta: "See how it works",
     previewTitle: "Preview",
@@ -65,10 +65,10 @@ export const en = {
     loginDescription:
       "Sign in to continue the conversation, pick up your profile, and move into the main app.",
     registerDescription:
-      "Set up a Tiny Chat account first. We keep the profile onboarding separate so the auth flow stays fast and clean.",
+      "Set up a Conyva account first. We keep the profile onboarding separate so the auth flow stays fast and clean.",
     completeProfileTitle: "Complete your profile",
     completeProfileDescription:
-      "This helps Tiny Chat match you with better topics and conversations.",
+      "This helps Conyva match you with better topics and conversations.",
     emailLabel: "Email",
     passwordLabel: "Password",
     confirmPasswordLabel: "Confirm password",
@@ -324,7 +324,7 @@ export const en = {
   },
   profile: {
     title: "My profile",
-    description: "Update your display name and avatar used inside Tiny Chat.",
+    description: "Update your display name and avatar used inside Conyva.",
     loadError: "Could not load profile",
     saveError: "Could not save profile",
     userIdLabel: "User ID",

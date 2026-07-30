@@ -4,10 +4,19 @@ import { ThemeInitializer } from "@/theme/theme-initializer";
 
 export const metadata: Metadata = {
   title: {
-    default: "Tiny Chat",
-    template: "%s | Tiny Chat",
+    default: "Conyva",
+    template: "%s | Conyva",
   },
-  description: "A clean front-end foundation for Tiny Chat.",
+  description: "Conyva — talk, learn, and connect in one place.",
+  metadataBase: new URL("https://conyva.app"),
+  alternates: { canonical: "https://conyva.app" },
+  openGraph: {
+    title: "Conyva",
+    description: "Talk, learn, and connect with Conyva.",
+    url: "https://conyva.app",
+    siteName: "Conyva",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
