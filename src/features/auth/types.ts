@@ -34,4 +34,7 @@ export type CompleteProfileRequest = {
     | "IELTS_BASIC";
   interests: string[];
   bio: string | null;
+  timezone: string;
+  availability: ("MORNING" | "AFTERNOON" | "EVENING" | "LATE_NIGHT" | "WEEKEND")[];
+  practiceFrequency: "CASUAL" | "FEW_TIMES_A_WEEK" | "ALMOST_DAILY";
 };
