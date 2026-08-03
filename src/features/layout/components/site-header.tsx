@@ -24,7 +24,7 @@ export function SiteHeader({
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
         <Link href={locale ? `/${locale}` : "/"} className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/15 text-sm font-semibold text-cyan-300 ring-1 ring-inset ring-cyan-400/30">
-            TC
+            C
           </span>
           <div className="min-w-0">
             <p className="text-sm font-semibold tracking-wide text-white">

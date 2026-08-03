@@ -67,7 +67,7 @@ export function ConversationListPage({
           <div className="tc-chat-canvas flex min-h-0 flex-1 items-center justify-center bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_32%),linear-gradient(180deg,rgba(2,6,23,0.16),rgba(2,6,23,0.35))] px-6">
             <div className="max-w-md text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-400/20 bg-cyan-400/10 text-2xl font-semibold text-cyan-200">
-                TC
+                C
               </div>
               <h1 className="mt-5 text-2xl font-semibold text-white">
                 {t.selectConversationTitle}
