@@ -46,22 +46,24 @@ export function reconcileIncomingMessage(
     return messages;
   }
 
-  const matchingOptimisticMessage = messages.some(
-    (message) =>
-      message.senderId === nextMessage.senderId &&
-      message.content === nextMessage.content &&
-      message.messageId < 0 &&
-      Math.abs(new Date(message.sentAt).getTime() - new Date(nextMessage.sentAt).getTime()) <
-        15_000,
-  );
+  const matchingOptimisticMessage = messages
+    .filter(
+      (message) =>
+        message.senderId === nextMessage.senderId &&
+        message.content === nextMessage.content &&
+        message.messageId < 0 &&
+        Math.abs(new Date(message.sentAt).getTime() - new Date(nextMessage.sentAt).getTime()) <
+          15_000,
+    )
+    .sort(
+      (left, right) =>
+        Math.abs(new Date(left.sentAt).getTime() - new Date(nextMessage.sentAt).getTime()) -
+        Math.abs(new Date(right.sentAt).getTime() - new Date(nextMessage.sentAt).getTime()),
+    )[0];
 
   if (matchingOptimisticMessage) {
     return messages.map((message) =>
-      message.messageId < 0 &&
-      message.senderId === nextMessage.senderId &&
-      message.content === nextMessage.content
-        ? nextMessage
-        : message,
+      message.messageId === matchingOptimisticMessage.messageId ? nextMessage : message,
     );
   }
 
