@@ -68,6 +68,7 @@ export function useChatRoom({
   const hasOlderMessagesRef = useRef(true);
   const loadingOlderRef = useRef(false);
   const loadingOlderMessagesRef = useRef(false);
+  const sendingMessageRef = useRef(false);
   const accessToken = useMemo(() => getAccessToken(), []);
 
   const refreshStreaksAfterFirstActivity = useCallback(async () => {
@@ -375,8 +376,12 @@ export function useChatRoom({
   }, [currentUser?.userId, groupId, messages, socketStatus]);
 
   async function sendMessage(replyTopic?: { id: number; content: string } | null) {
+    if (sendingMessageRef.current) return;
+
     const trimmed = content.trim();
     if (!trimmed) return;
+
+    sendingMessageRef.current = true;
 
     const optimisticMessage = createOptimisticMessage({
       content: trimmed,
@@ -432,6 +437,12 @@ export function useChatRoom({
       });
       setContent(trimmed);
       setSocketError(err instanceof Error ? err.message : copy.sendMessageError);
+    } finally {
+      // Prevent a key event and its form submit event from publishing the
+      // same message before React applies the cleared input state.
+      window.setTimeout(() => {
+        sendingMessageRef.current = false;
+      }, 0);
     }
   }
 

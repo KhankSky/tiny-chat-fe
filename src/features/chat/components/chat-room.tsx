@@ -422,12 +422,6 @@ export function ChatRoom({
           <Input
             value={content}
             onChange={(event) => setContent(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void handleSendMessage();
-              }
-            }}
             className="h-12 flex-1 rounded-full px-5 pr-12 text-sm"
             placeholder={socketStatus === "connected" ? t.writeMessage : t.waitingForConnection}
             disabled={false}
