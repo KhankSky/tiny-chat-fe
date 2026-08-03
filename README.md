@@ -16,6 +16,16 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Environment variables
+
+Copy `.env.example` to `.env.local` for local development. In production, set
+`NEXT_PUBLIC_API_URL` to the public backend origin, for example
+`https://api.example.com`. It is a public, build-time value, so rebuild and
+redeploy the frontend after changing it.
+
+`NEXT_PUBLIC_API_BASE_URL` remains supported for existing deployments, but
+`NEXT_PUBLIC_API_URL` takes precedence.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

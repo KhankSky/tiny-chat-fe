@@ -15,8 +15,11 @@ function isLocalFrontendOrigin(origin: string) {
 }
 
 export function getApiBaseUrl() {
-  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
-    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  const configuredApiUrl =
+    process.env.NEXT_PUBLIC_API_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  if (configuredApiUrl) {
+    return configuredApiUrl.replace(/\/$/, "");
   }
 
   if (typeof window !== "undefined") {
