@@ -26,20 +26,18 @@ export const vi = {
     backToChat: "Quay lại trang chat",
   },
   landing: {
-    badge: "Nhóm nhỏ • Chủ đề mỗi ngày • Duy trì streak",
+    badge: "Nhóm nhỏ • Ghép phù hợp • Duy trì streak",
     title: "Luyện tiếng Anh mỗi ngày qua những cuộc trò chuyện thật.",
     description:
-      "Conyva ghép bạn vào nhóm nhỏ phù hợp với trình độ, mục tiêu và sở thích, để bạn luôn có người cùng luyện và chủ đề để bắt đầu.",
+      "Conyva ghép bạn vào nhóm nhỏ phù hợp với trình độ, mục tiêu và sở thích, để bạn luôn có người cùng luyện.",
     primaryCta: "Tìm nhóm để luyện ngay",
     completeProfileCta: "Hoàn thiện hồ sơ",
     findGroupCta: "Tìm nhóm phù hợp",
     returnToChatCta: "Quay lại cuộc trò chuyện",
     secondaryCta: "Cách Conyva hoạt động",
     previewTitle: "Xem trước",
-    previewGroupName: "Daily English — A2",
+    previewGroupName: "English Conversation — A2",
     previewGroupMeta: "4 thành viên · Đang hoạt động hôm nay",
-    previewTopicLabel: "Chủ đề mỗi ngày",
-    previewTopic: "What was the best part of your day?",
     previewStreak: "Streak nhóm · 5 ngày",
     previewJoinCta: "Tìm nhóm",
     bubbles: [
@@ -51,7 +49,7 @@ export const vi = {
     trustItems: [
       "Nhóm nhỏ, dễ bắt đầu nói",
       "Phù hợp nhiều trình độ",
-      "Không cần tự tìm chủ đề một mình",
+      "Không gian thân thiện để bắt đầu nói",
       "Luyện đều cùng nhau mỗi ngày",
     ],
     benefitsLabel: "Conyva giúp gì cho bạn?",
@@ -63,9 +61,9 @@ export const vi = {
           "Ghép với những người cùng trình độ, mục tiêu và sở thích thay vì bị lạc trong một nhóm đông.",
       },
       {
-        title: "Luôn có chủ đề để bắt đầu",
+        title: "Bắt đầu trò chuyện tự nhiên",
         description:
-          "Chủ đề mỗi ngày giúp bạn không phải tự nghĩ xem hôm nay nên nói gì.",
+          "Nhóm nhỏ thân thiện giúp bạn dễ chào hỏi, chia sẻ và duy trì cuộc trò chuyện.",
       },
       {
         title: "Cùng nhau duy trì thói quen",
@@ -78,7 +76,7 @@ export const vi = {
     steps: [
       { title: "Cho Conyva biết về bạn", description: "Chọn trình độ, mục tiêu và sở thích." },
       { title: "Tham gia nhóm nhỏ", description: "Conyva tìm những người phù hợp với bạn." },
-      { title: "Bắt đầu trò chuyện", description: "Dùng chủ đề mỗi ngày và luyện cùng nhau." },
+      { title: "Bắt đầu trò chuyện", description: "Làm quen với nhóm và luyện cùng nhau." },
     ],
     fitLabel: "Conyva có hợp với bạn không?",
     fitTitle: "Dành cho người muốn nói nhưng chưa biết bắt đầu từ đâu.",

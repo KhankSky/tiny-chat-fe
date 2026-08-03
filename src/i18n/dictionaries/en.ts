@@ -26,20 +26,18 @@ export const en = {
     switchLabel: "VI",
   },
   landing: {
-    badge: "Small groups • Daily topics • Keep your streak",
+    badge: "Small groups • Thoughtful matching • Keep your streak",
     title: "Practice English every day through real conversations.",
     description:
-      "Conyva matches you with a small group based on your level, goals, and interests, so you always have people to practice with and a topic to start from.",
+      "Conyva matches you with a small group based on your level, goals, and interests, so you always have people to practice with.",
     primaryCta: "Find a group to practice",
     completeProfileCta: "Complete your profile",
     findGroupCta: "Find a group",
     returnToChatCta: "Back to conversation",
     secondaryCta: "How Conyva works",
     previewTitle: "Preview",
-    previewGroupName: "Daily English — A2",
+    previewGroupName: "English Conversation — A2",
     previewGroupMeta: "4 members · Active today",
-    previewTopicLabel: "Daily topic",
-    previewTopic: "What was the best part of your day?",
     previewStreak: "Group streak · 5 days",
     previewJoinCta: "Find a group",
     bubbles: [
@@ -51,7 +49,7 @@ export const en = {
     trustItems: [
       "Small groups, easy to speak up",
       "For different language levels",
-      "A daily topic is ready for you",
+      "A welcoming space to speak up",
       "Practice consistently, together",
     ],
     benefitsLabel: "What Conyva does for you",
@@ -63,9 +61,9 @@ export const en = {
           "Match with people who share your level, goals, and interests instead of getting lost in a crowded group.",
       },
       {
-        title: "Always have a topic to start from",
+        title: "Start conversations naturally",
         description:
-          "Daily topics give your group an easy starting point, so you never have to wonder what to say.",
+          "A small, friendly group makes it easier to say hello, share, and keep the conversation going.",
       },
       {
         title: "Build a habit together",
@@ -78,7 +76,7 @@ export const en = {
     steps: [
       { title: "Tell us about you", description: "Choose your level, goals, and interests." },
       { title: "Join a small group", description: "Conyva finds people who are a good fit." },
-      { title: "Start the conversation", description: "Use the daily topic and practice together." },
+      { title: "Start the conversation", description: "Get to know your group and practice together." },
     ],
     fitLabel: "Is Conyva right for you?",
     fitTitle: "Built for people who want to speak, but do not know where to begin.",

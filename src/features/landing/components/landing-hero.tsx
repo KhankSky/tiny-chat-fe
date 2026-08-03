@@ -105,14 +105,7 @@ export function LandingHero({
             <Users className="mt-1 h-5 w-5 shrink-0 text-cyan-300" aria-hidden="true" />
           </div>
 
-          <div className="mt-5 rounded-2xl border border-cyan-400/15 bg-cyan-400/5 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-cyan-300">
-              {dictionary.landing.previewTopicLabel}
-            </p>
-            <p className="mt-1 text-sm leading-6 text-slate-100">{dictionary.landing.previewTopic}</p>
-          </div>
-
-          <div className="mt-4 space-y-4">
+          <div className="mt-5 space-y-4">
             {dictionary.landing.bubbles.map((bubble, index) => (
               <MessageBubble
                 key={bubble.label}
