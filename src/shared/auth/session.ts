@@ -31,8 +31,11 @@ function readStoredAuthUser(): AuthUserResponse | null {
 export function persistAuthSession(user: AuthUserResponse) {
   if (typeof window === "undefined") return;
 
-  accessToken = user.accessToken;
-  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  const currentUser = getStoredAuthUser();
+  const nextAccessToken = user.accessToken ?? accessToken ?? currentUser?.accessToken ?? null;
+  const nextUser = { ...user, accessToken: nextAccessToken };
+  accessToken = nextAccessToken;
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(nextUser));
   cachedAuthUserRaw = null;
 }
 

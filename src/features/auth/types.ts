@@ -1,5 +1,5 @@
 export type AuthUserResponse = {
-  accessToken: string;
+  accessToken: string | null;
   userId: number;
   email: string;
   authProvider: "LOCAL" | "GOOGLE";
