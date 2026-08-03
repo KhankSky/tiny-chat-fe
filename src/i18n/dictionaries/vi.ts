@@ -47,6 +47,13 @@ export const vi = {
       { label: "Lan", text: "That sounds nice! I enjoyed a walk after work." },
       { label: "Bạn", text: "The best part was cooking dinner with my family." },
     ],
+    trustTitle: "Một cách nhẹ nhàng hơn để bắt đầu nói.",
+    trustItems: [
+      "Nhóm nhỏ, dễ bắt đầu nói",
+      "Phù hợp nhiều trình độ",
+      "Không cần tự tìm chủ đề một mình",
+      "Luyện đều cùng nhau mỗi ngày",
+    ],
     features: [
       {
         title: "Tìm đúng người để luyện",
@@ -71,6 +78,10 @@ export const vi = {
       { title: "Tham gia nhóm nhỏ", description: "Conyva tìm những người phù hợp với bạn." },
       { title: "Bắt đầu trò chuyện", description: "Dùng chủ đề mỗi ngày và luyện cùng nhau." },
     ],
+    fitLabel: "Conyva có hợp với bạn không?",
+    fitTitle: "Dành cho người muốn nói nhưng chưa biết bắt đầu từ đâu.",
+    fitDescription:
+      "Conyva phù hợp nếu bạn muốn luyện giao tiếp tiếng Anh nhưng ngại bắt đầu, không có bạn cùng luyện, hoặc thường bỏ dở sau vài ngày.",
   },
   auth: {
     loginTitle: "Chào mừng quay lại",

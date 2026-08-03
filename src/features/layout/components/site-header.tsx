@@ -35,7 +35,7 @@ export function SiteHeader({
         </Link>
 
         <nav className="hidden items-center gap-8 text-sm text-slate-300 md:flex">
-          {dictionary.header.nav.map((item) => (
+          {dictionary.header.nav.filter((item) => item.href !== "#contact").map((item) => (
             <a key={item.label} href={item.href} className="transition hover:text-white">
               {item.label}
             </a>

@@ -1,11 +1,25 @@
 import type { Dictionary } from "@/i18n/types";
-import { MessageCircle, SlidersHorizontal, Users } from "lucide-react";
+import { CheckCircle2, MessageCircle, SlidersHorizontal, Sparkles, Users } from "lucide-react";
 
 const featureIcons = [SlidersHorizontal, MessageCircle, Users] as const;
 
 export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
   return (
     <section id="features" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
+      <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/5 px-5 py-4 sm:rounded-3xl sm:px-6">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <p className="text-sm font-semibold text-white">{dictionary.landing.trustTitle}</p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-300">
+            {dictionary.landing.trustItems.map((item) => (
+              <li key={item} className="flex items-center gap-2">
+                <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-300" aria-hidden="true" />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
       <div className="grid gap-4 md:grid-cols-3">
         {dictionary.landing.features.map((feature, index) => {
           const Icon = featureIcons[index] ?? MessageCircle;
@@ -50,6 +64,25 @@ export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
           </div>
         </div>
       </div>
+
+      <section className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-5 sm:mt-8 sm:rounded-3xl sm:p-6">
+        <div className="flex max-w-3xl gap-4">
+          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 ring-1 ring-inset ring-cyan-400/20">
+            <Sparkles className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300 sm:text-sm sm:tracking-[0.3em]">
+              {dictionary.landing.fitLabel}
+            </p>
+            <h2 className="mt-2 text-xl font-semibold text-white sm:text-2xl">
+              {dictionary.landing.fitTitle}
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-slate-300 sm:text-base">
+              {dictionary.landing.fitDescription}
+            </p>
+          </div>
+        </div>
+      </section>
     </section>
   );
 }

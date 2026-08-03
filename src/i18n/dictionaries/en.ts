@@ -47,6 +47,13 @@ export const en = {
       { label: "Lan", text: "That sounds nice! I enjoyed a walk after work." },
       { label: "You", text: "The best part was cooking dinner with my family." },
     ],
+    trustTitle: "A calmer way to start speaking.",
+    trustItems: [
+      "Small groups, easy to speak up",
+      "For different language levels",
+      "A daily topic is ready for you",
+      "Practice consistently, together",
+    ],
     features: [
       {
         title: "Find the right people to practice with",
@@ -71,6 +78,10 @@ export const en = {
       { title: "Join a small group", description: "Conyva finds people who are a good fit." },
       { title: "Start the conversation", description: "Use the daily topic and practice together." },
     ],
+    fitLabel: "Is Conyva right for you?",
+    fitTitle: "Built for people who want to speak, but do not know where to begin.",
+    fitDescription:
+      "Conyva is for you if you want to practice English conversation but feel shy about starting, do not have a practice partner, or often stop studying after a few days.",
   },
   auth: {
     loginTitle: "Welcome back",
