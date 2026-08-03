@@ -23,9 +23,16 @@ export function AuthForm({
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const isLogin = mode === "login";
+
+  useEffect(() => {
+    if (isLogin && new URLSearchParams(window.location.search).get("registered") === "1") {
+      setSuccess(dictionary.auth.registerSuccess);
+    }
+  }, [isLogin]);
 
   async function handleGoogleCredential(response: { credential: string }) {
     setError(null);
@@ -78,17 +85,24 @@ export function AuthForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setSuccess(null);
     setLoading(true);
 
     try {
-      const user = isLogin
-        ? await login({ email, password })
-        : await register({ email, password, confirmPassword });
+      if (!isLogin) {
+        await register({ email, password, confirmPassword });
+        router.replace("/auth/login?registered=1");
+        return;
+      }
+
+      const user = await login({ email, password });
 
       persistAuthSession(user);
-      router.push(
-        user.profileCompleted ? "/conversations" : "/auth/complete-profile",
-      );
+      const nextPath = new URLSearchParams(window.location.search).get("next");
+      const destination = nextPath && nextPath.startsWith("/")
+        ? nextPath
+        : user.profileCompleted ? "/conversations" : "/auth/complete-profile";
+      router.replace(destination);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);
@@ -101,6 +115,11 @@ export function AuthForm({
     <>
       <Script src="https://accounts.google.com/gsi/client" async defer onLoad={initializeGoogle} />
       <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
+      {success ? (
+        <p className="tc-alert-success rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
+          {success}
+        </p>
+      ) : null}
       <div className="space-y-2">
         <label className="text-sm font-medium text-slate-200" htmlFor="email">
           {dictionary.auth.emailLabel}

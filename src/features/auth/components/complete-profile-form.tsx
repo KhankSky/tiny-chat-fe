@@ -13,18 +13,14 @@ import type { Dictionary, Locale } from "@/i18n/types";
 
 type ProfileRequest = CompleteProfileRequest;
 
-const englishLevels = [
-  { value: "LEVEL_A", label: "Beginner" },
-  { value: "LEVEL_B", label: "Intermediate" },
-  { value: "LEVEL_C", label: "Advanced" },
-] as const;
+const englishLevels = ["LEVEL_A", "LEVEL_B", "LEVEL_C"] as const;
 
 const practiceGoals = [
-  { value: "DAILY_CHAT", label: "Daily chat" },
-  { value: "IMPROVE_WRITING", label: "Improve writing" },
-  { value: "MAKE_FRIENDS", label: "Make friends" },
-  { value: "TOEIC_BASIC", label: "TOEIC basic" },
-  { value: "IELTS_BASIC", label: "IELTS basic" },
+  "DAILY_CHAT",
+  "IMPROVE_WRITING",
+  "MAKE_FRIENDS",
+  "TOEIC_BASIC",
+  "IELTS_BASIC",
 ] as const;
 
 const interests = [
@@ -39,7 +35,7 @@ const interests = [
   "TECHNOLOGY",
   "BOOKS",
   "GAMES",
-];
+] as const;
 
 export function CompleteProfileForm({
   dictionary,
@@ -53,11 +49,12 @@ export function CompleteProfileForm({
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
   const [bio, setBio] = useState("");
-  const [englishLevel, setEnglishLevel] = useState<ProfileRequest["englishLevel"]>("LEVEL_A");
+  const [englishLevel, setEnglishLevel] = useState<ProfileRequest["englishLevel"] | "">("");
   const [practiceGoal, setPracticeGoal] =
-    useState<ProfileRequest["practiceGoal"]>("DAILY_CHAT");
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(["DAILY_LIFE"]);
+    useState<ProfileRequest["practiceGoal"] | "">("");
+  const [selectedInterests, setSelectedInterests] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<"englishLevel" | "practiceGoal" | "interests" | null>(null);
   const [loading, setLoading] = useState(false);
 
   function toggleInterest(value: string) {
@@ -83,9 +80,18 @@ export function CompleteProfileForm({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
+    setFieldError(null);
 
+    if (!englishLevel) {
+      setFieldError("englishLevel");
+      return;
+    }
+    if (!practiceGoal) {
+      setFieldError("practiceGoal");
+      return;
+    }
     if (!selectedInterests.length) {
-      setError(t.pickInterestError);
+      setFieldError("interests");
       return;
     }
 
@@ -165,12 +171,14 @@ export function CompleteProfileForm({
             }
             className="min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50 sm:rounded-lg"
           >
+            <option value="">{t.englishLevelPlaceholder}</option>
             {englishLevels.map((level) => (
-              <option key={level.value} value={level.value}>
-                {level.label}
+              <option key={level} value={level}>
+                {dictionary.enums.englishLevel[level]}
               </option>
             ))}
           </select>
+          {fieldError === "englishLevel" ? <FieldError>{t.englishLevelRequired}</FieldError> : null}
         </Field>
 
         <Field label={t.practiceGoalLabel}>
@@ -181,12 +189,14 @@ export function CompleteProfileForm({
             }
             className="min-h-12 w-full rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white outline-none focus:border-cyan-400/50 sm:rounded-lg"
           >
+            <option value="">{t.practiceGoalPlaceholder}</option>
             {practiceGoals.map((goal) => (
-              <option key={goal.value} value={goal.value}>
-                {goal.label}
+              <option key={goal} value={goal}>
+                {dictionary.enums.practiceGoal[goal]}
               </option>
             ))}
           </select>
+          {fieldError === "practiceGoal" ? <FieldError>{t.practiceGoalRequired}</FieldError> : null}
         </Field>
       </div>
 
@@ -205,11 +215,12 @@ export function CompleteProfileForm({
                     : "border-white/10 bg-white/5 text-slate-300 hover:border-white/25"
                 }`}
               >
-                {interest.replaceAll("_", " ")}
+                {dictionary.enums.interest[interest]}
               </button>
             );
           })}
         </div>
+        {fieldError === "interests" ? <FieldError>{t.pickInterestError}</FieldError> : null}
       </Field>
 
       <Field label={t.shortBioLabel}>
@@ -251,4 +262,8 @@ function Field({
       {children}
     </label>
   );
+}
+
+function FieldError({ children }: { children: ReactNode }) {
+  return <span className="block text-sm text-red-300">{children}</span>;
 }

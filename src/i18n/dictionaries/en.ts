@@ -92,7 +92,7 @@ export const en = {
       "Set up a Conyva account first. We keep the profile onboarding separate so the auth flow stays fast and clean.",
     completeProfileTitle: "Complete your profile",
     completeProfileDescription:
-      "This helps Conyva match you with better topics and conversations.",
+      "This helps Conyva match you with a group that fits you better.",
     emailLabel: "Email",
     passwordLabel: "Password",
     confirmPasswordLabel: "Confirm password",
@@ -115,9 +115,14 @@ export const en = {
     googleAuthDescription: "Fast and secure with your Google account",
     authDivider: "Or",
     registerButton: "Create account",
+    registerSuccess: "Registration successful. Please log in to continue.",
     completeProfileButton: "Complete profile",
     backToLanding: "Back to home",
     pickInterestError: "Pick at least one interest.",
+    englishLevelPlaceholder: "Choose your level",
+    practiceGoalPlaceholder: "Choose your main goal",
+    englishLevelRequired: "Choose your English level.",
+    practiceGoalRequired: "Choose your main practice goal.",
     saveProfileError: "Could not save profile",
     errorFallback: "Request failed",
   },
@@ -390,9 +395,9 @@ export const en = {
   },
   enums: {
     englishLevel: {
-      LEVEL_A: "Beginner",
-      LEVEL_B: "Intermediate",
-      LEVEL_C: "Advanced",
+      LEVEL_A: "Beginner — understand words and simple sentences",
+      LEVEL_B: "Basic–intermediate — chat about familiar topics",
+      LEVEL_C: "Advanced — express ideas and keep a conversation going",
     },
     practiceGoal: {
       DAILY_CHAT: "Daily chat",
