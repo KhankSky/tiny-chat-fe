@@ -412,12 +412,24 @@ export const vi = {
       LEVEL_B: "Cơ bản–trung cấp — trò chuyện về chủ đề quen thuộc",
       LEVEL_C: "Khá — diễn đạt ý kiến và duy trì hội thoại",
     },
+    englishLevelDescription: {
+      LEVEL_A: "Tôi hiểu được từ và câu tiếng Anh đơn giản.",
+      LEVEL_B: "Tôi có thể trò chuyện về các chủ đề quen thuộc.",
+      LEVEL_C: "Tôi có thể diễn đạt ý kiến và duy trì hội thoại.",
+    },
     practiceGoal: {
       DAILY_CHAT: "Trò chuyện hằng ngày",
       IMPROVE_WRITING: "Cải thiện cách viết",
       MAKE_FRIENDS: "Tự tin giao tiếp và kết bạn",
       TOEIC_BASIC: "TOEIC cơ bản",
       IELTS_BASIC: "IELTS cơ bản",
+    },
+    practiceGoalDescription: {
+      DAILY_CHAT: "Tạo thói quen qua những cuộc trò chuyện hằng ngày.",
+      IMPROVE_WRITING: "Viết rõ ràng và tự nhiên hơn.",
+      MAKE_FRIENDS: "Gặp gỡ mọi người và tự tin kết nối hơn.",
+      TOEIC_BASIC: "Làm quen với những nền tảng TOEIC cơ bản.",
+      IELTS_BASIC: "Làm quen với những nền tảng IELTS cơ bản.",
     },
     interest: {
       FOOD: "Ẩm thực",

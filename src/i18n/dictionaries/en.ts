@@ -412,12 +412,24 @@ export const en = {
       LEVEL_B: "Basic–intermediate — chat about familiar topics",
       LEVEL_C: "Advanced — express ideas and keep a conversation going",
     },
+    englishLevelDescription: {
+      LEVEL_A: "I can understand simple words and sentences.",
+      LEVEL_B: "I can chat about familiar topics.",
+      LEVEL_C: "I can express ideas and keep a conversation going.",
+    },
     practiceGoal: {
       DAILY_CHAT: "Daily chat",
       IMPROVE_WRITING: "Improve writing",
       MAKE_FRIENDS: "Make friends",
       TOEIC_BASIC: "TOEIC basic",
       IELTS_BASIC: "IELTS basic",
+    },
+    practiceGoalDescription: {
+      DAILY_CHAT: "Build a habit through everyday conversations.",
+      IMPROVE_WRITING: "Write more clearly and naturally.",
+      MAKE_FRIENDS: "Meet people and feel more confident connecting.",
+      TOEIC_BASIC: "Prepare for the fundamentals of TOEIC.",
+      IELTS_BASIC: "Prepare for the fundamentals of IELTS.",
     },
     interest: {
       FOOD: "Food",
