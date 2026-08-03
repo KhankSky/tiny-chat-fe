@@ -26,12 +26,15 @@ export const en = {
     switchLabel: "VI",
   },
   landing: {
-    badge: "Build meaningful conversations faster",
-    title: "A clean chat experience for language practice, communities, and support.",
+    badge: "Small groups • Daily topics • Keep your streak",
+    title: "Practice English every day through real conversations.",
     description:
-      "Conyva is a simple, scalable space for meaningful conversations, language practice, communities, and support.",
-    primaryCta: "Get started",
-    secondaryCta: "See how it works",
+      "Conyva matches you with a small group based on your level, goals, and interests, so you always have people to practice with and a topic to start from.",
+    primaryCta: "Find a group to practice",
+    completeProfileCta: "Complete your profile",
+    findGroupCta: "Find a group",
+    returnToChatCta: "Back to conversation",
+    secondaryCta: "How Conyva works",
     previewTitle: "Preview",
     bubbles: [
       { label: "Teacher", text: "Welcome back. What topic do you want to practice today?" },
@@ -40,25 +43,28 @@ export const en = {
     ],
     features: [
       {
-        title: "Separation of concerns",
+        title: "Find the right people to practice with",
         description:
-          "Landing, auth, and app screens live as distinct modules, so future pages do not leak into each other.",
+          "Match with people who share your level, goals, and interests instead of getting lost in a crowded group.",
       },
       {
-        title: "Reusable UI blocks",
+        title: "Always have a topic to start from",
         description:
-          "Header, hero, and feature cards are isolated into components that can be reused or replaced independently.",
+          "Daily topics give your group an easy starting point, so you never have to wonder what to say.",
       },
       {
-        title: "Auth-ready navigation",
+        title: "Build a habit together",
         description:
-          "The top bar already points to login and register routes, making the next integration step straightforward.",
+          "Group activity and streaks help you come back and practice consistently.",
       },
     ],
-    foundationLabel: "Foundation",
-    foundationTitle: "Ready for login, register, and the main chat app.",
-    foundationDescription:
-      "The structure is intentionally boring in the best way. A small set of focused components now makes it much easier to add routes like auth, profile setup, onboarding, and the actual chat workspace later.",
+    foundationLabel: "How it works",
+    foundationTitle: "Start practicing in three simple steps.",
+    steps: [
+      { title: "Tell us about you", description: "Choose your level, goals, and interests." },
+      { title: "Join a small group", description: "Conyva finds people who are a good fit." },
+      { title: "Start the conversation", description: "Use the daily topic and practice together." },
+    ],
   },
   auth: {
     loginTitle: "Welcome back",

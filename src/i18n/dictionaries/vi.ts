@@ -26,12 +26,15 @@ export const vi = {
     backToChat: "Quay lại trang chat",
   },
   landing: {
-    badge: "Xây dựng cuộc trò chuyện ý nghĩa nhanh hơn",
-    title: "Trải nghiệm chat gọn gàng cho luyện ngôn ngữ, cộng đồng và hỗ trợ.",
+    badge: "Nhóm nhỏ • Chủ đề mỗi ngày • Duy trì streak",
+    title: "Luyện tiếng Anh mỗi ngày qua những cuộc trò chuyện thật.",
     description:
-      "Conyva là không gian đơn giản, linh hoạt để trò chuyện, luyện ngôn ngữ, kết nối cộng đồng và nhận hỗ trợ.",
-    primaryCta: "Bắt đầu ngay",
-    secondaryCta: "Xem cách hoạt động",
+      "Conyva ghép bạn vào nhóm nhỏ phù hợp với trình độ, mục tiêu và sở thích, để bạn luôn có người cùng luyện và chủ đề để bắt đầu.",
+    primaryCta: "Tìm nhóm để luyện ngay",
+    completeProfileCta: "Hoàn thiện hồ sơ",
+    findGroupCta: "Tìm nhóm phù hợp",
+    returnToChatCta: "Quay lại cuộc trò chuyện",
+    secondaryCta: "Cách Conyva hoạt động",
     previewTitle: "Xem trước",
     bubbles: [
       { label: "Giáo viên", text: "Chào mừng bạn quay lại. Hôm nay bạn muốn luyện chủ đề nào?" },
@@ -40,25 +43,28 @@ export const vi = {
     ],
     features: [
       {
-        title: "Tách biệt trách nhiệm",
+        title: "Tìm đúng người để luyện",
         description:
-          "Landing, auth và màn hình app được chia thành module riêng, nên các trang tương lai không chồng chéo nhau.",
+          "Ghép với những người cùng trình độ, mục tiêu và sở thích thay vì bị lạc trong một nhóm đông.",
       },
       {
-        title: "Khối UI tái sử dụng",
+        title: "Luôn có chủ đề để bắt đầu",
         description:
-          "Header, hero và feature cards được tách riêng để có thể dùng lại hoặc thay thế độc lập.",
+          "Chủ đề mỗi ngày giúp bạn không phải tự nghĩ xem hôm nay nên nói gì.",
       },
       {
-        title: "Sẵn sàng cho auth",
+        title: "Cùng nhau duy trì thói quen",
         description:
-          "Thanh điều hướng đã trỏ sẵn tới login và register, giúp tích hợp bước tiếp theo rất nhanh.",
+          "Hoạt động nhóm và streak giúp bạn quay lại luyện tập đều đặn hơn.",
       },
     ],
-    foundationLabel: "Nền tảng",
-    foundationTitle: "Sẵn sàng cho login, register và app chat chính.",
-    foundationDescription:
-      "Cấu trúc được giữ đơn giản theo hướng tốt nhất. Một bộ component nhỏ nhưng tập trung sẽ giúp việc thêm auth, profile setup, onboarding và khu vực chat sau này dễ hơn rất nhiều.",
+    foundationLabel: "Cách Conyva hoạt động",
+    foundationTitle: "Bắt đầu luyện tập qua ba bước đơn giản.",
+    steps: [
+      { title: "Cho Conyva biết về bạn", description: "Chọn trình độ, mục tiêu và sở thích." },
+      { title: "Tham gia nhóm nhỏ", description: "Conyva tìm những người phù hợp với bạn." },
+      { title: "Bắt đầu trò chuyện", description: "Dùng chủ đề mỗi ngày và luyện cùng nhau." },
+    ],
   },
   auth: {
     loginTitle: "Chào mừng quay lại",

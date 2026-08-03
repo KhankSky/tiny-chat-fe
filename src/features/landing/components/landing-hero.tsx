@@ -1,5 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { getConversations } from "@/features/chat/api/chat-api";
+import type { AuthUserResponse } from "@/features/auth/types";
 import type { Dictionary, Locale } from "@/i18n/types";
+import { getStoredAuthUser, subscribeAuthSession } from "@/shared/auth/session";
 
 export function LandingHero({
   dictionary,
@@ -7,6 +13,49 @@ export function LandingHero({
   dictionary: Dictionary;
   locale?: Locale;
 }) {
+  const currentUser = useSyncExternalStore(
+    subscribeAuthSession,
+    () => getStoredAuthUser() as AuthUserResponse | null,
+    () => null,
+  );
+  const [hasConversations, setHasConversations] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    if (!currentUser?.profileCompleted) {
+      return () => {
+        active = false;
+      };
+    }
+
+    void getConversations()
+      .then((conversations) => {
+        if (active) setHasConversations(conversations.length > 0);
+      })
+      .catch(() => {
+        if (active) setHasConversations(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [currentUser]);
+
+  const primaryHref = !currentUser
+    ? "/auth/register"
+    : !currentUser.profileCompleted
+      ? "/auth/complete-profile"
+      : hasConversations
+        ? "/conversations"
+        : "/groups/match";
+  const primaryLabel = !currentUser
+    ? dictionary.landing.primaryCta
+    : !currentUser.profileCompleted
+      ? dictionary.landing.completeProfileCta
+      : hasConversations
+        ? dictionary.landing.returnToChatCta
+        : dictionary.landing.findGroupCta;
+
   return (
     <section className="mx-auto grid max-w-6xl gap-8 px-4 pb-14 pt-10 sm:px-6 sm:pb-20 sm:pt-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-24">
       <div className="space-y-6 sm:space-y-8">
@@ -26,10 +75,10 @@ export function LandingHero({
 
         <div className="flex flex-col gap-3 sm:flex-row">
           <Link
-            href="/auth/register"
+            href={primaryHref}
             className="inline-flex min-h-12 items-center justify-center rounded-full bg-cyan-400 px-6 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
           >
-            {dictionary.landing.primaryCta}
+            {primaryLabel}
           </Link>
           <Link
             href="#how-it-works"

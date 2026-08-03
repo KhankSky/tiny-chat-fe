@@ -19,19 +19,27 @@ export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
 
       <div
         id="how-it-works"
-        className="mt-6 grid gap-5 rounded-2xl border border-white/10 bg-slate-950/70 p-5 sm:mt-8 sm:rounded-3xl sm:p-6 md:grid-cols-2"
+        className="mt-6 rounded-2xl border border-white/10 bg-slate-950/70 p-5 sm:mt-8 sm:rounded-3xl sm:p-6"
       >
-        <div>
+        <div className="grid gap-5 md:grid-cols-[0.8fr_1.2fr]">
+          <div>
           <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300 sm:text-sm sm:tracking-[0.3em]">
             {dictionary.landing.foundationLabel}
           </p>
-          <h2 className="mt-3 text-xl font-semibold text-white sm:text-2xl">
+            <h2 className="mt-3 text-xl font-semibold text-white sm:text-2xl">
             {dictionary.landing.foundationTitle}
-          </h2>
+            </h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {dictionary.landing.steps.map((step, index) => (
+              <article key={step.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <span className="text-sm font-semibold text-cyan-300">0{index + 1}</span>
+                <h3 className="mt-3 text-sm font-semibold text-white">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{step.description}</p>
+              </article>
+            ))}
+          </div>
         </div>
-        <p className="text-sm leading-7 text-slate-300">
-          {dictionary.landing.foundationDescription}
-        </p>
       </div>
     </section>
   );
