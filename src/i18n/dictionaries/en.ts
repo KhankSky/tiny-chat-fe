@@ -36,10 +36,16 @@ export const en = {
     returnToChatCta: "Back to conversation",
     secondaryCta: "How Conyva works",
     previewTitle: "Preview",
+    previewGroupName: "Daily English — A2",
+    previewGroupMeta: "4 members · Active today",
+    previewTopicLabel: "Daily topic",
+    previewTopic: "What was the best part of your day?",
+    previewStreak: "Group streak · 5 days",
+    previewJoinCta: "Join a practice group",
     bubbles: [
-      { label: "Teacher", text: "Welcome back. What topic do you want to practice today?" },
-      { label: "You", text: "I want to practice speaking about travel and daily routines." },
-      { label: "AI Tutor", text: "Perfect. We can start with simple prompts and level up gradually." },
+      { label: "Minh", text: "I had a great coffee with my friend this morning." },
+      { label: "Lan", text: "That sounds nice! I enjoyed a walk after work." },
+      { label: "You", text: "The best part was cooking dinner with my family." },
     ],
     features: [
       {

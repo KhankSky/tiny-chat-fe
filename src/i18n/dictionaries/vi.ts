@@ -36,10 +36,16 @@ export const vi = {
     returnToChatCta: "Quay lại cuộc trò chuyện",
     secondaryCta: "Cách Conyva hoạt động",
     previewTitle: "Xem trước",
+    previewGroupName: "Daily English — A2",
+    previewGroupMeta: "4 thành viên · Đang hoạt động hôm nay",
+    previewTopicLabel: "Chủ đề mỗi ngày",
+    previewTopic: "What was the best part of your day?",
+    previewStreak: "Streak nhóm · 5 ngày",
+    previewJoinCta: "Tham gia luyện cùng nhóm",
     bubbles: [
-      { label: "Giáo viên", text: "Chào mừng bạn quay lại. Hôm nay bạn muốn luyện chủ đề nào?" },
-      { label: "Bạn", text: "Mình muốn luyện nói về du lịch và sinh hoạt hằng ngày." },
-      { label: "AI Tutor", text: "Tuyệt vời. Chúng ta có thể bắt đầu với câu hỏi đơn giản rồi nâng dần độ khó." },
+      { label: "Minh", text: "I had a great coffee with my friend this morning." },
+      { label: "Lan", text: "That sounds nice! I enjoyed a walk after work." },
+      { label: "Bạn", text: "The best part was cooking dinner with my family." },
     ],
     features: [
       {

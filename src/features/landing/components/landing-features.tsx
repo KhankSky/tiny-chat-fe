@@ -1,20 +1,29 @@
 import type { Dictionary } from "@/i18n/types";
+import { MessageCircle, SlidersHorizontal, Users } from "lucide-react";
+
+const featureIcons = [SlidersHorizontal, MessageCircle, Users] as const;
 
 export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
   return (
     <section id="features" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
       <div className="grid gap-4 md:grid-cols-3">
-        {dictionary.landing.features.map((feature) => (
+        {dictionary.landing.features.map((feature, index) => {
+          const Icon = featureIcons[index] ?? MessageCircle;
+          return (
           <article
             key={feature.title}
             className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg shadow-black/20 sm:rounded-3xl sm:p-6"
           >
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300 ring-1 ring-inset ring-cyan-400/20">
+              <Icon className="h-5 w-5" aria-hidden="true" />
+            </span>
             <h2 className="text-lg font-semibold text-white">{feature.title}</h2>
             <p className="mt-3 text-sm leading-7 text-slate-300">
               {feature.description}
             </p>
           </article>
-        ))}
+          );
+        })}
       </div>
 
       <div
@@ -33,7 +42,7 @@ export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
           <div className="grid gap-3 sm:grid-cols-3">
             {dictionary.landing.steps.map((step, index) => (
               <article key={step.title} className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <span className="text-sm font-semibold text-cyan-300">0{index + 1}</span>
+                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-cyan-400 text-sm font-semibold text-slate-950">{index + 1}</span>
                 <h3 className="mt-3 text-sm font-semibold text-white">{step.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-300">{step.description}</p>
               </article>
