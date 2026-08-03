@@ -58,7 +58,7 @@ export function LandingHero({
         : dictionary.landing.findGroupCta;
 
   return (
-    <section className="mx-auto grid max-w-6xl gap-8 px-4 pb-14 pt-10 sm:px-6 sm:pb-20 sm:pt-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-center lg:px-8 lg:pb-28 lg:pt-24">
+    <section className="mx-auto grid max-w-6xl gap-8 px-4 pb-14 pt-10 sm:px-6 sm:pb-20 sm:pt-16 lg:grid-cols-[1.2fr_0.8fr] lg:items-start lg:px-8 lg:pb-24 lg:pt-16">
       <div className="space-y-6 sm:space-y-8">
         <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-sm text-cyan-200 sm:px-4">
           <span className="h-2 w-2 rounded-full bg-cyan-300" />
@@ -128,7 +128,7 @@ export function LandingHero({
               <Flame className="h-4 w-4 text-amber-300" aria-hidden="true" />
               <span>{dictionary.landing.previewStreak}</span>
             </div>
-            <Link href="/groups/match" className="inline-flex items-center gap-1 rounded-full bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-300">
+            <Link href="/groups/match" className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-300">
               <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
               {dictionary.landing.previewJoinCta}
             </Link>

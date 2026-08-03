@@ -7,9 +7,9 @@ export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
   return (
     <section id="features" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-24 lg:px-8">
       <div className="rounded-2xl border border-cyan-400/15 bg-cyan-400/5 px-5 py-4 sm:rounded-3xl sm:px-6">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
           <p className="text-sm font-semibold text-white">{dictionary.landing.trustTitle}</p>
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-300">
+          <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-300">
             {dictionary.landing.trustItems.map((item) => (
               <li key={item} className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 shrink-0 text-cyan-300" aria-hidden="true" />
@@ -20,7 +20,16 @@ export function LandingFeatures({ dictionary }: { dictionary: Dictionary }) {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="mt-10 max-w-2xl">
+        <p className="text-xs font-semibold uppercase tracking-[0.26em] text-cyan-300 sm:text-sm sm:tracking-[0.3em]">
+          {dictionary.landing.benefitsLabel}
+        </p>
+        <h2 className="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+          {dictionary.landing.benefitsTitle}
+        </h2>
+      </div>
+
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
         {dictionary.landing.features.map((feature, index) => {
           const Icon = featureIcons[index] ?? MessageCircle;
           return (

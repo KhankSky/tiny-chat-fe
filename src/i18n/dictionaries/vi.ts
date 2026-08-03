@@ -41,7 +41,7 @@ export const vi = {
     previewTopicLabel: "Chủ đề mỗi ngày",
     previewTopic: "What was the best part of your day?",
     previewStreak: "Streak nhóm · 5 ngày",
-    previewJoinCta: "Tham gia luyện cùng nhóm",
+    previewJoinCta: "Tìm nhóm",
     bubbles: [
       { label: "Minh", text: "I had a great coffee with my friend this morning." },
       { label: "Lan", text: "That sounds nice! I enjoyed a walk after work." },
@@ -54,6 +54,8 @@ export const vi = {
       "Không cần tự tìm chủ đề một mình",
       "Luyện đều cùng nhau mỗi ngày",
     ],
+    benefitsLabel: "Conyva giúp gì cho bạn?",
+    benefitsTitle: "Mọi thứ bạn cần để biến việc nói thành thói quen mỗi ngày.",
     features: [
       {
         title: "Tìm đúng người để luyện",

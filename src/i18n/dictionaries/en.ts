@@ -41,7 +41,7 @@ export const en = {
     previewTopicLabel: "Daily topic",
     previewTopic: "What was the best part of your day?",
     previewStreak: "Group streak · 5 days",
-    previewJoinCta: "Join a practice group",
+    previewJoinCta: "Find a group",
     bubbles: [
       { label: "Minh", text: "I had a great coffee with my friend this morning." },
       { label: "Lan", text: "That sounds nice! I enjoyed a walk after work." },
@@ -54,6 +54,8 @@ export const en = {
       "A daily topic is ready for you",
       "Practice consistently, together",
     ],
+    benefitsLabel: "What Conyva does for you",
+    benefitsTitle: "Everything you need to make speaking a daily habit.",
     features: [
       {
         title: "Find the right people to practice with",
