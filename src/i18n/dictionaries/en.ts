@@ -22,6 +22,7 @@ export const en = {
     ],
     login: "Login",
     register: "Register",
+    backToChat: "Back to chat",
     switchLabel: "VI",
   },
   landing: {

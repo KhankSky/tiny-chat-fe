@@ -84,12 +84,12 @@ export function ConversationSidebar({
               ‹
             </button>
           ) : null}
-          <div className="min-w-0">
+          <Link href="/" className="min-w-0" aria-label="Về trang chủ Conyva">
             <p className="text-xl font-semibold uppercase tracking-[0.35em] text-cyan-300/90">
               {dictionary.appName}
             </p>
             {/*<h1 className="mt-2 text-2xl font-semibold text-white">{t.sidebarTitle}</h1>*/}
-          </div>
+          </Link>
           <Link
             href="/groups/match"
             className="ml-auto inline-flex h-10 shrink-0 items-center rounded-full bg-cyan-400 px-4 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"

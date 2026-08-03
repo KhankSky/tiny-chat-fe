@@ -23,6 +23,7 @@ export const vi = {
     login: "Đăng nhập",
     register: "Đăng ký",
     switchLabel: "EN",
+    backToChat: "Quay lại trang chat",
   },
   landing: {
     badge: "Xây dựng cuộc trò chuyện ý nghĩa nhanh hơn",

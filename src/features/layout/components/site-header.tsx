@@ -1,16 +1,28 @@
+"use client";
+
 import Link from "next/link";
+import { useSyncExternalStore } from "react";
 import type { Dictionary, Locale } from "@/i18n/types";
+import { getStoredAuthUser, subscribeAuthSession } from "@/shared/auth/session";
 
 export function SiteHeader({
   dictionary,
+  locale,
 }: {
   dictionary: Dictionary;
   locale?: Locale;
 }) {
+  const currentUser = useSyncExternalStore(
+    subscribeAuthSession,
+    getStoredAuthUser,
+    () => null,
+  );
+  const chatHref = locale ? `/${locale}/conversations` : "/conversations";
+
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
-        <Link href="/" className="flex items-center gap-3">
+        <Link href={locale ? `/${locale}` : "/"} className="flex items-center gap-3">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-cyan-400/15 text-sm font-semibold text-cyan-300 ring-1 ring-inset ring-cyan-400/30">
             TC
           </span>
@@ -31,18 +43,23 @@ export function SiteHeader({
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
-          <Link
-            href="/auth/login"
-            className="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5 sm:inline-flex"
-          >
-            {dictionary.header.login}
-          </Link>
-          <Link
-            href="/auth/register"
-            className="inline-flex min-h-10 items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
-          >
-            {dictionary.header.register}
-          </Link>
+          {currentUser ? (
+            <Link
+              href={chatHref}
+              className="inline-flex min-h-10 items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300"
+            >
+              {dictionary.header.backToChat}
+            </Link>
+          ) : (
+            <>
+              <Link href="/auth/login" className="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5 sm:inline-flex">
+                {dictionary.header.login}
+              </Link>
+              <Link href="/auth/register" className="inline-flex min-h-10 items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+                {dictionary.header.register}
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
