@@ -10,7 +10,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  if (request.cookies.has("cetrano_refresh")) {
+  if (request.cookies.has("conyva_refresh")) {
     return NextResponse.next();
   }
 
