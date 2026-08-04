@@ -97,9 +97,11 @@ export function AuthForm({
 
       persistAuthSession(user);
       const nextPath = new URLSearchParams(window.location.search).get("next");
-      const destination = nextPath && nextPath.startsWith("/")
-        ? nextPath
-        : user.profileCompleted ? "/conversations" : "/auth/complete-profile";
+      const destination = !user.profileCompleted
+        ? "/auth/complete-profile"
+        : nextPath && nextPath.startsWith("/")
+          ? nextPath
+          : "/conversations";
       router.replace(destination);
     } catch (err) {
       setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);
