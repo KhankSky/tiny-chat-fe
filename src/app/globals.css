@@ -417,3 +417,8 @@ div:has(> div > label > input.sr-only[type="file"]) > label textarea {
   padding-top: 0.75rem !important;
   padding-bottom: 0.75rem !important;
 }
+
+/* Timezone is inferred for this onboarding; do not make users configure it. */
+section:has(#onboarding-step-title) label:has(select) {
+  display: none;
+}

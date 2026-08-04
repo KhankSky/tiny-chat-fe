@@ -97,9 +97,9 @@ async function readJsonResponse<TResponse>(
   }
 }
 
-function buildHeaders(token: string | null, requestId: string) {
+function buildHeaders(token: string | null, requestId: string, isFormData = false) {
   return {
-    "Content-Type": "application/json",
+    ...(isFormData ? {} : { "Content-Type": "application/json" }),
     "X-Request-Id": requestId,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
@@ -121,7 +121,7 @@ async function executeRequest(
     ...init,
     headers: {
       ...init.headers,
-      ...buildHeaders(token, requestId),
+      ...buildHeaders(token, requestId, init.body instanceof FormData),
     },
   });
 
@@ -142,7 +142,7 @@ async function executeRequest(
     ...init,
     headers: {
       ...init.headers,
-      ...buildHeaders(token, requestId),
+      ...buildHeaders(token, requestId, init.body instanceof FormData),
     },
   });
   return response;

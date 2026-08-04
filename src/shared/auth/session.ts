@@ -41,6 +41,9 @@ export function persistAuthSession(user: AuthUserResponse) {
 
 export function getAccessToken() {
   if (typeof window === "undefined") return null;
+  if (!accessToken) {
+    accessToken = getStoredAuthUser()?.accessToken ?? null;
+  }
   return accessToken;
 }
 
