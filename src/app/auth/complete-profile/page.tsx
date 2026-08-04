@@ -8,7 +8,7 @@ export default function CompleteProfilePage() {
 
   return (
     <main className="min-h-screen bg-[#070d18] px-4 py-8 text-white">
-      <div className="mx-auto max-w-4xl rounded-[2rem] border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-black/30">
+      <div className="mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
         <div className="mb-6">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
             {dictionary.appName}

@@ -16,23 +16,20 @@ export default async function CompleteProfilePage({
   const dictionary = getDictionary(locale);
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl items-center px-6 py-12 text-white">
-      <div className="grid w-full gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-        <section className="space-y-5 rounded-lg border border-white/10 bg-white/5 p-8">
+    <main className="min-h-screen bg-[#070d18] px-4 py-8 text-white">
+      <div className="mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-slate-950/80 p-8 shadow-2xl shadow-black/30">
+        <section className="mb-6">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-cyan-300">
             {dictionary.appName}
           </p>
-          <h1 className="text-3xl font-semibold">
+          <h1 className="mt-3 text-3xl font-semibold">
             {dictionary.auth.completeProfileTitle}
           </h1>
-          <p className="text-sm leading-7 text-slate-300">
+          <p className="mt-2 text-sm leading-7 text-slate-300">
             {dictionary.auth.completeProfileDescription}
           </p>
         </section>
-
-        <section className="rounded-lg border border-white/10 bg-slate-950/85 p-6">
-          <CompleteProfileForm locale={locale} dictionary={dictionary} />
-        </section>
+        <CompleteProfileForm locale={locale} dictionary={dictionary} />
       </div>
     </main>
   );
