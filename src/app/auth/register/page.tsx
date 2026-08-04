@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { AuthCard } from "@/features/auth/components/auth-card";
 import { AuthForm } from "@/features/auth/components/auth-form";
 import { useLanguagePreference } from "@/i18n/use-language-preference";
@@ -15,7 +16,9 @@ export default function RegisterPage() {
         locale={locale}
         activeTab="register"
       >
-        <AuthForm mode="register" dictionary={dictionary} locale={locale} />
+        <Suspense fallback={null}>
+          <AuthForm mode="register" dictionary={dictionary} locale={locale} />
+        </Suspense>
     </AuthCard>
   );
 }

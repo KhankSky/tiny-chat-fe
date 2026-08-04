@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { AuthCard } from "@/features/auth/components/auth-card";
 import { AuthForm } from "@/features/auth/components/auth-form";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
@@ -24,7 +25,9 @@ export default async function RegisterPage({
         locale={locale}
         activeTab="register"
       >
-        <AuthForm mode="register" dictionary={dictionary} locale={locale} />
+        <Suspense fallback={null}>
+          <AuthForm mode="register" dictionary={dictionary} locale={locale} />
+        </Suspense>
     </AuthCard>
   );
 }
