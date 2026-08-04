@@ -3,9 +3,9 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import Script from "next/script";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { googleLogin, login, register } from "@/features/auth/api/auth-api";
-import { persistAuthSession } from "@/shared/auth/session";
+import { clearAuthSession, persistAuthSession } from "@/shared/auth/session";
 import type { Dictionary, Locale } from "@/i18n/types";
 
 type Mode = "login" | "register";
@@ -19,6 +19,7 @@ export function AuthForm({
   locale?: Locale;
 }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -27,12 +28,9 @@ export function AuthForm({
   const [loading, setLoading] = useState(false);
 
   const isLogin = mode === "login";
-
-  useEffect(() => {
-    if (isLogin && new URLSearchParams(window.location.search).get("registered") === "1") {
-      setSuccess(dictionary.auth.registerSuccess);
-    }
-  }, [isLogin]);
+  const registeredSuccess = isLogin && searchParams.get("registered") === "1"
+    ? dictionary.auth.registerSuccess
+    : null;
 
   async function handleGoogleCredential(response: { credential: string }) {
     setError(null);
@@ -45,7 +43,6 @@ export function AuthForm({
       const user = await googleLogin({ idToken: response.credential });
       persistAuthSession(user);
       router.push(user.profileCompleted ? "/conversations" : "/auth/complete-profile");
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);
     } finally {
@@ -91,6 +88,7 @@ export function AuthForm({
     try {
       if (!isLogin) {
         await register({ email, password, confirmPassword });
+        clearAuthSession();
         router.replace("/auth/login?registered=1");
         return;
       }
@@ -103,7 +101,6 @@ export function AuthForm({
         ? nextPath
         : user.profileCompleted ? "/conversations" : "/auth/complete-profile";
       router.replace(destination);
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : dictionary.auth.errorFallback);
     } finally {
@@ -115,9 +112,9 @@ export function AuthForm({
     <>
       <Script src="https://accounts.google.com/gsi/client" async defer onLoad={initializeGoogle} />
       <form className="flex flex-col space-y-4" onSubmit={handleSubmit}>
-      {success ? (
+      {success || registeredSuccess ? (
         <p className="tc-alert-success rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-          {success}
+          {success || registeredSuccess}
         </p>
       ) : null}
       <div className="space-y-2">

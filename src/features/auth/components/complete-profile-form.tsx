@@ -3,12 +3,12 @@
 import type { FormEvent, MouseEvent, ReactNode } from "react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { completeProfile, getCurrentUser } from "@/features/auth/api/auth-api";
+import { completeProfile } from "@/features/auth/api/auth-api";
 import type { CompleteProfileRequest } from "@/features/auth/types";
 import { uploadMeAvatar } from "@/features/profile/api/profile-api";
 import { Avatar } from "@/shared/ui/avatar";
-import { persistAuthSession, updateStoredAuthUser } from "@/shared/auth/session";
-import type { Dictionary } from "@/i18n/types";
+import { getStoredAuthUser, persistAuthSession, updateStoredAuthUser } from "@/shared/auth/session";
+import type { Dictionary, Locale } from "@/i18n/types";
 
 type Availability = "MORNING" | "AFTERNOON" | "EVENING" | "LATE_NIGHT" | "WEEKEND";
 type Frequency = "CASUAL" | "FEW_TIMES_A_WEEK" | "ALMOST_DAILY";
@@ -22,7 +22,7 @@ const interests = ["FOOD", "TRAVEL", "STUDY", "WORK", "MUSIC", "MOVIES", "DAILY_
 const availability: Availability[] = ["MORNING", "AFTERNOON", "EVENING", "LATE_NIGHT", "WEEKEND"];
 const frequencies: Frequency[] = ["CASUAL", "FEW_TIMES_A_WEEK", "ALMOST_DAILY"];
 
-export function CompleteProfileForm({ dictionary }: { dictionary: Dictionary }) {
+export function CompleteProfileForm({ dictionary }: { dictionary: Dictionary; locale?: Locale }) {
   const router = useRouter();
   const t = dictionary.auth;
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -43,13 +43,7 @@ export function CompleteProfileForm({ dictionary }: { dictionary: Dictionary }) 
   const [completed, setCompleted] = useState(false);
 
   useEffect(() => {
-    let active = true;
-    getCurrentUser().then((user) => {
-      if (!active) return;
-      persistAuthSession(user);
-      if (user.profileCompleted) router.replace("/conversations");
-    }).catch(() => {});
-    return () => { active = false; };
+    if (getStoredAuthUser()?.profileCompleted) router.replace("/conversations");
   }, [router]);
 
   useEffect(() => {
@@ -146,5 +140,4 @@ function MatchingFields({ t, dictionary, selectedInterests, setSelectedInterests
 function ChoiceCards({ values, selected, labels, descriptions, onSelect }: { values: readonly string[]; selected: string; labels: Record<string, string>; descriptions: Record<string, string>; onSelect: (value: string) => void }) { return <div className="grid gap-3 sm:grid-cols-2">{values.map((value, index) => <button type="button" key={value} aria-pressed={selected === value} onClick={() => onSelect(value)} className={`group min-h-28 rounded-2xl border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 ${selected === value ? "border-cyan-400 bg-cyan-400/15 text-cyan-100" : "border-white/10 bg-white/5 text-slate-200 hover:border-cyan-300/50"}`}><span className="flex items-start gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10 text-lg">{["◎", "✦", "◈", "◉", "◇"][index]}</span><span><span className="block text-sm font-semibold">{labels[value]}</span><span className="mt-1 block text-xs font-normal leading-5 text-slate-400">{descriptions[value]}</span></span></span></button>)}</div>; }
 function Field({ label, children }: { label: string; children: ReactNode }) { return <label className="block space-y-2"><span className="text-sm font-semibold text-slate-200">{label}</span>{children}</label>; }
 function CompletionFinal({ t, onFindGroup }: { t: Dictionary["auth"]; onFindGroup: () => void }) { return <section className="space-y-6 text-center"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cyan-400 text-3xl text-slate-950">✓</div><h2 className="text-2xl font-semibold">{t.profileReadyTitle}</h2><p className="text-slate-300">{t.profileReadyDescription}</p><button type="button" onClick={onFindGroup} className="min-h-11 w-full rounded-full bg-cyan-400 px-5 font-semibold text-slate-950">{t.findMatchingGroupButton}</button></section>; }
-function Review({ dictionary, displayName, englishLevel, practiceGoal, interests, bio }: { dictionary: Dictionary; displayName: string; englishLevel: string; practiceGoal: string; interests: string[]; bio: string }) { const t = dictionary.auth; return <section className="grid gap-3 sm:grid-cols-2">{[[t.displayNameLabel, displayName], [t.englishLevelLabel, dictionary.enums.englishLevel[englishLevel]], [t.practiceGoalLabel, dictionary.enums.practiceGoal[practiceGoal]], [t.interestsLabel, interests.map((value) => dictionary.enums.interest[value]).join(", ")], [t.shortBioLabel, bio || t.noBioLabel]].map(([label, value]) => <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 text-sm text-white">{value}</p></div>)}</section>; }
-function Completion({ t, onFindGroup, onReview }: { t: Dictionary["auth"]; onFindGroup: () => void; onReview: () => void }) { return <section className="space-y-6 text-center"><div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cyan-400 text-3xl text-slate-950">✓</div><h2 className="text-2xl font-semibold">{t.profileReadyTitle}</h2><p className="text-slate-300">{t.profileReadyDescription}</p><div className="flex flex-col gap-3 sm:flex-row"><button type="button" onClick={onFindGroup} className="min-h-11 flex-1 rounded-full bg-cyan-400 px-5 font-semibold text-slate-950">{t.findMatchingGroupButton}</button><button type="button" onClick={onReview} className="min-h-11 flex-1 rounded-full border border-white/15 px-5 font-semibold text-white">{t.reviewProfileButton}</button></div></section>; }
+function Review({ dictionary, displayName, englishLevel, practiceGoal, interests, bio }: { dictionary: Dictionary; displayName: string; englishLevel: string; practiceGoal: string; interests: string[]; bio: string }) { const t = dictionary.auth; const englishLevelLabels = dictionary.enums.englishLevel as Record<string, string>; const practiceGoalLabels = dictionary.enums.practiceGoal as Record<string, string>; const interestLabels = dictionary.enums.interest as Record<string, string>; return <section className="grid gap-3 sm:grid-cols-2">{[[t.displayNameLabel, displayName], [t.englishLevelLabel, englishLevelLabels[englishLevel]], [t.practiceGoalLabel, practiceGoalLabels[practiceGoal]], [t.interestsLabel, interests.map((value) => interestLabels[value]).join(", ")], [t.shortBioLabel, bio || t.noBioLabel]].map(([label, value]) => <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-4"><p className="text-xs text-slate-400">{label}</p><p className="mt-1 text-sm text-white">{value}</p></div>)}</section>; }

@@ -2,7 +2,6 @@
 
 import { AuthCard } from "@/features/auth/components/auth-card";
 import { AuthForm } from "@/features/auth/components/auth-form";
-import { SessionRedirect } from "@/features/auth/components/session-redirect";
 import { useLanguagePreference } from "@/i18n/use-language-preference";
 
 export default function LoginPage() {
@@ -10,7 +9,6 @@ export default function LoginPage() {
 
   return (
     <>
-      <SessionRedirect />
       <AuthCard
         title={dictionary.auth.loginTitle}
         description={dictionary.auth.loginDescription}
