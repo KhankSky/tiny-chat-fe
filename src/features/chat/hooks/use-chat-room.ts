@@ -1,6 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import type { AuthUserResponse } from "@/features/auth/types";
 import {
   getGroupMessages,
@@ -34,6 +42,23 @@ const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
 const lastSyncedReadMessageIds = new Map<number, number>();
 export const GROUP_STREAK_CHANGED_EVENT = "conyva:group-streak-changed";
 export const PERSONAL_STREAK_CHANGED_EVENT = "conyva:personal-streak-changed";
+
+function getChatAttention() {
+  if (typeof document === "undefined") return false;
+  return document.visibilityState === "visible" && document.hasFocus();
+}
+
+function subscribeToChatAttention(onStoreChange: () => void) {
+  document.addEventListener("visibilitychange", onStoreChange);
+  window.addEventListener("focus", onStoreChange);
+  window.addEventListener("blur", onStoreChange);
+
+  return () => {
+    document.removeEventListener("visibilitychange", onStoreChange);
+    window.removeEventListener("focus", onStoreChange);
+    window.removeEventListener("blur", onStoreChange);
+  };
+}
 
 export function useChatRoom({
   currentUser,
@@ -74,6 +99,11 @@ export function useChatRoom({
   const loadingOlderMessagesRef = useRef(false);
   const sendingMessageRef = useRef(false);
   const accessToken = useMemo(() => getAccessToken(), []);
+  const isChatVisible = useSyncExternalStore(
+    subscribeToChatAttention,
+    getChatAttention,
+    () => false,
+  );
 
   const refreshStreaksAfterFirstActivity = useCallback(async () => {
     if (!accessToken) return;
@@ -426,6 +456,8 @@ export function useChatRoom({
   }, [content, publishTyping]);
 
   useEffect(() => {
+    if (!isChatVisible) return;
+
     const lastMessage = messages[messages.length - 1];
     if (!lastMessage?.messageId || lastMessage.messageId < 0 || !currentUser?.userId) return;
     if (lastReadMessageIdRef.current === lastMessage.messageId) return;
@@ -452,7 +484,7 @@ export function useChatRoom({
       }
       // Read sync should not interrupt chat usage.
     });
-  }, [currentUser?.userId, groupId, messages, socketStatus]);
+  }, [currentUser?.userId, groupId, isChatVisible, messages, socketStatus]);
 
   async function sendMessage(replyTopic?: { id: number; content: string } | null) {
     if (sendingMessageRef.current) return;
