@@ -404,15 +404,28 @@ export function GroupSidebar({
       </div>
 
       {isEditing ? (
-        <Modal ariaLabel={t.editGroup} onClose={cancelEdit} className="max-w-md rounded-3xl p-5">
-          <div className="space-y-4">
-            <div>
+        <Modal
+          ariaLabel={t.editGroup}
+          onClose={cancelEdit}
+          fullScreenOnMobile
+          className="overflow-hidden sm:max-w-md sm:rounded-3xl"
+        >
+          <div className="border-b border-white/10 px-5 py-4 sm:px-6 sm:py-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
                 {t.membersEyebrow}
               </p>
               <h3 className="mt-2 text-xl font-semibold text-white">{t.editGroup}</h3>
+                <p className="mt-1 text-sm text-slate-400">{group?.groupName || t.loadingGroup}</p>
+              </div>
+              <Button type="button" onClick={cancelEdit} variant="icon" aria-label={dictionary.common.close}>
+                x
+              </Button>
             </div>
-            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3">
+          </div>
+          <div className="space-y-5 px-5 py-5 sm:px-6">
+            <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-cyan-300/30 bg-cyan-400/[0.04] p-3 transition hover:border-cyan-300/60 hover:bg-cyan-400/[0.08]">
               <Avatar className="h-16 w-16 shrink-0 ring-1 ring-cyan-400/30" src={groupAvatarPreviewUrl || group?.groupAvatarUrl} alt={group?.groupName || t.loadingGroup} />
               <span className="min-w-0 text-sm text-slate-300">
                 <span className="block font-medium text-white">{t.groupAvatarLabel}</span>
@@ -427,26 +440,37 @@ export function GroupSidebar({
                 onChange={(event) => handleGroupAvatarChange(event.target.files?.[0] ?? null)}
               />
             </label>
-            <Input
-              value={groupName}
-              onChange={(event) => setGroupName(event.target.value)}
-              placeholder={t.groupNamePlaceholder}
-            />
-            <Input
-              value={groupDescription}
-              onChange={(event) => setGroupDescription(event.target.value)}
-              placeholder={t.groupDescriptionPlaceholder}
-            />
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-200">{t.groupNamePlaceholder}</span>
+              <Input
+                value={groupName}
+                onChange={(event) => setGroupName(event.target.value)}
+                placeholder={t.groupNamePlaceholder}
+                maxLength={100}
+              />
+            </label>
+            <label className="block space-y-2">
+              <span className="text-sm font-medium text-slate-200">{t.groupDescriptionPlaceholder}</span>
+              <textarea
+                value={groupDescription}
+                onChange={(event) => setGroupDescription(event.target.value)}
+                placeholder={t.groupDescriptionPlaceholder}
+                maxLength={300}
+                rows={4}
+                className="w-full resize-none rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/50"
+              />
+              <span className="block text-right text-xs text-slate-500">{groupDescription.length}/300</span>
+            </label>
             {saveError ? <ErrorMessage>{saveError}</ErrorMessage> : null}
-            <div className="flex gap-2">
+          </div>
+          <div className="flex flex-col-reverse gap-2 border-t border-white/10 px-5 py-4 sm:flex-row sm:justify-end sm:px-6 sm:py-5">
+              <Button type="button" onClick={cancelEdit} disabled={isSaving} variant="ghost">
+                {dictionary.common.cancel}
+              </Button>
               <Button type="button" onClick={saveGroupDetail} disabled={isSaving}>
                 {isSaving ? dictionary.common.saving : dictionary.common.saveChanges}
               </Button>
-              <Button type="button" onClick={cancelEdit} disabled={isSaving} variant="secondary">
-                {dictionary.common.cancel}
-              </Button>
             </div>
-          </div>
         </Modal>
       ) : null}
 

@@ -5,11 +5,13 @@ export function Modal({
   ariaLabel,
   children,
   className,
+  fullScreenOnMobile = false,
   onClose,
 }: {
   ariaLabel: string;
   children: ReactNode;
   className?: string;
+  fullScreenOnMobile?: boolean;
   onClose: () => void;
 }) {
   return (
@@ -17,13 +19,19 @@ export function Modal({
       className="fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-sm"
       onClick={onClose}
     >
-      <div className="flex h-full items-center justify-center p-4 sm:p-6">
+      <div
+        className={cn(
+          "flex h-full items-center justify-center p-4 sm:p-6",
+          fullScreenOnMobile && "!items-stretch !p-0 sm:!items-center sm:!p-6",
+        )}
+      >
         <div
           role="dialog"
           aria-modal="true"
           aria-label={ariaLabel}
           className={cn(
             "w-full max-w-xl rounded-[2rem] border border-white/10 bg-[#0b111c] shadow-2xl shadow-black/40",
+            fullScreenOnMobile && "!h-[100dvh] !max-w-none !rounded-none sm:!h-auto sm:!max-w-xl sm:!rounded-[2rem]",
             className,
           )}
           onClick={(event) => event.stopPropagation()}
