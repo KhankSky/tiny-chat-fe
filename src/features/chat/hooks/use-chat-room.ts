@@ -32,8 +32,8 @@ export type TypingUser = {
 const messageHistoryCache = new Map<number, LocalChatMessage[]>();
 const messageHistoryRequests = new Map<number, Promise<LocalChatMessage[]>>();
 const lastSyncedReadMessageIds = new Map<number, number>();
-export const GROUP_STREAK_CHANGED_EVENT = "tiny-chat:group-streak-changed";
-export const PERSONAL_STREAK_CHANGED_EVENT = "tiny-chat:personal-streak-changed";
+export const GROUP_STREAK_CHANGED_EVENT = "conyva:group-streak-changed";
+export const PERSONAL_STREAK_CHANGED_EVENT = "conyva:personal-streak-changed";
 
 export function useChatRoom({
   currentUser,

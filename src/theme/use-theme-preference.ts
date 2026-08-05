@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 
-const THEME_STORAGE_KEY = "tiny-chat-theme";
-export const THEME_CHANGED_EVENT = "tiny-chat:theme-changed";
+const OLD_THEME_STORAGE_KEY = "tiny-chat-theme";
+const THEME_STORAGE_KEY = "conyva-theme";
+export const THEME_CHANGED_EVENT = "conyva:theme-changed";
 
 export type ThemeMode = "dark" | "light";
 
@@ -15,7 +16,17 @@ function isThemeMode(value: string | null): value is ThemeMode {
 
 export function getStoredTheme(): ThemeMode {
   if (typeof window === "undefined") return "dark";
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  let storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  if (!storedTheme) {
+    const legacyTheme = window.localStorage.getItem(OLD_THEME_STORAGE_KEY);
+    if (legacyTheme) {
+      storedTheme = legacyTheme;
+      try {
+        window.localStorage.setItem(THEME_STORAGE_KEY, legacyTheme);
+        window.localStorage.removeItem(OLD_THEME_STORAGE_KEY);
+      } catch {}
+    }
+  }
   return isThemeMode(storedTheme) ? storedTheme : "dark";
 }
 

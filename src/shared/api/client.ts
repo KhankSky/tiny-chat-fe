@@ -32,9 +32,20 @@ async function requestRefresh(): Promise<string | null> {
   }
 }
 
+async function requestRefreshWithCrossTabLock(): Promise<string | null> {
+  if (typeof navigator === "undefined" || !navigator.locks) {
+    return requestRefresh();
+  }
+
+  // Refresh-token rotation allows one use only. The in-memory promise below
+  // protects concurrent requests in one tab; the Web Lock extends that
+  // protection to every tab opened on the same Conyva origin.
+  return navigator.locks.request("conyva-refresh-token", { mode: "exclusive" }, requestRefresh);
+}
+
 function refreshAccessToken(): Promise<string | null> {
   if (!refreshRequest) {
-    refreshRequest = requestRefresh().finally(() => {
+    refreshRequest = requestRefreshWithCrossTabLock().finally(() => {
       refreshRequest = null;
     });
   }

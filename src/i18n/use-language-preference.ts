@@ -4,8 +4,9 @@ import { useSyncExternalStore } from "react";
 import { dictionaries } from "./dictionaries";
 import type { Dictionary, Locale } from "./types";
 
-const LANGUAGE_STORAGE_KEY = "tiny-chat-language";
-export const LANGUAGE_CHANGED_EVENT = "tiny-chat:language-changed";
+const OLD_LANGUAGE_STORAGE_KEY = "tiny-chat-language";
+const LANGUAGE_STORAGE_KEY = "conyva-language";
+export const LANGUAGE_CHANGED_EVENT = "conyva:language-changed";
 
 export const supportedLocales: Locale[] = ["en", "vi"];
 
@@ -15,7 +16,17 @@ function isLocale(value: string | null): value is Locale {
 
 export function getStoredLocale(): Locale {
   if (typeof window === "undefined") return "vi";
-  const storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  let storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  if (!storedLocale) {
+    const legacyLocale = window.localStorage.getItem(OLD_LANGUAGE_STORAGE_KEY);
+    if (legacyLocale) {
+      storedLocale = legacyLocale;
+      try {
+        window.localStorage.setItem(LANGUAGE_STORAGE_KEY, legacyLocale);
+        window.localStorage.removeItem(OLD_LANGUAGE_STORAGE_KEY);
+      } catch {}
+    }
+  }
   return isLocale(storedLocale) ? storedLocale : "vi";
 }
 

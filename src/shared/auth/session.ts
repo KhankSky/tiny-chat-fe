@@ -1,14 +1,26 @@
 import type { AuthUserResponse } from "@/features/auth/types";
 
-const AUTH_USER_KEY = "tiny-chat.auth-user";
-export const AUTH_SESSION_CHANGED_EVENT = "tiny-chat:auth-session-changed";
+const OLD_AUTH_USER_KEY = "tiny-chat.auth-user";
+const AUTH_USER_KEY = "conyva.auth-user";
+export const AUTH_SESSION_CHANGED_EVENT = "conyva:auth-session-changed";
 
 let cachedAuthUserRaw: string | null | undefined;
 let cachedAuthUser: AuthUserResponse | null = null;
 let accessToken: string | null = null;
 
 function readStoredAuthUser(): AuthUserResponse | null {
-  const raw = localStorage.getItem(AUTH_USER_KEY);
+  let raw = localStorage.getItem(AUTH_USER_KEY);
+  if (!raw) {
+    const legacyRaw = localStorage.getItem(OLD_AUTH_USER_KEY);
+    if (legacyRaw) {
+      raw = legacyRaw;
+      try {
+        localStorage.setItem(AUTH_USER_KEY, legacyRaw);
+        localStorage.removeItem(OLD_AUTH_USER_KEY);
+      } catch {}
+    }
+  }
+
   if (raw === cachedAuthUserRaw) {
     return cachedAuthUser;
   }
@@ -48,7 +60,18 @@ export function getAccessToken() {
 }
 
 export function setAccessToken(token: string) {
+  if (typeof window === "undefined") return;
   accessToken = token;
+
+  // Keep the rotated token durable and let other tabs observe it through the
+  // browser's storage event. Login already stores access tokens here, so this
+  // does not widen the existing storage exposure.
+  const currentUser = getStoredAuthUser();
+  if (currentUser) {
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify({ ...currentUser, accessToken: token }));
+    cachedAuthUserRaw = null;
+    window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
+  }
 }
 
 export function getStoredAuthUser() {
@@ -78,6 +101,7 @@ export function clearAuthSession() {
   if (typeof window === "undefined") return;
   accessToken = null;
   localStorage.removeItem(AUTH_USER_KEY);
+  localStorage.removeItem(OLD_AUTH_USER_KEY);
   cachedAuthUserRaw = null;
   window.dispatchEvent(new Event(AUTH_SESSION_CHANGED_EVENT));
 }
@@ -92,7 +116,7 @@ export function subscribeAuthSession(onStoreChange: () => void) {
   }
 
   function handleStorage(event: StorageEvent) {
-    if (!event.key || event.key === AUTH_USER_KEY) {
+    if (!event.key || event.key === AUTH_USER_KEY || event.key === OLD_AUTH_USER_KEY) {
       onStoreChange();
     }
   }
