@@ -2,10 +2,10 @@ export const en = {
   appName: "Conyva",
   appTagline: "Talk, learn, connect",
   seo: {
-    homeTitle: "Conyva – Practice English in Small Conversation Groups",
-    socialHeadline: "Practice English every day through real conversations.",
-    socialDescription: "Small groups matched by level, goals, and interests.",
-    socialImageAlt: "Conyva: Practice English in small conversation groups",
+    homeTitle: "Conyva – Practice English by Chatting Daily in Small Groups",
+    socialHeadline: "Practice English every day through real chats.",
+    socialDescription: "Chat in small groups matched by level, goals, and interests.",
+    socialImageAlt: "Conyva: Practice English by chatting daily in small groups",
   },
   common: {
     anonymous: "Anonymous",
