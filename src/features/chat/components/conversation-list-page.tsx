@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { logout } from "@/shared/api/client";
 import { useConversations } from "@/features/chat/hooks/use-conversations";
+import { useUnreadTabTitle } from "@/features/chat/hooks/use-unread-tab-title";
 import { ProfileEditorModal } from "@/features/profile/components/profile-editor-modal";
 import { useProfileEditor } from "@/features/profile/hooks/use-profile-editor";
 import type { Dictionary, Locale } from "@/i18n/types";
@@ -28,6 +29,7 @@ export function ConversationListPage({
   const router = useRouter();
   const t = dictionary.chat;
   const conversations = useConversations({ dictionary, locale });
+  useUnreadTabTitle({ appName: dictionary.appName, conversations });
   const profileEditor = useProfileEditor(dictionary);
 
   async function handleLogout() {
