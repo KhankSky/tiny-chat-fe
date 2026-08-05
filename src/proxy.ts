@@ -49,7 +49,9 @@ export function proxy(request: NextRequest) {
   if (
     pathname === `/${routeLocale}` ||
     pathname === `/${routeLocale}/auth/login` ||
-    pathname === `/${routeLocale}/auth/register`
+    pathname === `/${routeLocale}/auth/register` ||
+    pathname === `/${routeLocale}/opengraph-image` ||
+    pathname === `/${routeLocale}/twitter-image`
   ) {
     return withLocalePreference(request, routeLocale);
   }

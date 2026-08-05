@@ -1,6 +1,12 @@
 export const vi = {
   appName: "Conyva",
   appTagline: "Nói chuyện, học tập, kết nối",
+  seo: {
+    homeTitle: "Conyva – Luyện nói tiếng Anh theo nhóm nhỏ",
+    socialHeadline: "Luyện tiếng Anh mỗi ngày qua những cuộc trò chuyện thật.",
+    socialDescription: "Nhóm nhỏ phù hợp với trình độ, mục tiêu và sở thích của bạn.",
+    socialImageAlt: "Conyva: Luyện nói tiếng Anh theo nhóm nhỏ",
+  },
   common: {
     logout: "Đăng xuất",
     anonymous: "Ẩn danh",
