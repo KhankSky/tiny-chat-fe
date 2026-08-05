@@ -41,14 +41,34 @@ function restoreFavicon(link: HTMLLinkElement, snapshot: FaviconSnapshot | null)
   }
 }
 
-function createUnreadFavicon() {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-    <rect x="5" y="5" width="46" height="46" rx="12" fill="#22d3ee"/>
-    <text x="28" y="37" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" font-weight="700" fill="#083344">C</text>
-    <circle cx="50" cy="14" r="12" fill="#ef4444" stroke="#ffffff" stroke-width="3"/>
-  </svg>`;
+function createUnreadFavicon(faviconHref: string) {
+  return new Promise<string>((resolve, reject) => {
+    const sourceImage = new Image();
+    sourceImage.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 64;
+      canvas.height = 64;
 
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+      const context = canvas.getContext("2d");
+      if (!context) {
+        reject(new Error("Unable to create a favicon canvas."));
+        return;
+      }
+
+      context.drawImage(sourceImage, 0, 0, 64, 64);
+      context.beginPath();
+      context.arc(51, 13, 11, 0, Math.PI * 2);
+      context.fillStyle = "#ef4444";
+      context.fill();
+      context.lineWidth = 3;
+      context.strokeStyle = "#ffffff";
+      context.stroke();
+
+      resolve(canvas.toDataURL("image/png"));
+    };
+    sourceImage.onerror = () => reject(new Error("Unable to load the original favicon."));
+    sourceImage.src = faviconHref;
+  });
 }
 
 export function useUnreadTabTitle({
@@ -88,13 +108,37 @@ export function useUnreadTabTitle({
 
   useEffect(() => {
     const favicon = getFaviconLink();
+    let isCurrent = true;
 
     if (unreadCount > 0) {
-      favicon.href = createUnreadFavicon();
-      favicon.type = "image/svg+xml";
-      return;
+      const originalHref = initialFaviconRef.current?.href;
+      if (!originalHref) {
+        return () => {
+          isCurrent = false;
+        };
+      }
+
+      void createUnreadFavicon(originalHref)
+        .then((faviconWithBadge) => {
+          if (!isCurrent) {
+            return;
+          }
+
+          favicon.href = faviconWithBadge;
+          favicon.type = "image/png";
+        })
+        .catch(() => {
+          // Keep the original favicon if the browser cannot draw it on a canvas.
+        });
+
+      return () => {
+        isCurrent = false;
+      };
     }
 
     restoreFavicon(favicon, initialFaviconRef.current);
+    return () => {
+      isCurrent = false;
+    };
   }, [unreadCount]);
 }
