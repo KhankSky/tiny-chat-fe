@@ -43,6 +43,7 @@ export function ConversationSidebar({
   const t = dictionary.chat;
   const [userStreak, setUserStreak] = useState<UserStreakResponse | null>(null);
   const currentUserId = currentUser?.userId;
+  const visibleUserStreak = userStreak?.userId === currentUserId ? userStreak : null;
 
   useEffect(() => {
     let active = true;
@@ -156,9 +157,9 @@ export function ConversationSidebar({
                 <span className="truncate text-sm font-semibold text-white">
                 {currentUser?.displayName || currentUser?.email || dictionary.common.you}
                 </span>
-                {userStreak ? (
-                  <span title={`${t.personalStreak}: ${userStreak.currentStreak} ${t.streakDays}`} className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200/20 bg-amber-300/10 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-200">
-                    <span aria-hidden="true">🔥</span>{userStreak.currentStreak}
+                {visibleUserStreak ? (
+                  <span title={`${t.personalStreak}: ${visibleUserStreak.currentStreak} ${t.streakDays}`} className="inline-flex shrink-0 items-center gap-1 rounded-full border border-amber-200/20 bg-amber-300/10 px-1.5 py-0.5 text-[10px] font-bold leading-none text-amber-200">
+                    <span aria-hidden="true">🔥</span>{visibleUserStreak.currentStreak}
                   </span>
                 ) : null}
               </span>

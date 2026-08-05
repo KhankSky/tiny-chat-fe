@@ -1,4 +1,5 @@
 import { apiGet, apiPost } from "@/shared/api/client";
+import { getStoredAuthUser } from "@/shared/auth/session";
 import type {
   ChatMessage,
   ConversationResponse,
@@ -9,9 +10,19 @@ import type {
   UserStreakResponse,
 } from "../types";
 
-let myStreakCache: UserStreakResponse | null = null;
-let myStreakRequest: Promise<UserStreakResponse> | null = null;
-let myStreakActivityRefreshUsed = false;
+type UserStreakCache = {
+  userId: number;
+  streak: UserStreakResponse;
+};
+
+type UserStreakRequest = {
+  userId: number;
+  promise: Promise<UserStreakResponse>;
+};
+
+let myStreakCache: UserStreakCache | null = null;
+let myStreakRequest: UserStreakRequest | null = null;
+const myStreakActivityRefreshUsed = new Set<number>();
 const groupStreakCache = new Map<number, GroupStreakResponse>();
 const groupStreakRequests = new Map<number, Promise<GroupStreakResponse>>();
 const groupStreakActivityRefreshUsed = new Set<number>();
@@ -53,28 +64,36 @@ export function getMyStreak() {
   return apiGet<UserStreakResponse>("/api/me/streak");
 }
 
-export function getMyStreakCached(_options: { force?: boolean } = {}) {
-  if (myStreakRequest) return myStreakRequest;
-  if (myStreakCache) {
-    return Promise.resolve(myStreakCache);
+export function getMyStreakCached({ force = false }: { force?: boolean } = {}) {
+  const userId = getStoredAuthUser()?.userId;
+  if (!userId) return getMyStreak();
+
+  if (myStreakRequest?.userId === userId) return myStreakRequest.promise;
+  if (!force && myStreakCache?.userId === userId) {
+    return Promise.resolve(myStreakCache.streak);
   }
 
-  myStreakRequest = getMyStreak()
+  const request = getMyStreak()
     .then((streak) => {
-      myStreakCache = streak;
+      myStreakCache = { userId, streak };
       return streak;
     })
     .finally(() => {
-      myStreakRequest = null;
+      if (myStreakRequest?.promise === request) {
+        myStreakRequest = null;
+      }
     });
+  myStreakRequest = { userId, promise: request };
 
-  return myStreakRequest;
+  return request;
 }
 
 export function refreshMyStreakAfterActivityOnce() {
-  if (myStreakActivityRefreshUsed) return getMyStreakCached();
-  myStreakActivityRefreshUsed = true;
-  myStreakCache = null;
+  const userId = getStoredAuthUser()?.userId;
+  if (!userId) return getMyStreakCached();
+  if (myStreakActivityRefreshUsed.has(userId)) return getMyStreakCached();
+  myStreakActivityRefreshUsed.add(userId);
+  if (myStreakCache?.userId === userId) myStreakCache = null;
   return getMyStreakCached();
 }
 
