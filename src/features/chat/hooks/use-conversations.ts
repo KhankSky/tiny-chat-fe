@@ -6,12 +6,22 @@ import type { ConversationResponse, ConversationUpdateResponse } from "@/feature
 import type { ConversationItem } from "@/features/chat/components/conversation-sidebar";
 import { formatConversationTime } from "@/i18n/format";
 import type { Dictionary, Locale } from "@/i18n/types";
-import { getAccessToken } from "@/shared/auth/session";
+import { getAccessToken, getStoredAuthUser } from "@/shared/auth/session";
 import { logClientError } from "@/shared/lib/logger";
 import { StompClient } from "@/shared/realtime/stomp";
 
-let cachedConversations: ConversationResponse[] | null = null;
-let conversationsRequest: Promise<ConversationResponse[]> | null = null;
+type ConversationCache = {
+  userId: number;
+  conversations: ConversationResponse[];
+};
+
+type ConversationRequest = {
+  userId: number;
+  promise: Promise<ConversationResponse[]>;
+};
+
+let cachedConversations: ConversationCache | null = null;
+let conversationsRequest: ConversationRequest | null = null;
 
 export function clearConversationCache() {
   cachedConversations = null;
@@ -64,9 +74,10 @@ export function useConversations({
   dictionary: Dictionary;
   locale: Locale;
 }) {
+  const currentUserId = getStoredAuthUser()?.userId ?? null;
   const [conversations, setConversations] = useState<ConversationItem[]>(() =>
-    cachedConversations
-      ? cachedConversations.map((conversation) =>
+    cachedConversations?.userId === currentUserId
+      ? cachedConversations.conversations.map((conversation) =>
           toConversationItem(conversation, locale, dictionary.chat.noMessages),
         )
       : [],
@@ -74,33 +85,49 @@ export function useConversations({
 
   useEffect(() => {
     let active = true;
+    const userId = getStoredAuthUser()?.userId ?? null;
     const accessToken = getAccessToken();
     const client = accessToken ? new StompClient(accessToken) : null;
     let unsubscribe: (() => void) | null = null;
+    let request: ConversationRequest | null = null;
 
     async function loadConversations() {
+      if (userId === null) {
+        setConversations([]);
+        return;
+      }
+
       try {
-        if (cachedConversations) {
+        if (cachedConversations?.userId === userId) {
           setConversations(
-            cachedConversations.map((conversation) =>
+            cachedConversations.conversations.map((conversation) =>
               toConversationItem(conversation, locale, dictionary.chat.noMessages),
             ),
           );
           return;
         }
 
-        conversationsRequest ??= getConversations();
-        const data = await conversationsRequest;
-        cachedConversations = data;
-        if (active) {
+        if (conversationsRequest?.userId !== userId) {
+          conversationsRequest = { userId, promise: getConversations() };
+        }
+        request = conversationsRequest;
+        const data = await request.promise;
+
+        if (active && getStoredAuthUser()?.userId === userId) {
+          cachedConversations = { userId, conversations: data };
           setConversations(
             data.map((conversation) =>
               toConversationItem(conversation, locale, dictionary.chat.noMessages),
             ),
           );
         }
+        if (conversationsRequest?.promise === request.promise) {
+          conversationsRequest = null;
+        }
       } catch {
-        conversationsRequest = null;
+        if (conversationsRequest?.promise === request?.promise) {
+          conversationsRequest = null;
+        }
         if (active) {
           setConversations([]);
         }
@@ -110,7 +137,7 @@ export function useConversations({
     void loadConversations();
 
     async function connectRealtime() {
-      if (!client) return;
+      if (!client || userId === null) return;
 
       try {
         await client.connect();
@@ -120,13 +147,17 @@ export function useConversations({
           try {
             const payload = JSON.parse(body) as ConversationUpdateResponse;
             if (payload.event !== "UPSERT") return;
-            cachedConversations = upsertConversation(
-              cachedConversations ?? [],
+            const currentCache = cachedConversations?.userId === userId
+              ? cachedConversations.conversations
+              : [];
+            const nextConversations = upsertConversation(
+              currentCache,
               payload.conversation,
             );
+            cachedConversations = { userId, conversations: nextConversations };
             if (active) {
               setConversations(
-                cachedConversations.map((conversation) =>
+                nextConversations.map((conversation) =>
                   toConversationItem(conversation, locale, dictionary.chat.noMessages),
                 ),
               );
@@ -149,7 +180,7 @@ export function useConversations({
       unsubscribe?.();
       client?.disconnect();
     };
-  }, [dictionary.chat.noMessages, locale]);
+  }, [currentUserId, dictionary.chat.noMessages, locale]);
 
   return conversations;
 }
