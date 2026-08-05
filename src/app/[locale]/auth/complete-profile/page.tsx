@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { CompleteProfileForm } from "@/features/auth/components/complete-profile-form";
+import { isLocale } from "@/i18n/config";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export default async function CompleteProfilePage({
@@ -8,10 +9,8 @@ export default async function CompleteProfilePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: rawLocale } = await params;
+  if (!isLocale(rawLocale)) notFound();
   const locale = getLocaleFromParams(rawLocale);
-  if (!["en", "vi"].includes(locale)) {
-    notFound();
-  }
 
   const dictionary = getDictionary(locale);
 

@@ -2,20 +2,20 @@
 
 import { useSyncExternalStore } from "react";
 import { dictionaries } from "./dictionaries";
+import {
+  DEFAULT_LOCALE,
+  isLocale,
+  LOCALE_COOKIE_MAX_AGE,
+  LOCALE_COOKIE_NAME,
+} from "./config";
 import type { Dictionary, Locale } from "./types";
 
 const OLD_LANGUAGE_STORAGE_KEY = "tiny-chat-language";
 const LANGUAGE_STORAGE_KEY = "conyva-language";
 export const LANGUAGE_CHANGED_EVENT = "conyva:language-changed";
 
-export const supportedLocales: Locale[] = ["en", "vi"];
-
-function isLocale(value: string | null): value is Locale {
-  return supportedLocales.includes(value as Locale);
-}
-
 export function getStoredLocale(): Locale {
-  if (typeof window === "undefined") return "vi";
+  if (typeof window === "undefined") return DEFAULT_LOCALE;
   let storedLocale = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
   if (!storedLocale) {
     const legacyLocale = window.localStorage.getItem(OLD_LANGUAGE_STORAGE_KEY);
@@ -27,11 +27,12 @@ export function getStoredLocale(): Locale {
       } catch {}
     }
   }
-  return isLocale(storedLocale) ? storedLocale : "vi";
+  return isLocale(storedLocale) ? storedLocale : DEFAULT_LOCALE;
 }
 
 export function persistLocale(locale: Locale) {
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, locale);
+  document.cookie = `${LOCALE_COOKIE_NAME}=${locale}; Path=/; Max-Age=${LOCALE_COOKIE_MAX_AGE}; SameSite=Lax`;
   window.dispatchEvent(new CustomEvent(LANGUAGE_CHANGED_EVENT, { detail: locale }));
 }
 
@@ -59,7 +60,7 @@ export function useLanguagePreference(): {
       };
     },
     getStoredLocale,
-    (): Locale => "vi",
+    (): Locale => DEFAULT_LOCALE,
   );
 
   function setLocale(nextLocale: Locale) {

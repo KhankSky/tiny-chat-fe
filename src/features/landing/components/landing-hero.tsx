@@ -10,9 +10,10 @@ import { getStoredAuthUser, subscribeAuthSession } from "@/shared/auth/session";
 
 export function LandingHero({
   dictionary,
+  locale,
 }: {
   dictionary: Dictionary;
-  locale?: Locale;
+  locale: Locale;
 }) {
   const currentUser = useSyncExternalStore(
     subscribeAuthSession,
@@ -43,12 +44,12 @@ export function LandingHero({
   }, [currentUser]);
 
   const primaryHref = !currentUser
-    ? "/auth/register"
+    ? `/${locale}/auth/register`
     : !currentUser.profileCompleted
-      ? "/auth/complete-profile"
+      ? `/${locale}/auth/complete-profile`
       : hasConversations
-        ? "/conversations"
-        : "/groups/match";
+        ? `/${locale}/conversations`
+        : `/${locale}/groups/match`;
   const primaryLabel = !currentUser
     ? dictionary.landing.primaryCta
     : !currentUser.profileCompleted
@@ -121,7 +122,7 @@ export function LandingHero({
               <Flame className="h-4 w-4 text-amber-300" aria-hidden="true" />
               <span>{dictionary.landing.previewStreak}</span>
             </div>
-            <Link href="/groups/match" className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-300">
+            <Link href={`/${locale}/groups/match`} className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-cyan-400 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-300">
               <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
               {dictionary.landing.previewJoinCta}
             </Link>

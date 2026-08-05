@@ -1,6 +1,6 @@
 import type { en } from "./dictionaries/en";
 
-export type Locale = "en" | "vi";
+export type { Locale } from "./config";
 
 type WidenDictionary<T> = T extends string
   ? string

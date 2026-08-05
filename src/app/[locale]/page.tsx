@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { SiteHeader } from "@/features/layout/components/site-header";
 import { LandingHero } from "@/features/landing/components/landing-hero";
 import { LandingFeatures } from "@/features/landing/components/landing-features";
+import { isLocale, supportedLocales } from "@/i18n/config";
 import { getDictionary, getLocaleFromParams } from "@/i18n/get-dictionary";
 
 export async function generateMetadata({
@@ -11,12 +12,42 @@ export async function generateMetadata({
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale: rawLocale } = await params;
+  if (!isLocale(rawLocale)) notFound();
   const locale = getLocaleFromParams(rawLocale);
   const dictionary = getDictionary(locale);
+  const localePath = `/${locale}`;
 
   return {
-    title: dictionary.appName,
+    title: {
+      absolute: locale === "vi"
+        ? "Conyva – Luyện nói tiếng Anh theo nhóm nhỏ"
+        : "Conyva – Practice English in Small Conversation Groups",
+    },
     description: dictionary.landing.description,
+    alternates: {
+      canonical: localePath,
+      languages: Object.fromEntries(
+        [
+          ...supportedLocales.map((supportedLocale) => [
+            supportedLocale,
+            `/${supportedLocale}`,
+          ]),
+          ["x-default", "/"],
+        ],
+      ),
+    },
+    openGraph: {
+      title: locale === "vi"
+        ? "Conyva – Luyện nói tiếng Anh theo nhóm nhỏ"
+        : "Conyva – Practice English in Small Conversation Groups",
+      description: dictionary.landing.description,
+      url: localePath,
+      locale: locale === "vi" ? "vi_VN" : "en_US",
+      alternateLocale: locale === "vi" ? "en_US" : "vi_VN",
+      siteName: "Conyva",
+      type: "website",
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -26,10 +57,8 @@ export default async function LocaleHomePage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale: rawLocale } = await params;
+  if (!isLocale(rawLocale)) notFound();
   const locale = getLocaleFromParams(rawLocale);
-  if (!["en", "vi"].includes(locale)) {
-    notFound();
-  }
 
   const dictionary = getDictionary(locale);
 

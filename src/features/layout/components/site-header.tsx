@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSyncExternalStore } from "react";
 import type { Dictionary, Locale } from "@/i18n/types";
 import { getStoredAuthUser, subscribeAuthSession } from "@/shared/auth/session";
+import { LocaleSwitcher } from "./locale-switcher";
 
 export function SiteHeader({
   dictionary,
@@ -18,6 +19,7 @@ export function SiteHeader({
     () => null,
   );
   const chatHref = locale ? `/${locale}/conversations` : "/conversations";
+  const localePrefix = locale ? `/${locale}` : "";
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
@@ -43,6 +45,7 @@ export function SiteHeader({
         </nav>
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          {locale ? <LocaleSwitcher currentLocale={locale} /> : null}
           {currentUser ? (
             <Link
               href={chatHref}
@@ -52,10 +55,10 @@ export function SiteHeader({
             </Link>
           ) : (
             <>
-              <Link href="/auth/login" className="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5 sm:inline-flex">
+              <Link href={`${localePrefix}/auth/login`} className="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5 sm:inline-flex">
                 {dictionary.header.login}
               </Link>
-              <Link href="/auth/register" className="inline-flex min-h-10 items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
+              <Link href={`${localePrefix}/auth/register`} className="inline-flex min-h-10 items-center rounded-full bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:bg-cyan-300">
                 {dictionary.header.register}
               </Link>
             </>
