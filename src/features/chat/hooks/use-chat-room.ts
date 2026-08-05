@@ -58,6 +58,10 @@ export function useChatRoom({
     currentUser?.userId ? { [currentUser.userId]: true } : {},
   );
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const chatCanvasRef = useRef<HTMLDivElement | null>(null);
+  const initialScrollDoneRef = useRef(false);
+  const isAutoScrollingRef = useRef(false);
+  const prevMessagesLengthRef = useRef(0);
   const stompClientRef = useRef<StompClient | null>(null);
   const unsubscribeRef = useRef<(() => void) | null>(null);
   const typingStopTimeoutRef = useRef<number | null>(null);
@@ -96,6 +100,9 @@ export function useChatRoom({
     hasOlderMessagesRef.current = true;
     loadingOlderRef.current = false;
     loadingOlderMessagesRef.current = false;
+    initialScrollDoneRef.current = false;
+    isAutoScrollingRef.current = false;
+    prevMessagesLengthRef.current = 0;
 
     async function loadHistoryAndConnect() {
       try {
@@ -265,30 +272,84 @@ export function useChatRoom({
     refreshStreaksAfterFirstActivity,
   ]);
 
+  const scrollToBottom = useCallback((behavior: ScrollBehavior = "instant") => {
+    const container = chatCanvasRef.current ?? bottomRef.current?.parentElement;
+    if (!container) return;
+
+    isAutoScrollingRef.current = true;
+    if (behavior === "instant" || behavior === "auto") {
+      container.scrollTop = container.scrollHeight;
+    } else {
+      container.scrollTo({ top: container.scrollHeight, behavior: "smooth" });
+    }
+
+    requestAnimationFrame(() => {
+      if (container && (behavior === "instant" || behavior === "auto")) {
+        container.scrollTop = container.scrollHeight;
+      }
+      window.setTimeout(() => {
+        isAutoScrollingRef.current = false;
+      }, 100);
+    });
+  }, []);
+
   useLayoutEffect(() => {
+    const container = chatCanvasRef.current ?? bottomRef.current?.parentElement;
+    if (!container) return;
+
     if (loadingOlderMessagesRef.current) {
       loadingOlderMessagesRef.current = false;
+      prevMessagesLengthRef.current = messages.length;
       return;
     }
-    const bottomElement = bottomRef.current;
-    if (!bottomElement) return;
 
-    const frameId = window.requestAnimationFrame(() => {
-      const scrollContainer = bottomElement.parentElement;
-      if (scrollContainer) {
-        scrollContainer.scrollTo({
-          top: scrollContainer.scrollHeight,
-          behavior: "smooth",
-        });
+    if (!initialScrollDoneRef.current) {
+      if (!loading && messages.length > 0) {
+        scrollToBottom("instant");
+        initialScrollDoneRef.current = true;
+      }
+      prevMessagesLengthRef.current = messages.length;
+      return;
+    }
+
+    const isNewMessageAdded = messages.length > prevMessagesLengthRef.current;
+    prevMessagesLengthRef.current = messages.length;
+
+    if (isNewMessageAdded || Object.keys(typingUsers).length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      const isMine = lastMessage?.senderId === currentUser?.userId;
+      const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+
+      if (isMine || distanceFromBottom < 150) {
+        scrollToBottom(isMine ? "instant" : "smooth");
+      }
+    }
+  }, [currentUser?.userId, loading, messages, scrollToBottom, typingUsers]);
+
+  useEffect(() => {
+    const container = chatCanvasRef.current ?? bottomRef.current?.parentElement;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      if (!initialScrollDoneRef.current || isAutoScrollingRef.current) {
+        container.scrollTop = container.scrollHeight;
       } else {
-        bottomElement.scrollIntoView({ behavior: "smooth", block: "end" });
+        const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+        if (distanceFromBottom < 40) {
+          container.scrollTop = container.scrollHeight;
+        }
       }
     });
 
+    observer.observe(container);
+    if (container.firstElementChild) {
+      observer.observe(container.firstElementChild as Element);
+    }
+
     return () => {
-      window.cancelAnimationFrame(frameId);
+      observer.disconnect();
     };
-  }, [messages, typingUsers]);
+  }, [groupId]);
 
   const loadOlderMessages = useCallback(async () => {
     if (loadingOlderRef.current || !hasOlderMessagesRef.current) return false;
@@ -315,6 +376,24 @@ export function useChatRoom({
       loadingOlderRef.current = false;
     }
   }, [groupId]);
+
+  const handleChatScroll = useCallback(async () => {
+    const container = chatCanvasRef.current ?? bottomRef.current?.parentElement;
+    if (!container) return;
+
+    if (isAutoScrollingRef.current || !initialScrollDoneRef.current) return;
+    if (container.scrollTop > 80) return;
+
+    const previousHeight = container.scrollHeight;
+    const loaded = await loadOlderMessages();
+    if (!loaded) return;
+
+    requestAnimationFrame(() => {
+      if (container) {
+        container.scrollTop += container.scrollHeight - previousHeight;
+      }
+    });
+  }, [loadOlderMessages]);
 
   const publishTyping = useCallback(
     (typing: boolean) => {
@@ -448,8 +527,10 @@ export function useChatRoom({
 
   return {
     bottomRef,
+    chatCanvasRef,
     content,
     error,
+    handleChatScroll,
     loading,
     loadOlderMessages,
     messages,

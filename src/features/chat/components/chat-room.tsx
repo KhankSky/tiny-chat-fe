@@ -46,10 +46,11 @@ export function ChatRoom({
   const emojis = ["😀", "😂", "😊", "😍", "👍", "👏", "🙏", "🔥", "🎉", "💪", "❤️", "🤔"];
   const {
     bottomRef,
+    chatCanvasRef,
     content,
     error,
+    handleChatScroll,
     loading,
-    loadOlderMessages,
     messages,
     presenceByUser,
     sendMessage,
@@ -58,17 +59,6 @@ export function ChatRoom({
     socketStatus,
     typingUsers,
   } = useChatRoom({ currentUser, dictionary, groupId });
-  const chatCanvasRef = useRef<HTMLDivElement | null>(null);
-  async function handleChatScroll() {
-    const canvas = chatCanvasRef.current;
-    if (!canvas || canvas.scrollTop > 80) return;
-    const previousHeight = canvas.scrollHeight;
-    const loaded = await loadOlderMessages();
-    if (!loaded) return;
-    requestAnimationFrame(() => {
-      canvas.scrollTop += canvas.scrollHeight - previousHeight;
-    });
-  }
   const messagesWithAvatars = useMemo(
     () =>
       messages.map((message) => ({
